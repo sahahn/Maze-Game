@@ -13,6 +13,7 @@
 #include <memory>
 #include <algorithm>
 #include "Maze.h"
+#include "Player.h"
 using namespace std;
 
 
@@ -20,12 +21,9 @@ using namespace std;
 //NOTE EVERYTHING IN THIS FILE IS STILL VERY MESSY! SORRY!
 //There are a few very half implimented/thought out ideas, like holding key values
 
-Maze test; //Im just calling the maze object test right now... which is admittedly dumb
-GLdouble width, height; //width and height of screen in pixels
+Maze map; //Im just calling the maze object
 int wd;
-Point loc; //location of the "player" within the array
-Point player; //Pixel location of the "player", top left of the square
-
+Player p;
 int scale; //Scale is how big each item in the array is displayed
 int scope; //Scope is how much of the array/map is rendered each time
 
@@ -51,18 +49,11 @@ bool wall; //flag value for collisions
 
 
 void init() {
-    width = 700;
-    height = 700;
-    test = Maze();
-
-    loc.x = 50;
-    loc.y = 50;
-
-    player.x = 340;
-    player.y = 340;
+    map = Maze();
+    p = Player();
 
     scope = 4;
-    scale = 100;
+    scale = GameInfo::scale;
 
     x_shift = 0;
     y_shift = 0;
@@ -76,17 +67,12 @@ void init() {
     true_x_shift = 0;
     true_y_shift = 0;
 
-    person_size = 20;
-
     hBoundary = ((scale-person_size) / 2);
     sBoundary = (scale/2);
 
 }
 
-Point calcMazeLocation(int x, int y) { //
 
-// ;
-}
 
 /*
  * My rough first attempt at calculating collisions, will probally want to re-work this.
@@ -103,18 +89,18 @@ void calcShift(int x, int y) {
     if (temp2 < (-hBoundary)) {
 
         if (temp1 > hBoundary) {
-            if (test.maze[loc.x + 1][loc.y - 1].get_wall()) {
+            if (map.maze[p.x + 1][p.y - 1].get_wall()) {
                 wall = true;
             }
         }
 
         else if (temp1 < (-hBoundary)) {
-            if (test.maze[loc.x + 1][loc.y + 1].get_wall()) {
+            if (map.maze[p.x + 1][p.y + 1].get_wall()) {
                 wall = true;
             }
         }
 
-        else if (test.maze[loc.x+1][loc.y].get_wall()) {
+        else if (map.maze[p.x+1][p.y].get_wall()) {
             wall = true;
         }
     }
@@ -122,12 +108,12 @@ void calcShift(int x, int y) {
     if (temp1 > (hBoundary)) {
 
         if (temp2 > hBoundary) {
-            if (test.maze[loc.x - 1][loc.y - 1].get_wall()) {
+            if (map.maze[p.x - 1][p.y - 1].get_wall()) {
                 wall = true;
             }
         }
 
-        else if (test.maze[loc.x][loc.y-1].get_wall()) {
+        else if (map.maze[p.x][p.y-1].get_wall()) {
             wall = true;
         }
     }
@@ -135,19 +121,19 @@ void calcShift(int x, int y) {
     if (temp1 < (-hBoundary)) {
 
         if (temp2 > hBoundary) {
-            if (test.maze[loc.x - 1][loc.y + 1].get_wall()) {
+            if (map.maze[p.x - 1][p.y + 1].get_wall()) {
                 wall = true;
             }
         }
 
-        else if (test.maze[loc.x][loc.y+1].get_wall()) {
+        else if (map.maze[p.x][p.y+1].get_wall()) {
             wall = true;
         }
     }
 
     if (temp2 > (hBoundary)) {
 
-        if (test.maze[loc.x-1][loc.y].get_wall()) {
+        if (map.maze[p.x-1][p.y].get_wall()) {
             wall = true;
         }
     }
@@ -169,13 +155,13 @@ void initGL() {
  whenever the window needs to be re-painted. */
 void display() {
     // tell OpenGL to use the whole window for drawing
-    glViewport(0, 0, width, height);
+    glViewport(0, 0, GameInfo::screen_width, GameInfo::screen_height);
 
     // do an orthographic parallel projection with the coordinate
     // system set to first quadrant, limited by screen/window size
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0.0, width, height, 0.0, -1.f, 1.f);
+    glOrtho(0.0, GameInfo::screen_width, GameInfo::screen_height, 0.0, -1.f, 1.f);
 
     glClear(GL_COLOR_BUFFER_BIT);   // Clear the color buffer with current clearing color
 
@@ -188,10 +174,10 @@ void display() {
 
     //This part is a little sketchy too, but basically the lower boundaries and upper boundaries
     //lb1 and up1 ect.. are used to keep what is displayed from trying to render parts that are not in the array
-    int lb1 = loc.x - scope;
-    int upb1 = loc.x + scope;
-    int lb2 = loc.y - scope;
-    int upb2 = loc.y + scope;
+    int lb1 = p.x - scope;
+    int upb1 = p.x + scope;
+    int lb2 = p.y - scope;
+    int upb2 = p.y + scope;
 
     if (lb1 < 0) {
         lb1 = 0;
@@ -200,12 +186,12 @@ void display() {
         lb2 = 0;
     }
 
-    if (upb1 > Maze::height) {
-        upb1 = Maze::height;
+    if (upb1 > GameInfo::height) {
+        upb1 = GameInfo::height;
     }
 
-    if (upb2 > Maze::width) {
-        upb2 = Maze::width;
+    if (upb2 > GameInfo::width) {
+        upb2 = GameInfo::width;
     }
 
     //x and y here are the relative locations to be rendered on the screen,
@@ -217,28 +203,12 @@ void display() {
         int y = -1;
 
         for (int j = lb2; j < upb2+1; j++, y++) {
-            test.maze[i][j].draw(x,y,x_shift,y_shift,angleR);
+            map.maze[i][j].draw(x,y,x_shift,y_shift,angleR);
 
         }
     }
 
-
-
-
-    //I just draw the player here as a small square... this should be moved
-    glColor3f(1, 1, 0);
-    glBegin(GL_QUADS);
-    // top left corner
-    glVertex2i(player.x, player.y);
-    // top right corner
-    glVertex2i((player.x+person_size),player.y);
-    // bottom right corner
-    glVertex2i((player.x+person_size),(player.y+person_size));
-    // bottom left corner
-    glVertex2i(player.x, (player.y+person_size));
-
-    glEnd();
-
+    p.draw();
 
     glFlush();  // Render now
 }
@@ -316,22 +286,22 @@ void kbdS(int key, int x, int y) {
     //keeping track of the players location in the maze array. The exact location/ what appears
     //on screen a mix of loc.x and loc.y, with the x and y shift handling all the small movement between array chunks.
     if (true_y_shift < (-sBoundary)) {
-        loc.x +=1;
+        p.x +=1;
         true_y_shift += scale;
     }
 
     if (true_x_shift > (sBoundary)) {
-        loc.y -= 1;
+        p.y -= 1;
         true_x_shift -= scale;
     }
 
     if (true_x_shift < (-sBoundary)) {
-        loc.y += 1;
+        p.y += 1;
         true_x_shift += scale;
     }
 
     if (true_y_shift > (sBoundary)) {
-        loc.x -= 1;
+        p.x -= 1;
         true_y_shift -=scale;
     }
 
@@ -382,9 +352,9 @@ int graphicsPlay(int argc, char** argv) {
 
     glutInitDisplayMode(GLUT_RGBA);
 
-    glutInitWindowSize((int)width, (int)height);
-    glutInitWindowPosition((glutGet(GLUT_SCREEN_WIDTH)-width)/2,
-                           (glutGet(GLUT_SCREEN_HEIGHT)-height)/2);
+    glutInitWindowSize(GameInfo::screen_width, GameInfo::screen_height);
+    glutInitWindowPosition((glutGet(GLUT_SCREEN_WIDTH)-GameInfo::screen_width)/2,
+                           (glutGet(GLUT_SCREEN_HEIGHT)-GameInfo::screen_height)/2);
     /* create the window and store the handle to it */
     wd = glutCreateWindow("Fun with...Fans!");
 

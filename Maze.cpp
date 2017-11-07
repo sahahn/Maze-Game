@@ -4,9 +4,7 @@
 
 #include "Maze.h"
 
-//Unsure how we should treat the width and height
-//static const int Maze::height = 100;
-//static const int Maze::width = 100;
+
 
 Maze::Maze() {
 
@@ -50,7 +48,7 @@ void Maze::check_and_add(int x, int y) {
 void Maze::add_wall(int x, int y) {
 
 
-    if ((x+1) < (height-1)) {
+    if ((x+1) < (GameInfo::height-1)) {
         check_and_add((x+1),y);
     }
 
@@ -58,7 +56,7 @@ void Maze::add_wall(int x, int y) {
         check_and_add((x-1),y);
     }
 
-    if ((y+1) < (width-1)) {
+    if ((y+1) < (GameInfo::width-1)) {
         check_and_add(x,(y+1));
     }
 
@@ -72,7 +70,7 @@ void Maze::remove_operation(int r) {
     int x = wall_list[r].get_x();
     int y = wall_list[r].get_y();
 
-    if ((x+1) < (height-1)) {
+    if ((x+1) < (GameInfo::height-1)) {
         if (maze[x+1][y].get_wall() == false) {
             count += 1;
         }
@@ -84,7 +82,7 @@ void Maze::remove_operation(int r) {
         }
     }
 
-    if ((y+1) < (width-1)) {
+    if ((y+1) < (GameInfo::width-1)) {
         if (maze[x][y+1].get_wall() == false) {
             count += 1;
         }

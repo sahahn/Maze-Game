@@ -3,6 +3,7 @@
 //
 
 #include "Tile.h"
+#include "GameInfo.h"
 #include <iostream>
 #include <math.h>
 
@@ -12,14 +13,14 @@
  */
 Point cp(int x, int y, double Angle) {
 
-    x-= 350; //This is the center of the screen, still need to change where this is stored
-    y-= 350;
+    x-= (GameInfo::screen_width / 2);
+    y-= (GameInfo::screen_height / 2);
 
     double xP = ((x * cos(Angle)) - (y * sin(Angle)));
     double yP = ((y * cos(Angle)) + (x * sin(Angle)));
 
-    xP += 350;
-    yP += 350;
+    xP += (GameInfo::screen_width / 2);
+    yP += (GameInfo::screen_height / 2);
 
     Point newPoint;
     newPoint.x = ((int) xP);
@@ -44,8 +45,7 @@ void Tile::set_wall(bool b) {
 //Take in coordinates in the way the array is stored, convert it to pixel coordinates
 void Tile::draw(int x, int y, int x_shift, int y_shift, double angle) const {
 
-    int scale = 100; // The size of each array piece, e.g. 100x100 if scale = 100, change where this is stored
-
+    int const scale = GameInfo::scale; // The size of each array piece, e.g. 100x100 if scale = 100
 
     if (wall) {
         glColor3f(0, 0, 0);

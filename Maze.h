@@ -7,18 +7,16 @@
 #include "Tile.h"
 #include <vector>
 #include <iostream>
-#include "Tile.h"
 #include <vector>
 #include <random>
 #include <memory>
 #include <algorithm>
+#include "GameInfo.h"
 using namespace std;
 
 class Maze {
 
 public:
-    static const int height = 100; //Unsure how we should treat the width and height
-    static const int width = 100;
 
     /*
      * Constructors
@@ -31,7 +29,7 @@ public:
      */
     Maze(int x, int y);
 
-    Tile maze[height][width]; //Make the final maze w/ info public to easily get contents
+    Tile maze[GameInfo::height][GameInfo::width]; //Make the final maze w/ info public to easily get contents
 
 
 private:
@@ -40,7 +38,6 @@ private:
     void check_and_add(int x, int y);
     void remove_operation(int r);
     void add_wall(int x, int y);
-
 };
 
 
