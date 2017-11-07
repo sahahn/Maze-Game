@@ -11,7 +11,7 @@ Player::Player() {
     location.x = (GameInfo::screen_width / 2) - (size/2);
     location.y = (GameInfo::screen_height / 2) - (size/2);
 
-    x = 50;
+    x = 50;  //Starting location in the maze array
     y = 50;
 
 }
