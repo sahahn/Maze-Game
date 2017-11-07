@@ -5,6 +5,7 @@
 #ifndef GRAPHICS_TILE_H
 #define GRAPHICS_TILE_H
 #include "graphics.h"
+#include <math.h>
 
 class Tile {
 public:

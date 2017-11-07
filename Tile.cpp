@@ -23,8 +23,8 @@ Point cp(int x, int y, double Angle) {
     yP += (GameInfo::screen_height / 2);
 
     Point newPoint;
-    newPoint.x = ((int) xP);
-    newPoint.y = ((int) yP);
+    newPoint.x = rint (xP);
+    newPoint.y = rint (yP);
 
     return newPoint;
 }
@@ -51,11 +51,9 @@ void Tile::draw(int x, int y, int x_shift, int y_shift, double angle) const {
         glColor3f(0, 0, 0);
     }
 
-
     else {
         glColor3f(1, 0, 1);
     }
-
 
     x = (x * scale) + y_shift;
     y = (y * scale) + x_shift;

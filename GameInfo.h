@@ -13,6 +13,9 @@ public:
     static const int scale = 100;
     static const int screen_height = 700;
     static const int screen_width = 700;
+    static const int scope = 4;
+    static const int start_x = 4;
+    static const int start_y = 4;
 
 
 };

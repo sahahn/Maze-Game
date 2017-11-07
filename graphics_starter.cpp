@@ -4,6 +4,7 @@
 
 #include "graphics.h"
 #include <iostream>
+#include <math.h>
 
 #include <iostream>
 #include "graphics.h"
@@ -17,15 +18,11 @@
 using namespace std;
 
 
-
-//NOTE EVERYTHING IN THIS FILE IS STILL VERY MESSY! SORRY!
-//There are a few very half implimented/thought out ideas, like holding key values
-
-Maze map; //Im just calling the maze object
+Maze map; //Calling the maze object
 int wd;
 Player p;
 int scale; //Scale is how big each item in the array is displayed
-int scope; //Scope is how much of the array/map is rendered each time
+int scope;
 
 //I use the x_shift and true x_shifts in calculating movement
 int x_shift, y_shift;
@@ -36,8 +33,7 @@ bool keys[128]; //not used yet
 int angle; //angle of screen tilt in degrees
 double angleR; //angle in radians
 
-double temp1; //Used in calculating collisions
-double temp2;
+int temp1, temp2;
 
 int person_size; //Size of the "player"
 
@@ -47,13 +43,14 @@ int hBoundary;
 
 bool wall; //flag value for collisions
 
+bool r_state;
 
 void init() {
     map = Maze();
     p = Player();
 
-    scope = 4;
     scale = GameInfo::scale;
+    scope = GameInfo::scope;
 
     x_shift = 0;
     y_shift = 0;
@@ -64,12 +61,10 @@ void init() {
 
     angle = 0;
 
-    true_x_shift = 0;
-    true_y_shift = 0;
-
-    hBoundary = ((scale-person_size) / 2);
+    hBoundary = ((scale-p.getSize()) / 2);
     sBoundary = (scale/2);
 
+    r_state = false;
 }
 
 
@@ -82,65 +77,82 @@ void calcShift(int x, int y) {
 
     wall = false;
 
-    temp1 = true_x_shift + ((x * cos(-angleR)) - (y * sin(-angleR)));
-    temp2 = true_y_shift + ((y * cos(-angleR)) + (x * sin(-angleR)));
+    temp1 = rint(x_shift + ((x * cos(-angleR)) - (y * sin(-angleR))));
+    temp2 = rint(y_shift + ((y * cos(-angleR)) + (x * sin(-angleR))));
 
 
     if (temp2 < (-hBoundary)) {
 
         if (temp1 > hBoundary) {
             if (map.maze[p.x + 1][p.y - 1].get_wall()) {
+
+                x_shift = hBoundary;
+                y_shift = -hBoundary;
                 wall = true;
             }
         }
 
         else if (temp1 < (-hBoundary)) {
             if (map.maze[p.x + 1][p.y + 1].get_wall()) {
+
+                x_shift = -hBoundary;
+                y_shift = -hBoundary;
                 wall = true;
             }
         }
 
         else if (map.maze[p.x+1][p.y].get_wall()) {
+
+            y_shift = -hBoundary;
             wall = true;
         }
     }
 
-    if (temp1 > (hBoundary)) {
+    else if (temp1 > (hBoundary)) {
 
         if (temp2 > hBoundary) {
             if (map.maze[p.x - 1][p.y - 1].get_wall()) {
+
+                x_shift = hBoundary;
+                y_shift = hBoundary;
                 wall = true;
             }
         }
 
         else if (map.maze[p.x][p.y-1].get_wall()) {
+
+            x_shift = hBoundary;
             wall = true;
         }
     }
 
-    if (temp1 < (-hBoundary)) {
+    else if (temp1 < (-hBoundary)) {
 
         if (temp2 > hBoundary) {
             if (map.maze[p.x - 1][p.y + 1].get_wall()) {
+                x_shift = -hBoundary;
+                y_shift = hBoundary;
                 wall = true;
             }
         }
 
         else if (map.maze[p.x][p.y+1].get_wall()) {
+            x_shift = -hBoundary;
             wall = true;
         }
     }
 
-    if (temp2 > (hBoundary)) {
+    else if (temp2 > (hBoundary)) {
 
         if (map.maze[p.x-1][p.y].get_wall()) {
+            y_shift = hBoundary;
             wall = true;
         }
     }
 
     if (wall == false) {
-        true_x_shift = temp1;
-        true_y_shift = temp2;
+        x_shift = temp1;
+        y_shift = temp2;
     }
 }
 
@@ -166,11 +178,6 @@ void display() {
     glClear(GL_COLOR_BUFFER_BIT);   // Clear the color buffer with current clearing color
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-
-    //Okay so the way I'm doing this right now, is calculating the shifts from their "true" double values
-    x_shift = ((int) true_x_shift+.5);
-    y_shift = ((int) true_y_shift+.5);
 
     //This part is a little sketchy too, but basically the lower boundaries and upper boundaries
     //lb1 and up1 ect.. are used to keep what is displayed from trying to render parts that are not in the array
@@ -208,7 +215,7 @@ void display() {
         }
     }
 
-    p.draw();
+    p.draw(); //Draw the player
 
     glFlush();  // Render now
 }
@@ -225,8 +232,9 @@ void kbd(unsigned char key, int x, int y)
 
     //key 32 is space, I just have that rotate the map here
     if (key == 32) {
-        angle = (angle + 3) % 360;
-        angleR = angle * (M_PI /180);
+        //angle = (angle + 90) % 360;
+        //angleR = angle * (M_PI /180);
+        r_state = true; //Animated transition
     }
 
     glutPostRedisplay();
@@ -234,13 +242,6 @@ void kbd(unsigned char key, int x, int y)
     return;
 }
 
-void betterKeys() {
-
-    switch (keys[GLUT_KEY_DOWN] == true) {
-        //
-    }
-
-}
 
 void kbdS(int key, int x, int y) {
 
@@ -251,58 +252,25 @@ void kbdS(int key, int x, int y) {
     switch(key) {
 
         case GLUT_KEY_DOWN:
-            //loc.x += 1;
-            //y_shift -= 10;
 
-            calcShift(0,-20);
+            keys[GLUT_KEY_DOWN] = true;
 
             break;
         case GLUT_KEY_LEFT:
-            //loc.y -= 1;
-           // x_shift += 10;
 
-            calcShift(20,0);
+            keys[GLUT_KEY_LEFT] = true;
 
             break;
         case GLUT_KEY_RIGHT:
-            //loc.y += 1;
-            //x_shift -= 10;
 
-            calcShift(-20,0);
+            keys[GLUT_KEY_RIGHT] = true;
             break;
 
         case GLUT_KEY_UP:
-            //loc.x -= 1;
-            //y_shift += 10;
 
-            calcShift(0,20);
+            keys[GLUT_KEY_UP] = true;
 
             break;
-    }
-
-
-    //So what I'm doing here, is with the true_x and true_y shifts.
-    //I determine the place where loc.x and y ends up, so basically
-    //keeping track of the players location in the maze array. The exact location/ what appears
-    //on screen a mix of loc.x and loc.y, with the x and y shift handling all the small movement between array chunks.
-    if (true_y_shift < (-sBoundary)) {
-        p.x +=1;
-        true_y_shift += scale;
-    }
-
-    if (true_x_shift > (sBoundary)) {
-        p.y -= 1;
-        true_x_shift -= scale;
-    }
-
-    if (true_x_shift < (-sBoundary)) {
-        p.y += 1;
-        true_x_shift += scale;
-    }
-
-    if (true_y_shift > (sBoundary)) {
-        p.x -= 1;
-        true_y_shift -=scale;
     }
 
     //std::cout << true_x_shift << " " << true_y_shift << std::endl;
@@ -310,6 +278,35 @@ void kbdS(int key, int x, int y) {
     glutPostRedisplay();
 
     return;
+}
+
+
+void keyUp (int key, int x, int y) {
+
+
+    switch(key) {
+
+        case GLUT_KEY_DOWN:
+            keys[GLUT_KEY_DOWN] = false;
+
+            break;
+        case GLUT_KEY_LEFT:
+
+            keys[GLUT_KEY_LEFT] = false;
+
+            break;
+        case GLUT_KEY_RIGHT:
+            keys[GLUT_KEY_RIGHT] = false;
+
+            break;
+
+        case GLUT_KEY_UP:
+
+            keys[GLUT_KEY_UP] = false;
+            break;
+    }
+
+
 }
 
 //void cursor(int x, int y) {
@@ -333,9 +330,62 @@ void mouse(int button, int state, int x, int y) {
 
 
 void timer(int extra) {
-    //This is where I have the map slowly rotate for fun
-    angle = (angle + 1) % 360;
-    angleR = angle * (M_PI /180);
+    //slowly rotate for fun
+    //angle = (angle + 1) % 360;
+    //angleR = angle * (M_PI /180);
+
+    if (r_state == false) {
+
+        if (keys[GLUT_KEY_DOWN]) {
+            calcShift(0, -p.speed);
+        }
+
+        if (keys[GLUT_KEY_LEFT]) {
+            calcShift(p.speed, 0);
+        }
+
+        if (keys[GLUT_KEY_UP]) {
+            calcShift(0, p.speed);
+        }
+
+        if (keys[GLUT_KEY_RIGHT]) {
+            calcShift(-p.speed, 0);
+        }
+
+        //So what I'm doing here, is with the true_x and true_y shifts.
+        //I determine the place where loc.x and y ends up, so basically
+        //keeping track of the players location in the maze array. The exact location/ what appears
+        //on screen a mix of loc.x and loc.y, with the x and y shift handling all the small movement between array chunks.
+        if (y_shift < (-sBoundary)) {
+            p.x += 1;
+            y_shift += scale;
+        }
+
+        if (x_shift > (sBoundary)) {
+            p.y -= 1;
+            x_shift -= scale;
+        }
+
+        if (x_shift < (-sBoundary)) {
+            p.y += 1;
+            x_shift += scale;
+        }
+
+        if (y_shift > (sBoundary)) {
+            p.x -= 1;
+            y_shift -= scale;
+        }
+    }
+
+    else {
+
+        angle = (angle + 3) % 360;
+        angleR = angle * (M_PI /180);
+
+        if (angle % 90 == 0) {
+            r_state = 0;
+        }
+    }
 
     glutPostRedisplay();
     glutTimerFunc(50, timer, 0);
@@ -370,6 +420,12 @@ int graphicsPlay(int argc, char** argv) {
 
     // register special event: function keys, arrows, etc.
     glutSpecialFunc(kbdS);
+
+    glutSpecialUpFunc(keyUp); // Tell GLUT to use the method "keyUp" for key up events
+
+    glutSetKeyRepeat(0); //This func makes it so key repeats are off
+
+
 
     // handles mouse movement
     //    glutPassiveMotionFunc(cursor);

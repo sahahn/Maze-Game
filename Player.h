@@ -16,13 +16,16 @@ public:
     //Location in the array
     int x;
     int y;
+
+    int speed;
+
     void draw() const;
+
+    int getSize() const;
 
 private:
     Point location; //Location on screen
     int size;
-
-
 
 };
 

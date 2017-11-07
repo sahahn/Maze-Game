@@ -33,6 +33,7 @@ public:
 
 
 private:
+    int scope;
     vector<point> wall_list;
 
     void check_and_add(int x, int y);

@@ -8,11 +8,14 @@
 
 Player::Player() {
     size = 20;
+    speed = 20;
     location.x = (GameInfo::screen_width / 2) - (size/2);
     location.y = (GameInfo::screen_height / 2) - (size/2);
 
-    x = 50;  //Starting location in the maze array
-    y = 50;
+    x = GameInfo::start_x;  //Starting location in the maze array
+    y = GameInfo::start_x;
+
+
 
 }
 
@@ -31,6 +34,11 @@ void Player::draw() const {
     glVertex2i(location.x, (location.y+size));
 
     glEnd();
+}
+
+
+int Player::getSize() const {
+    return size;
 }
 
 
