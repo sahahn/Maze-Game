@@ -11,9 +11,9 @@ class Tile {
 public:
     Tile();
 
-    bool get_wall() const;
+    bool getWall() const;
 
-    void set_wall(bool b);
+    void setWall(bool b);
 
     void draw(int x, int y, int x_shift, int y_shift, double angle) const;
 
@@ -32,10 +32,10 @@ public:
 
     point(int X, int Y);
 
-    int get_x() const;
-    int get_y() const;
-    void set_x(int X);
-    void set_y(int Y);
+    int getX() const;
+    int getY() const;
+    void setX(int X);
+    void setY(int Y);
 
     bool operator ==(const point &b) const;
 

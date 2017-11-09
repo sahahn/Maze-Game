@@ -5,13 +5,13 @@
 #ifndef GRAPHICS_MAZE_H
 #define GRAPHICS_MAZE_H
 #include "Tile.h"
+#include "GameInfo.h"
 #include <vector>
 #include <iostream>
 #include <vector>
 #include <random>
 #include <memory>
 #include <algorithm>
-#include "GameInfo.h"
 using namespace std;
 
 class Maze {
@@ -29,16 +29,16 @@ public:
      */
     Maze(int x, int y);
 
-    Tile maze[GameInfo::height][GameInfo::width]; //Make the final maze w/ info public to easily get contents
+    Tile maze[HEIGHT][WIDTH]; //Make the final maze w/ info public to easily get contents
 
 
 private:
     int scope;
-    vector<point> wall_list;
+    vector<point> wallList;
 
-    void check_and_add(int x, int y);
-    void remove_operation(int r);
-    void add_wall(int x, int y);
+    void checkAndAdd(int x, int y);
+    void removeOperation(int r);
+    void addWall(int x, int y);
 };
 
 

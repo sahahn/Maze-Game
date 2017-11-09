@@ -1,5 +1,6 @@
 #ifndef graphics_h
 #define graphics_h
+
 #include "Tile.h"
 #include <stdlib.h>
 #ifdef _WIN32

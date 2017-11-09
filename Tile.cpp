@@ -2,8 +2,9 @@
 // Created by sage on 10/31/17.
 //
 
-#include "Tile.h"
 #include "GameInfo.h"
+#include "Tile.h"
+
 #include <iostream>
 #include <math.h>
 
@@ -13,14 +14,14 @@
  */
 Point cp(int x, int y, double Angle) {
 
-    x-= (GameInfo::screen_width / 2);
-    y-= (GameInfo::screen_height / 2);
+    x-= (SCREEN_WIDTH / 2);
+    y-= (SCREEN_HEIGHT / 2);
 
     double xP = ((x * cos(Angle)) - (y * sin(Angle)));
     double yP = ((y * cos(Angle)) + (x * sin(Angle)));
 
-    xP += (GameInfo::screen_width / 2);
-    yP += (GameInfo::screen_height / 2);
+    xP += (SCREEN_WIDTH / 2);
+    yP += (SCREEN_HEIGHT / 2);
 
     Point newPoint;
     newPoint.x = rint (xP);
@@ -34,18 +35,16 @@ Tile::Tile() {
     wall = true;
 }
 
-bool Tile::get_wall() const {
+bool Tile::getWall() const {
     return wall;
 }
 
-void Tile::set_wall(bool b) {
+void Tile::setWall(bool b) {
     wall = b;
 }
 
 //Take in coordinates in the way the array is stored, convert it to pixel coordinates
 void Tile::draw(int x, int y, int x_shift, int y_shift, double angle) const {
-
-    int const scale = GameInfo::scale; // The size of each array piece, e.g. 100x100 if scale = 100
 
     if (wall) {
         glColor3f(0, 0, 0);
@@ -55,22 +54,22 @@ void Tile::draw(int x, int y, int x_shift, int y_shift, double angle) const {
         glColor3f(1, 0, 1);
     }
 
-    x = (x * scale) + y_shift;
-    y = (y * scale) + x_shift;
+    x = (x * SCALE) + y_shift;
+    y = (y * SCALE) + x_shift;
 
 
-    //Convery to pixel coordinates
+    //Convert to pixel coordinates
     glBegin(GL_QUADS);
 
     if (angle == 0) {
         // top left corner
         glVertex2i(y, x);
         // top right corner
-        glVertex2i((y + scale), x);
+        glVertex2i((y + SCALE), x);
         // bottom right corner
-        glVertex2i((y + scale), (x + scale));
+        glVertex2i((y + SCALE), (x + SCALE));
         // bottom left corner
-        glVertex2i(y, (x + scale));
+        glVertex2i(y, (x + SCALE));
         glEnd();
     }
         //If using the rotate func,
@@ -78,9 +77,9 @@ void Tile::draw(int x, int y, int x_shift, int y_shift, double angle) const {
 
         Point p1,p2,p3,p4;
         p1 = cp(y,x,angle);
-        p2 = cp((y+scale),x,angle);
-        p3 = cp((y+scale),(x+scale),angle);
-        p4 = cp(y,(x+scale),angle);
+        p2 = cp((y+SCALE),x,angle);
+        p3 = cp((y+SCALE),(x+SCALE),angle);
+        p4 = cp(y,(x+SCALE),angle);
 
         glVertex2i(p1.x,p1.y);
         glVertex2i(p2.x,p2.y);
@@ -99,21 +98,21 @@ point::point(int X, int Y) {
     y = Y;
 }
 
-int point::get_x() const {
+int point::getX() const {
     return x;
 }
-int point::get_y() const {
+int point::getY() const {
     return y;
 }
-void point::set_x(int X) {
+void point::setX(int X) {
     x = X;
 }
-void point::set_y(int Y) {
+void point::setY(int Y) {
     y = Y;
 }
 
 bool point::operator ==(const point &b) const {
-    if ((x == b.get_x()) && (y == b.get_y())) {
+    if ((x == b.getX()) && (y == b.getY())) {
         return true;
     }
     else {
