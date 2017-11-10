@@ -10,19 +10,18 @@
 
 class Character {
 
-        //sBoundary = (scale/2);
 
 public:
 
     //Location in the array
     int x;
     int y;
-    int x_shift;
-    int y_shift;
+    int xShift;
+    int yShift;
 
-    int get_size() const;
+    int getSize() const;
 
-    int get_speed() const;
+    int getSpeed() const;
 
     void update();
 
@@ -33,7 +32,7 @@ protected:
     Point location; //Location on screen
     int size;
     int speed;
-    static const int sBoundary = (GameInfo::scale / 2);
+    static const int sBoundary = (SCALE / 2);
 };
 
 

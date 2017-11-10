@@ -11,33 +11,33 @@
  */
 
 
-int Character::get_size() const {
+int Character::getSize() const {
     return size;
 }
 
-int Character::get_speed() const {
+int Character::getSpeed() const {
     return speed;
 }
 
 void Character::update() {
-    if (y_shift < (-sBoundary)) {
+    if (yShift < (-sBoundary)) {
         x += 1;
-        y_shift += GameInfo::scale;
+        yShift += SCALE;
     }
 
-    if (x_shift > (sBoundary)) {
+    if (xShift > (sBoundary)) {
         y -= 1;
-        x_shift -= GameInfo::scale;
+        xShift -= SCALE;
     }
 
-    if (x_shift < (-sBoundary)) {
+    if (xShift < (-sBoundary)) {
         y += 1;
-        x_shift += GameInfo::scale;
+        xShift += SCALE;
     }
 
-    if (y_shift > (sBoundary)) {
+    if (yShift > (sBoundary)) {
         x -= 1;
-        y_shift -= GameInfo::scale;
+        yShift -= SCALE;
     }
 }
 
@@ -47,14 +47,14 @@ void Character::update() {
 Player::Player() {
     size = 20;
     speed = 20;
-    location.x = (GameInfo::screen_width / 2) - (size/2);
-    location.y = (GameInfo::screen_height / 2) - (size/2);
+    location.x = (SCREEN_WIDTH / 2) - (size/2);
+    location.y = (SCREEN_HEIGHT / 2) - (size/2);
 
-    x = GameInfo::start_x;  //Starting location in the maze array
-    y = GameInfo::start_y;
+    x = START_X;  //Starting location in the maze array
+    y = START_Y;
 
-    x_shift = 0;
-    y_shift = 0;
+    xShift = 0;
+    yShift = 0;
 
 
 }
@@ -62,14 +62,14 @@ Player::Player() {
 Player::Player(int X, int Y) {
     size = 20;
     speed = 20;
-    location.x = (GameInfo::screen_width / 2) - (size/2);
-    location.y = (GameInfo::screen_height / 2) - (size/2);
+    location.x = (SCREEN_WIDTH / 2) - (size/2);
+    location.y = (SCREEN_HEIGHT / 2) - (size/2);
 
     x = X;  //Starting location in the maze array
     y = Y;
 
-    x_shift = 0;
-    y_shift = 0;
+    xShift = 0;
+    yShift = 0;
 }
 
 
@@ -103,8 +103,8 @@ Enemy::Enemy() {
     x = 60;
     y = 60;
 
-    x_shift = 0;
-    y_shift = 0;
+    xShift = 0;
+    yShift = 0;
 
 }
 
@@ -119,15 +119,15 @@ Enemy::Enemy(int X, int Y) {
     x = X;
     y = Y;
 
-    x_shift = 0;
-    y_shift = 0;
+    xShift = 0;
+    yShift = 0;
 }
 
 
 void Enemy::draw(int X, int Y) const {
 
-    X = (X * GameInfo::scale) - y_shift;
-    Y = (Y * GameInfo::scale) - x_shift;
+    X = (X * SCALE) - yShift;
+    Y = (Y * SCALE) - xShift;
 
     X -= (size/2);
     Y -= (size/2);

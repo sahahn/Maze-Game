@@ -11,24 +11,24 @@ class Tile {
 public:
     Tile();
 
-    bool get_wall() const;
+    bool getWall() const;
 
-    void set_wall(bool b);
+    void setWall(bool b);
 
-    bool get_was_here() const;
+    bool getWasHere() const;
 
-    void set_was_here(bool b);
+    void setWasHere(bool b);
 
-    bool get_correct_path() const;
+    bool getCorrectPath() const;
 
-    void set_correct_path(bool b);
+    void setCorrectPath(bool b);
 
-    void draw(int x, int y, int x_shift, int y_shift, double angle) const;
+    void draw(int x, int y, int xShift, int yShift, double angle) const;
 
 private:
     bool wall;
-    bool was_here;
-    bool correct_path;
+    bool wasHere;
+    bool correctPath;
 
 };
 
@@ -42,10 +42,10 @@ public:
 
     point(int X, int Y);
 
-    int get_x() const;
-    int get_y() const;
-    void set_x(int X);
-    void set_y(int Y);
+    int getX() const;
+    int getY() const;
+    void setX(int X);
+    void setY(int Y);
 
     bool operator ==(const point &b) const;
 

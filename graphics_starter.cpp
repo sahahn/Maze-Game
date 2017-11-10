@@ -16,9 +16,6 @@ Maze map; //Calling the maze object
 int wd;
 Player p;
 Enemy e;
-int scale; //Scale is how big each item in the array is displayed
-int scope;
-
 
 bool keys[128]; //Holds value of key presses and releases
 
@@ -33,7 +30,7 @@ int hBoundary;
 
 bool wall; //flag value for collisions
 
-bool r_state;
+bool rState;
 
 int endx, endy;
 
@@ -41,21 +38,17 @@ void init() {
     map = Maze();
     p = Player();
 
-    scale = GameInfo::scale;
-    scope = GameInfo::scope;
-
     for (int i =0; i < 128; i++) {
         keys[i] = false;
     }
 
     angle = 0;
 
-    hBoundary = ((scale-p.get_size()) / 2);
+    hBoundary = ((SCALE-p.getSize()) / 2);
 
-    r_state = false;
-
-    cout << map.maze[10][10].get_wall() << endl;
-
+    rState = false;
+    
+    //TEMP
     e = Enemy(10, 10);
 
     map.solve_maze(e.x, e.y, p.x, p.y);
@@ -74,32 +67,32 @@ void calcShift(int x, int y) {
 
     wall = false;
 
-    temp1 = rint(p.x_shift + ((x * cos(-angleR)) - (y * sin(-angleR))));
-    temp2 = rint(p.y_shift + ((y * cos(-angleR)) + (x * sin(-angleR))));
+    temp1 = rint(p.xShift + ((x * cos(-angleR)) - (y * sin(-angleR))));
+    temp2 = rint(p.yShift + ((y * cos(-angleR)) + (x * sin(-angleR))));
 
     if (temp2 < (-hBoundary)) {
 
         if (temp1 > hBoundary) {
-            if (map.maze[p.x + 1][p.y - 1].get_wall()) {
+            if (map.maze[p.x + 1][p.y - 1].getWall()) {
 
-                p.x_shift = hBoundary;
-                p.y_shift = -hBoundary;
+                p.xShift = hBoundary;
+                p.yShift = -hBoundary;
                 wall = true;
             }
         }
 
         else if (temp1 < (-hBoundary)) {
-            if (map.maze[p.x + 1][p.y + 1].get_wall()) {
+            if (map.maze[p.x + 1][p.y + 1].getWall()) {
 
-                p.x_shift = -hBoundary;
-                p.y_shift = -hBoundary;
+                p.xShift = -hBoundary;
+                p.yShift = -hBoundary;
                 wall = true;
             }
         }
 
-        else if (map.maze[p.x+1][p.y].get_wall()) {
+        else if (map.maze[p.x+1][p.y].getWall()) {
 
-            p.y_shift = -hBoundary;
+            p.yShift = -hBoundary;
             wall = true;
         }
     }
@@ -107,17 +100,17 @@ void calcShift(int x, int y) {
     else if (temp1 > (hBoundary)) {
 
         if (temp2 > hBoundary) {
-            if (map.maze[p.x - 1][p.y - 1].get_wall()) {
+            if (map.maze[p.x - 1][p.y - 1].getWall()) {
 
-                p.x_shift = hBoundary;
-                p.y_shift = hBoundary;
+                p.xShift = hBoundary;
+                p.yShift = hBoundary;
                 wall = true;
             }
         }
 
-        else if (map.maze[p.x][p.y-1].get_wall()) {
+        else if (map.maze[p.x][p.y-1].getWall()) {
 
-            p.x_shift = hBoundary;
+            p.xShift = hBoundary;
             wall = true;
         }
     }
@@ -125,30 +118,30 @@ void calcShift(int x, int y) {
     else if (temp1 < (-hBoundary)) {
 
         if (temp2 > hBoundary) {
-            if (map.maze[p.x - 1][p.y + 1].get_wall()) {
-                p.x_shift = -hBoundary;
-                p.y_shift = hBoundary;
+            if (map.maze[p.x - 1][p.y + 1].getWall()) {
+                p.xShift = -hBoundary;
+                p.yShift = hBoundary;
                 wall = true;
             }
         }
 
-        else if (map.maze[p.x][p.y+1].get_wall()) {
-            p.x_shift = -hBoundary;
+        else if (map.maze[p.x][p.y+1].getWall()) {
+            p.xShift = -hBoundary;
             wall = true;
         }
     }
 
     else if (temp2 > (hBoundary)) {
 
-        if (map.maze[p.x-1][p.y].get_wall()) {
-            p.y_shift = hBoundary;
+        if (map.maze[p.x-1][p.y].getWall()) {
+            p.yShift = hBoundary;
             wall = true;
         }
     }
 
     if (wall == false) {
-        p.x_shift = temp1;
-        p.y_shift = temp2;
+        p.xShift = temp1;
+        p.yShift = temp2;
     }
 }
 
@@ -163,13 +156,13 @@ void initGL() {
  whenever the window needs to be re-painted. */
 void display() {
     // tell OpenGL to use the whole window for drawing
-    glViewport(0, 0, GameInfo::screen_width, GameInfo::screen_height);
+    glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     // do an orthographic parallel projection with the coordinate
     // system set to first quadrant, limited by screen/window size
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0.0, GameInfo::screen_width, GameInfo::screen_height, 0.0, -1.f, 1.f);
+    glOrtho(0.0, SCREEN_WIDTH, SCREEN_HEIGHT, 0.0, -1.f, 1.f);
 
     glClear(GL_COLOR_BUFFER_BIT);   // Clear the color buffer with current clearing color
 
@@ -177,10 +170,10 @@ void display() {
 
     //This part is a little sketchy too, but basically the lower boundaries and upper boundaries
     //lb1 and up1 ect.. are used to keep what is displayed from trying to render parts that are not in the array
-    int lb1 = p.x - scope;
-    int upb1 = p.x + scope;
-    int lb2 = p.y - scope;
-    int upb2 = p.y + scope;
+    int lb1 = p.x - SCOPE;
+    int upb1 = p.x + SCOPE;
+    int lb2 = p.y - SCOPE;
+    int upb2 = p.y + SCOPE;
 
     if (lb1 < 0) {
         lb1 = 0;
@@ -189,12 +182,12 @@ void display() {
         lb2 = 0;
     }
 
-    if (upb1 > GameInfo::height) {
-        upb1 = GameInfo::height;
+    if (upb1 > HEIGHT) {
+        upb1 = HEIGHT;
     }
 
-    if (upb2 > GameInfo::width) {
-        upb2 = GameInfo::width;
+    if (upb2 > HEIGHT) {
+        upb2 = HEIGHT;
     }
 
     //x and y here are the relative locations to be rendered on the screen,
@@ -206,7 +199,7 @@ void display() {
         int y = -1;
 
         for (int j = lb2; j < upb2+1; j++, y++) {
-            map.maze[i][j].draw(x,y,p.x_shift,p.y_shift,angleR);
+            map.maze[i][j].draw(x,y,p.xShift,p.yShift,angleR);
 
             if ((e.x == i) && (e.y == j)) {
 
@@ -236,7 +229,7 @@ void kbd(unsigned char key, int x, int y)
     if (key == 32) {
         //angle = (angle + 90) % 360;
         //angleR = angle * (M_PI /180);
-        r_state = true; //Animated transition
+        rState = true; //Animated transition
     }
 
     glutPostRedisplay();
@@ -270,8 +263,6 @@ void kbdS(int key, int x, int y) {
 
             break;
     }
-
-    
 
     glutPostRedisplay();
 
@@ -330,31 +321,28 @@ void mouse(int button, int state, int x, int y) {
 
 void follow_path() {
 
-    if (map.maze[e.x][e.y].get_correct_path()) {
-        map.maze[e.x][e.y].set_correct_path(false);
+    if (map.maze[e.x][e.y].getCorrectPath()) {
+        map.maze[e.x][e.y].setCorrectPath(false);
     }
 
-    if (map.maze[e.x+1][e.y].get_correct_path()) {
-        e.y_shift -= e.get_speed();
+    if (map.maze[e.x+1][e.y].getCorrectPath()) {
+        e.yShift -= e.getSpeed();
     }
 
-    else if (map.maze[e.x-1][e.y].get_correct_path()) {
-        e.y_shift += e.get_speed();
+    else if (map.maze[e.x-1][e.y].getCorrectPath()) {
+        e.yShift += e.getSpeed();
     }
 
-    else if (map.maze[e.x][e.y+1].get_correct_path()) {
-        e.x_shift -= e.get_speed();
+    else if (map.maze[e.x][e.y+1].getCorrectPath()) {
+        e.xShift -= e.getSpeed();
     }
 
-    else if (map.maze[e.x][e.y-1].get_correct_path()) {
-        e.x_shift += e.get_speed();
+    else if (map.maze[e.x][e.y-1].getCorrectPath()) {
+        e.xShift += e.getSpeed();
     }
 
-    //else ()
 
     e.update();
-
-
 }
 
 
@@ -363,22 +351,22 @@ void timer(int extra) {
     //angle = (angle + 1) % 360;
     //angleR = angle * (M_PI /180);
 
-    if (r_state == false) {
+    if (rState == false) {
 
         if (keys[GLUT_KEY_DOWN]) {
-            calcShift(0, -p.get_speed());
+            calcShift(0, -p.getSpeed());
         }
 
         if (keys[GLUT_KEY_LEFT]) {
-            calcShift(p.get_speed(), 0);
+            calcShift(p.getSpeed(), 0);
         }
 
         if (keys[GLUT_KEY_UP]) {
-            calcShift(0, p.get_speed());
+            calcShift(0, p.getSpeed());
         }
 
         if (keys[GLUT_KEY_RIGHT]) {
-            calcShift(-p.get_speed(), 0);
+            calcShift(-p.getSpeed(), 0);
         }
 
         p.update();
@@ -395,7 +383,7 @@ void timer(int extra) {
         angleR = angle * (M_PI /180);
 
         if (angle % 90 == 0) {
-            r_state = 0;
+            rState = 0;
         }
     }
 
@@ -415,9 +403,9 @@ int graphicsPlay(int argc, char** argv) {
 
     glutInitDisplayMode(GLUT_RGBA);
 
-    glutInitWindowSize(GameInfo::screen_width, GameInfo::screen_height);
-    glutInitWindowPosition((glutGet(GLUT_SCREEN_WIDTH)-GameInfo::screen_width)/2,
-                           (glutGet(GLUT_SCREEN_HEIGHT)-GameInfo::screen_height)/2);
+    glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+    glutInitWindowPosition((glutGet(GLUT_SCREEN_WIDTH)-SCREEN_WIDTH)/2,
+                           (glutGet(GLUT_SCREEN_HEIGHT)-SCREEN_HEIGHT)/2);
     /* create the window and store the handle to it */
     wd = glutCreateWindow("Fun with...Fans!");
 

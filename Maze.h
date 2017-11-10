@@ -29,25 +29,25 @@ public:
      */
     Maze(int x, int y);
 
-    Tile maze[GameInfo::height][GameInfo::width]; //Make the final maze w/ info public to easily get contents
+    Tile maze[HEIGHT][WIDTH]; //Make the final maze w/ info public to easily get contents
 
     void solve_maze(int s_x, int s_y, int e_x, int e_y);
 
 
 private:
     int scope;
-    vector<point> wall_list;
-    int start_X, start_Y; // Starting x and y for solving maze
-    int end_X, end_Y;     // End x and y for for solving maze
+    vector<point> wallList;
+    int startX, startY; // Starting x and y for solving maze
+    int endX, endY;     // End x and y for for solving maze
 
 
 
 
-    void check_and_add(int x, int y);
-    void remove_operation(int r);
-    void add_wall(int x, int y);
+    void checkAndAdd(int x, int y);
+    void removeOperation(int r);
+    void addWall(int x, int y);
 
-    bool recursive_solve (int x, int y);
+    bool recursiveSolve (int x, int y);
 
 };
 
