@@ -4,36 +4,26 @@
 
 #include "graphics.h"
 #include <iostream>
-#include <math.h>
-
-#include <iostream>
-#include "graphics.h"
-#include "Tile.h"
-#include <vector>
-#include <random>
+#include <cmath>
 #include <memory>
-#include <algorithm>
+#include <random>
 #include "Maze.h"
-#include "Player.h"
+#include "Character.h"
 using namespace std;
 
 
 Maze map; //Calling the maze object
 int wd;
 Player p;
+Enemy e;
 int scale; //Scale is how big each item in the array is displayed
 int scope;
 
-//I use the x_shift and true x_shifts in calculating movement
-int x_shift, y_shift;
-double true_x_shift, true_y_shift;
 
-bool keys[128]; //not used yet
+bool keys[128]; //Holds value of key presses and releases
 
 int angle; //angle of screen tilt in degrees
 double angleR; //angle in radians
-
-int temp1, temp2;
 
 int person_size; //Size of the "player"
 
@@ -45,6 +35,8 @@ bool wall; //flag value for collisions
 
 bool r_state;
 
+int endx, endy;
+
 void init() {
     map = Maze();
     p = Player();
@@ -52,42 +44,46 @@ void init() {
     scale = GameInfo::scale;
     scope = GameInfo::scope;
 
-    x_shift = 0;
-    y_shift = 0;
-
     for (int i =0; i < 128; i++) {
         keys[i] = false;
     }
 
     angle = 0;
 
-    hBoundary = ((scale-p.getSize()) / 2);
-    sBoundary = (scale/2);
+    hBoundary = ((scale-p.get_size()) / 2);
 
     r_state = false;
+
+    cout << map.maze[10][10].get_wall() << endl;
+
+    e = Enemy(10, 10);
+
+    map.solve_maze(e.x, e.y, p.x, p.y);
+
+    ////////////////////
 }
 
 
 
 /*
- * My rough first attempt at calculating collisions, will probally want to re-work this.
- * NOTE: as currently implemented still misses certain edge cases, I'll try and fix this soon
+ * Calculate collisions
  */
 void calcShift(int x, int y) {
 
+    int temp1, temp2;
+
     wall = false;
 
-    temp1 = rint(x_shift + ((x * cos(-angleR)) - (y * sin(-angleR))));
-    temp2 = rint(y_shift + ((y * cos(-angleR)) + (x * sin(-angleR))));
-
+    temp1 = rint(p.x_shift + ((x * cos(-angleR)) - (y * sin(-angleR))));
+    temp2 = rint(p.y_shift + ((y * cos(-angleR)) + (x * sin(-angleR))));
 
     if (temp2 < (-hBoundary)) {
 
         if (temp1 > hBoundary) {
             if (map.maze[p.x + 1][p.y - 1].get_wall()) {
 
-                x_shift = hBoundary;
-                y_shift = -hBoundary;
+                p.x_shift = hBoundary;
+                p.y_shift = -hBoundary;
                 wall = true;
             }
         }
@@ -95,15 +91,15 @@ void calcShift(int x, int y) {
         else if (temp1 < (-hBoundary)) {
             if (map.maze[p.x + 1][p.y + 1].get_wall()) {
 
-                x_shift = -hBoundary;
-                y_shift = -hBoundary;
+                p.x_shift = -hBoundary;
+                p.y_shift = -hBoundary;
                 wall = true;
             }
         }
 
         else if (map.maze[p.x+1][p.y].get_wall()) {
 
-            y_shift = -hBoundary;
+            p.y_shift = -hBoundary;
             wall = true;
         }
     }
@@ -113,15 +109,15 @@ void calcShift(int x, int y) {
         if (temp2 > hBoundary) {
             if (map.maze[p.x - 1][p.y - 1].get_wall()) {
 
-                x_shift = hBoundary;
-                y_shift = hBoundary;
+                p.x_shift = hBoundary;
+                p.y_shift = hBoundary;
                 wall = true;
             }
         }
 
         else if (map.maze[p.x][p.y-1].get_wall()) {
 
-            x_shift = hBoundary;
+            p.x_shift = hBoundary;
             wall = true;
         }
     }
@@ -130,14 +126,14 @@ void calcShift(int x, int y) {
 
         if (temp2 > hBoundary) {
             if (map.maze[p.x - 1][p.y + 1].get_wall()) {
-                x_shift = -hBoundary;
-                y_shift = hBoundary;
+                p.x_shift = -hBoundary;
+                p.y_shift = hBoundary;
                 wall = true;
             }
         }
 
         else if (map.maze[p.x][p.y+1].get_wall()) {
-            x_shift = -hBoundary;
+            p.x_shift = -hBoundary;
             wall = true;
         }
     }
@@ -145,14 +141,14 @@ void calcShift(int x, int y) {
     else if (temp2 > (hBoundary)) {
 
         if (map.maze[p.x-1][p.y].get_wall()) {
-            y_shift = hBoundary;
+            p.y_shift = hBoundary;
             wall = true;
         }
     }
 
     if (wall == false) {
-        x_shift = temp1;
-        y_shift = temp2;
+        p.x_shift = temp1;
+        p.y_shift = temp2;
     }
 }
 
@@ -160,7 +156,7 @@ void calcShift(int x, int y) {
 /* Initialize OpenGL Graphics */
 void initGL() {
     // Set "clearing" or background color
-    glClearColor(0.1f, 0.1f, 1.0f, 1.0f); // Changed color to blue
+    glClearColor(0, 0, 0, 0); // Changed color to blue
 }
 
 /* Handler for window-repaint event. Call back when the window first appears and
@@ -210,12 +206,18 @@ void display() {
         int y = -1;
 
         for (int j = lb2; j < upb2+1; j++, y++) {
-            map.maze[i][j].draw(x,y,x_shift,y_shift,angleR);
+            map.maze[i][j].draw(x,y,p.x_shift,p.y_shift,angleR);
+
+            if ((e.x == i) && (e.y == j)) {
+
+                e.draw(x,y);
+            }
 
         }
     }
 
-    p.draw(); //Draw the player
+    p.draw(1,1); //Draw the player
+
 
     glFlush();  // Render now
 }
@@ -245,10 +247,6 @@ void kbd(unsigned char key, int x, int y)
 
 void kbdS(int key, int x, int y) {
 
-    /*
-     * This whole chunk could be reworked, or atleast redesigned so that we keep track of
-     * key up and key down, and do the actual movement somewhere else.
-     */
     switch(key) {
 
         case GLUT_KEY_DOWN:
@@ -273,7 +271,7 @@ void kbdS(int key, int x, int y) {
             break;
     }
 
-    //std::cout << true_x_shift << " " << true_y_shift << std::endl;
+    
 
     glutPostRedisplay();
 
@@ -306,7 +304,6 @@ void keyUp (int key, int x, int y) {
             break;
     }
 
-
 }
 
 //void cursor(int x, int y) {
@@ -329,6 +326,38 @@ void mouse(int button, int state, int x, int y) {
 }
 
 
+//make_unique<FiremansDaughter>(fire1)
+
+void follow_path() {
+
+    if (map.maze[e.x][e.y].get_correct_path()) {
+        map.maze[e.x][e.y].set_correct_path(false);
+    }
+
+    if (map.maze[e.x+1][e.y].get_correct_path()) {
+        e.y_shift -= e.get_speed();
+    }
+
+    else if (map.maze[e.x-1][e.y].get_correct_path()) {
+        e.y_shift += e.get_speed();
+    }
+
+    else if (map.maze[e.x][e.y+1].get_correct_path()) {
+        e.x_shift -= e.get_speed();
+    }
+
+    else if (map.maze[e.x][e.y-1].get_correct_path()) {
+        e.x_shift += e.get_speed();
+    }
+
+    //else ()
+
+    e.update();
+
+
+}
+
+
 void timer(int extra) {
     //slowly rotate for fun
     //angle = (angle + 1) % 360;
@@ -337,44 +366,27 @@ void timer(int extra) {
     if (r_state == false) {
 
         if (keys[GLUT_KEY_DOWN]) {
-            calcShift(0, -p.speed);
+            calcShift(0, -p.get_speed());
         }
 
         if (keys[GLUT_KEY_LEFT]) {
-            calcShift(p.speed, 0);
+            calcShift(p.get_speed(), 0);
         }
 
         if (keys[GLUT_KEY_UP]) {
-            calcShift(0, p.speed);
+            calcShift(0, p.get_speed());
         }
 
         if (keys[GLUT_KEY_RIGHT]) {
-            calcShift(-p.speed, 0);
+            calcShift(-p.get_speed(), 0);
         }
 
-        //So what I'm doing here, is with the true_x and true_y shifts.
-        //I determine the place where loc.x and y ends up, so basically
-        //keeping track of the players location in the maze array. The exact location/ what appears
-        //on screen a mix of loc.x and loc.y, with the x and y shift handling all the small movement between array chunks.
-        if (y_shift < (-sBoundary)) {
-            p.x += 1;
-            y_shift += scale;
-        }
+        p.update();
 
-        if (x_shift > (sBoundary)) {
-            p.y -= 1;
-            x_shift -= scale;
-        }
+        map.solve_maze(e.x, e.y, p.x, p.y);
+        follow_path();
 
-        if (x_shift < (-sBoundary)) {
-            p.y += 1;
-            x_shift += scale;
-        }
 
-        if (y_shift > (sBoundary)) {
-            p.x -= 1;
-            y_shift -= scale;
-        }
     }
 
     else {
@@ -387,10 +399,11 @@ void timer(int extra) {
         }
     }
 
+
+
     glutPostRedisplay();
     glutTimerFunc(50, timer, 0);
 }
-
 
 
 /* Main function: GLUT runs as a console application starting at main()  */

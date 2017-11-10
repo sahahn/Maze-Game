@@ -8,15 +8,14 @@
 
 class GameInfo {
 public:
-    static const int height = 100;
+    static const int height = 100; //Size of maze array
     static const int width = 100;
-    static const int scale = 100;
-    static const int screen_height = 700;
-    static const int screen_width = 700;
-    static const int scope = 4;
-    static const int start_x = 4;
-    static const int start_y = 4;
-
+    static const int scale = 200;
+    static const int screen_height = 1000;
+    static const int screen_width = 1000;
+    static const int scope = 3;
+    static const int start_x = 3;
+    static const int start_y = 3;
 
 };
 

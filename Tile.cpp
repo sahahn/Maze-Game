@@ -32,14 +32,32 @@ Point cp(int x, int y, double Angle) {
 
 Tile::Tile() {
     wall = true;
+    was_here = false;
+    correct_path = false;
 }
 
 bool Tile::get_wall() const {
     return wall;
 }
 
+bool Tile::get_was_here() const {
+    return was_here;
+}
+
+bool Tile::get_correct_path() const {
+    return correct_path;
+}
+
 void Tile::set_wall(bool b) {
     wall = b;
+}
+
+void Tile::set_was_here(bool b) {
+    was_here = b;
+}
+
+void Tile::set_correct_path(bool b) {
+    correct_path = b;
 }
 
 //Take in coordinates in the way the array is stored, convert it to pixel coordinates

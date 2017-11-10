@@ -15,10 +15,20 @@ public:
 
     void set_wall(bool b);
 
+    bool get_was_here() const;
+
+    void set_was_here(bool b);
+
+    bool get_correct_path() const;
+
+    void set_correct_path(bool b);
+
     void draw(int x, int y, int x_shift, int y_shift, double angle) const;
 
 private:
     bool wall;
+    bool was_here;
+    bool correct_path;
 
 };
 

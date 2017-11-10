@@ -4,8 +4,6 @@
 
 #include "Maze.h"
 
-
-
 Maze::Maze() {
 
     scope = GameInfo::scope;
@@ -24,6 +22,9 @@ Maze::Maze(int x, int y) {
 
     maze[x][y].set_wall(false);
     add_wall(x, y);
+    maze[10][10].set_wall(false);
+    add_wall(10,10);
+
     int remove;
 
     while (wall_list.size() != 0) {
@@ -106,3 +107,71 @@ void Maze::remove_operation(int r) {
         wall_list.erase(wall_list.begin()+r);
     }
 }
+
+bool Maze::recursive_solve(int x, int y) {
+    if ((x == end_X) && (y == end_Y)) {
+        return true;
+    }
+
+    if ((maze[x][y].get_wall()) || (maze[x][y].get_was_here())) {
+        return false;
+    }
+
+    // If you are on a wall or already were here
+    maze[x][y].set_was_here(true);
+
+    if (x != 0) {                              // Checks if not on left edge
+        if (recursive_solve(x - 1, y)) {       // Recalls method one to the left
+            maze[x][y].set_correct_path(true); // Sets that path value to true;
+            return true;
+        }
+    }
+
+    if (x != GameInfo::width - 1) {
+
+                                                // Checks if not on right edge
+        if (recursive_solve(x+1, y)) {          // Recalls method one to the right
+            maze[x][y].set_correct_path(true);  // Sets that path value to true;
+            return true;
+        }
+    }
+
+    if (y != 0) {                               // Checks if not on top edge
+        if (recursive_solve(x, y-1)) {          // Recalls method one up
+            maze[x][y].set_correct_path(true);  // Sets that path value to true;
+            return true;
+        }
+    }
+
+    if (y != GameInfo::height - 1) {            // Checks if not on bottom edge
+        if (recursive_solve(x, y + 1)) {        // Recalls method one down
+            maze[x][y].set_correct_path(true);  // Sets that path value to true;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+void Maze::solve_maze(int s_x, int s_y, int e_x, int e_y) {
+
+    for (int i=0; i < GameInfo::height; i++) {
+        for (int j=0; j < GameInfo::width; j ++) {
+            maze[i][j].set_was_here(false);
+            maze[i][j].set_correct_path(false);
+
+        }
+    }
+
+
+    start_X = s_x;
+    start_Y = s_y;
+    end_X = e_x;
+    end_Y = e_y;
+
+    bool b = recursive_solve(s_x, s_y); //Will solve maze recursively, and leave solution in correct_path
+
+    maze[end_X][end_Y].set_correct_path(true);
+}
+
