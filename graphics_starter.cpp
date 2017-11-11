@@ -135,7 +135,7 @@ void calcShift(int x, int y) {
         }
     }
 
-    if (wall == false) {
+    if (!wall) {
         p.xShift = temp1;
         p.yShift = temp2;
     }
@@ -230,7 +230,6 @@ void kbd(unsigned char key, int x, int y)
 
     glutPostRedisplay();
 
-    return;
 }
 
 
@@ -261,8 +260,6 @@ void kbdS(int key, int x, int y) {
     }
 
     glutPostRedisplay();
-
-    return;
 }
 
 
@@ -313,55 +310,56 @@ void mouse(int button, int state, int x, int y) {
 }
 
 
-void follow_path() {
+void follow_path(Enemy &E) {
 
-    if (map.maze[e.x][e.y].getCorrectPath()) {
-        map.maze[e.x][e.y].setCorrectPath(false);
+    if (map.maze[E.x][E.y].getCorrectPath()) {
+        map.maze[E.x][E.y].setCorrectPath(false);
     }
 
-    if (map.maze[e.x+1][e.y].getCorrectPath()) {
-        e.yShift -= e.getSpeed();
+    if (map.maze[E.x+1][E.y].getCorrectPath()) {
+        E.yShift -= E.getSpeed();
     }
 
-    else if (map.maze[e.x-1][e.y].getCorrectPath()) {
-        e.yShift += e.getSpeed();
+    else if (map.maze[E.x-1][E.y].getCorrectPath()) {
+        E.yShift += E.getSpeed();
     }
 
-    else if (map.maze[e.x][e.y+1].getCorrectPath()) {
-        e.xShift -= e.getSpeed();
+    else if (map.maze[E.x][E.y+1].getCorrectPath()) {
+        E.xShift -= E.getSpeed();
     }
 
-    else if (map.maze[e.x][e.y-1].getCorrectPath()) {
-        e.xShift += e.getSpeed();
+    else if (map.maze[E.x][E.y-1].getCorrectPath()) {
+        E.xShift += E.getSpeed();
     }
 
-    else if ((p.x == e.x) && (p.y == e.y)) {
+        //When in the players square, different movement behavior
+    else if ((p.x == E.x) && (p.y == E.y)) {
 
-        cout << "test" << endl;
-        if (p.yShift > e.yShift) {
-            e.yShift += e.getSpeed();
-            cout << "test2" << endl;
+
+        if (p.yShift > E.yShift) {
+            E.yShift += E.getSpeed();
+
         }
 
-        if (p.yShift < e.yShift) {
-            e.yShift -= e.getSpeed();
-            cout << "test3" << endl;
+        if (p.yShift < E.yShift) {
+            E.yShift -= E.getSpeed();
+
         }
 
-        if (p.xShift < e.xShift) {
-            e.xShift -= e.getSpeed();
-            cout << "test4" << endl;
+        if (p.xShift < E.xShift) {
+            E.xShift -= E.getSpeed();
+
         }
 
-        if (p.xShift > e.xShift) {
-            e.xShift += e.getSpeed();
-            cout << "test5" << endl;
+        if (p.xShift > E.xShift) {
+            E.xShift += E.getSpeed();
+
         }
 
     }
 
 
-    e.update();
+    E.update();
 }
 
 
@@ -370,7 +368,7 @@ void timer(int extra) {
     //angle = (angle + 1) % 360;
     //angleR = angle * (M_PI /180);
 
-    if (rState == false) {
+    if (!rState) {
 
         if (keys[GLUT_KEY_DOWN]) {
             calcShift(0, -p.getSpeed());
@@ -391,10 +389,9 @@ void timer(int extra) {
         p.update();
 
         map.solve_maze(e.x, e.y, p.x, p.y);
-        follow_path();
+        follow_path(e);
 
-        cout << "e" <<  e.xShift << " " << e.yShift << endl;
-        cout << "p" <<  p.xShift << " " << p.yShift << endl;
+
 
 
     }
