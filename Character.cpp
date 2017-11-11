@@ -5,7 +5,6 @@
 #include "Character.h"
 
 
-
 /*
  * Character Abstract Class
  */
@@ -73,7 +72,7 @@ Player::Player(int X, int Y) {
 }
 
 
-void Player::draw(int X, int Y) const {
+void Player::draw(int X, int Y, int pXShift, int pYShift) const {
 
     glBegin(GL_QUADS);
     glColor3f(1, 1, 0);
@@ -124,13 +123,13 @@ Enemy::Enemy(int X, int Y) {
 }
 
 
-void Enemy::draw(int X, int Y) const {
+void Enemy::draw(int X, int Y, int pXShift, int pYShift) const {
 
-    X = (X * SCALE) - yShift;
-    Y = (Y * SCALE) - xShift;
+    X = (X * SCALE) - yShift + pYShift;
+    Y = (Y * SCALE) - xShift + pXShift;
 
-    X -= (size/2);
-    Y -= (size/2);
+    X += (SCALE/2) - (size/2);
+    Y += (SCALE/2) - (size/2);
 
     glBegin(GL_QUADS);
     glColor3f(0, 1, .5);

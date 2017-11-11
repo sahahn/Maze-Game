@@ -13,12 +13,12 @@
 
 static const int HEIGHT = 100;
 static const int WIDTH = 100;
-static const int SCALE = 100;
-static const int SCREEN_HEIGHT = 700;
-static const int SCREEN_WIDTH = 700;
-static const int SCOPE = 4;
-static const int START_X = 4;
-static const int START_Y = 4;
+static const int SCALE = 200;
+static const int SCREEN_HEIGHT = 1000;
+static const int SCREEN_WIDTH = 1000;
+static const int SCOPE = 3;
+static const int START_X = 3;
+static const int START_Y = 3;
 
 
 

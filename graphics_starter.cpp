@@ -22,17 +22,13 @@ bool keys[128]; //Holds value of key presses and releases
 int angle; //angle of screen tilt in degrees
 double angleR; //angle in radians
 
-int person_size; //Size of the "player"
 
 //Used in keeping track of playing location in array and checking for collisions
-int sBoundary;
 int hBoundary;
 
 bool wall; //flag value for collisions
 
 bool rState;
-
-int endx, endy;
 
 void init() {
     map = Maze();
@@ -203,13 +199,13 @@ void display() {
 
             if ((e.x == i) && (e.y == j)) {
 
-                e.draw(x,y);
+                e.draw(x,y,p.xShift,p.yShift);
             }
 
         }
     }
 
-    p.draw(1,1); //Draw the player
+    p.draw(1,1,1,1); //Draw the player
 
 
     glFlush();  // Render now
@@ -317,8 +313,6 @@ void mouse(int button, int state, int x, int y) {
 }
 
 
-//make_unique<FiremansDaughter>(fire1)
-
 void follow_path() {
 
     if (map.maze[e.x][e.y].getCorrectPath()) {
@@ -339,6 +333,31 @@ void follow_path() {
 
     else if (map.maze[e.x][e.y-1].getCorrectPath()) {
         e.xShift += e.getSpeed();
+    }
+
+    else if ((p.x == e.x) && (p.y == e.y)) {
+
+        cout << "test" << endl;
+        if (p.yShift > e.yShift) {
+            e.yShift += e.getSpeed();
+            cout << "test2" << endl;
+        }
+
+        if (p.yShift < e.yShift) {
+            e.yShift -= e.getSpeed();
+            cout << "test3" << endl;
+        }
+
+        if (p.xShift < e.xShift) {
+            e.xShift -= e.getSpeed();
+            cout << "test4" << endl;
+        }
+
+        if (p.xShift > e.xShift) {
+            e.xShift += e.getSpeed();
+            cout << "test5" << endl;
+        }
+
     }
 
 
@@ -373,6 +392,9 @@ void timer(int extra) {
 
         map.solve_maze(e.x, e.y, p.x, p.y);
         follow_path();
+
+        cout << "e" <<  e.xShift << " " << e.yShift << endl;
+        cout << "p" <<  p.xShift << " " << p.yShift << endl;
 
 
     }
