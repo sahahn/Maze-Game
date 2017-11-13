@@ -4,6 +4,9 @@
 
 #ifndef GRAPHICS_GAMEINFO_H
 #define GRAPHICS_GAMEINFO_H
+
+
+#include <cmath>
 // Global settings for use in Graphics,cpp, Tile.cpp, Player.cpp, and Maze.cpp
 // Include GameInfo.h to access fields.
 
@@ -19,6 +22,16 @@ static const int SCREEN_WIDTH = 1000;
 static const int SCOPE = 3;
 static const int START_X = 3;
 static const int START_Y = 3;
+
+struct Point {   // Declare Point struct type
+    int x;   // Declare member types
+    int y;
+};
+
+/*
+ * Takes in an x and y, and an angle in radians and returns the location of the point rotated around the center
+ */
+Point cp(int x, int y, double Angle);
 
 
 

@@ -16,6 +16,7 @@ Maze map; //Calling the maze object
 int wd;
 Player p;
 Enemy e;
+Enemy e2;
 
 bool keys[128]; //Holds value of key presses and releases
 
@@ -46,8 +47,10 @@ void init() {
     
     //TEMP
     e = Enemy(10, 10);
+    e2 = Enemy();
 
     map.solve_maze(e.x, e.y, p.x, p.y);
+    map.solve_maze(e2.x, e2.y, p.x, p.y);
 
     ////////////////////
 }
@@ -199,13 +202,18 @@ void display() {
 
             if ((e.x == i) && (e.y == j)) {
 
-                e.draw(x,y,p.xShift,p.yShift);
+                e.draw(x,y,p.xShift,p.yShift,angleR);
+            }
+
+            if ((e2.x == i) && (e2.y == j)) {
+
+                e2.draw(x,y,p.xShift,p.yShift,angleR);
             }
 
         }
     }
 
-    p.draw(1,1,1,1); //Draw the player
+    p.draw(1,1,1,1,1.0); //Draw the player
 
 
     glFlush();  // Render now
@@ -391,8 +399,8 @@ void timer(int extra) {
         map.solve_maze(e.x, e.y, p.x, p.y);
         follow_path(e);
 
-
-
+        map.solve_maze(e2.x, e2.y, p.x, p.y);
+        follow_path(e2);
 
     }
 

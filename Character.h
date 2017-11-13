@@ -25,7 +25,7 @@ public:
 
     void update();
 
-    virtual void draw(int X, int Y, int pXShift, int pYShift) const = 0; //Make the class pure virtual
+    virtual void draw(int X, int Y, int pXShift, int pYShift, double angle) const = 0; //Make the class pure virtual
 
 protected:
 
@@ -41,7 +41,7 @@ public:
 
     Player();
     Player(int X, int Y);
-    void draw(int X, int Y, int pXShift, int pYShift) const override;
+    void draw(int X, int Y, int pXShift, int pYShift, double angle) const override;
 };
 
 
@@ -51,7 +51,7 @@ public:
 
     Enemy();
     Enemy(int X, int Y);
-    void draw(int X, int Y, int pXShift, int pYShift) const override;
+    void draw(int X, int Y, int pXShift, int pYShift, double angle) const override;
 };
 
 

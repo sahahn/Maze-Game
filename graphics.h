@@ -14,11 +14,6 @@
 #include <GL/glut.h>
 #endif
 
-struct Point {   // Declare PERSON struct type
-    int x;   // Declare member types
-    int y;
-};
-
 
 void calcShift(int x, int y);
 
@@ -55,11 +50,5 @@ void mouse(int button, int state, int x, int y);
 int graphicsPlay(int argc, char *argv[]);
 
 void betterKeys();
-
-//Internal function used in isInTriangle
-float sign (Point p1, Point p2, Point p3);
-
-//Check if a point x,y is within the global triangle points
-bool isInTriangle (int x, int y);
 
 #endif /* graphics_h */

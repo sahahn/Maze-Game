@@ -72,7 +72,7 @@ Player::Player(int X, int Y) {
 }
 
 
-void Player::draw(int X, int Y, int pXShift, int pYShift) const {
+void Player::draw(int X, int Y, int pXShift, int pYShift, double angle) const {
 
     glBegin(GL_QUADS);
     glColor3f(1, 1, 0);
@@ -94,13 +94,13 @@ void Player::draw(int X, int Y, int pXShift, int pYShift) const {
 
 Enemy::Enemy() {
     size = 20;
-    speed = 10;
+    speed = 15;
 
     location.x = 1;
     location.y = 1;
 
-    x = 60;
-    y = 60;
+    x = 10;
+    y = 10;
 
     xShift = 0;
     yShift = 0;
@@ -123,7 +123,7 @@ Enemy::Enemy(int X, int Y) {
 }
 
 
-void Enemy::draw(int X, int Y, int pXShift, int pYShift) const {
+void Enemy::draw(int X, int Y, int pXShift, int pYShift, double angle) const {
 
     X = (X * SCALE) - yShift + pYShift;
     Y = (Y * SCALE) - xShift + pXShift;
@@ -133,18 +133,38 @@ void Enemy::draw(int X, int Y, int pXShift, int pYShift) const {
 
     glBegin(GL_QUADS);
     glColor3f(0, 1, .5);
-    // top left corner
-    glVertex2i(Y, X);
-    // top right corner
-    glVertex2i((Y + size), X);
-    // bottom right corner
-    glVertex2i((Y + size), (X + size));
-    // bottom left corner
-    glVertex2i(Y, (X + size));
-    glEnd();
+
+    if (angle == 0) {
+
+        // top left corner
+        glVertex2i(Y, X);
+        // top right corner
+        glVertex2i((Y + size), X);
+        // bottom right corner
+        glVertex2i((Y + size), (X + size));
+        // bottom left corner
+        glVertex2i(Y, (X + size));
+    }
 
 
+    else {
+
+        Point p1,p2,p3,p4;
+        p1 = cp(Y,X,angle);
+        p2 = cp((Y+size),X,angle);
+        p3 = cp((Y+size),(X+size),angle);
+        p4 = cp(Y,(X+size),angle);
+
+        glVertex2i(p1.x,p1.y);
+        glVertex2i(p2.x,p2.y);
+        glVertex2i(p3.x,p3.y);
+        glVertex2i(p4.x,p4.y);
+    }
+
+
+
     glEnd();
+
 }
 
 
