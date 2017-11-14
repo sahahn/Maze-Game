@@ -51,7 +51,7 @@ void Character::update() {
  */
 Player::Player() {
     size = 20;
-    speed = 20;
+    speed = 2;
     location.x = (SCREEN_WIDTH / 2) - (size/2);
     location.y = (SCREEN_HEIGHT / 2) - (size/2);
 

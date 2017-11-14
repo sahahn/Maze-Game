@@ -4,9 +4,6 @@
 
 #include "graphics.h"
 #include <iostream>
-#include <cmath>
-#include <memory>
-#include <random>
 #include "Maze.h"
 #include "Character.h"
 using namespace std;
@@ -16,6 +13,7 @@ Maze map; //Calling the maze object
 int wd;
 Player p;
 Enemy e, e2;
+const double M_PI = 3.14159265358;
 
 bool keys[128]; //Holds value of key presses and releases
 
@@ -43,8 +41,8 @@ void init() {
 
     rState = false;
 
-    e = Enemy(10, 10, 20, 10);
-    e2 = Enemy(10, 10, 20, 5);
+    e = Enemy(10, 10, 20, 1);
+    e2 = Enemy(10, 10, 20, 1);
 
 }
 
@@ -284,7 +282,7 @@ void keyUp (int key, int x, int y) {
 void cursor(int x, int y) {
 
 
-  //  glutPostRedisplay();
+    //  glutPostRedisplay();
 }
 
 void mousemov(int x, int y) {
@@ -350,7 +348,6 @@ void follow_path(Enemy &E) {
     E.update();
 }
 
-
 void timer(int extra) {
     //slowly rotate for fun
     //angle = (angle + 1) % 360;
@@ -401,7 +398,7 @@ void timer(int extra) {
 
 
     glutPostRedisplay();
-    glutTimerFunc(50, timer, 0);
+    glutTimerFunc(3, timer, 0);
 }
 
 
@@ -442,10 +439,10 @@ int graphicsPlay(int argc, char** argv) {
     // handles mouse movement
     //    glutPassiveMotionFunc(cursor);
 
-  //  glutMotionFunc(mousemov);
+    //  glutMotionFunc(mousemov);
 
     // handles mouse click
-   // glutMouseFunc(mouse);
+    glutMouseFunc(mouse);
 
     // handles timer
     glutTimerFunc(0, timer, 0);

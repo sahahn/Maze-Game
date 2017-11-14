@@ -1,16 +1,7 @@
 #include <iostream>
-#include "Tile.h"
-#include <random>
-#include <memory>
-#include"Maze.h"
 #include "graphics.h"
-
-using namespace std;
-
-int main(int argc, char** argv) {
-
+int main(int argc, char** argv){
+    std::cout << "Hello, World!" << std::endl;
     graphicsPlay(argc, argv);
-
     return 0;
 }
-
