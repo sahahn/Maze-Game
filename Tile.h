@@ -13,15 +13,19 @@ public:
 
     bool getWall() const;
 
-    void setWall(bool b);
-
     bool getWasHere() const;
-
-    void setWasHere(bool b);
 
     bool getCorrectPath() const;
 
+    bool getEnd() const;
+
+    void setWall(bool b);
+
+    void setWasHere(bool b);
+
     void setCorrectPath(bool b);
+
+    void setEnd(bool b);
 
     void draw(int x, int y, int xShift, int yShift, double angle) const;
 
@@ -29,6 +33,7 @@ private:
     bool wall;
     bool wasHere;
     bool correctPath;
+    bool end;
 
 };
 

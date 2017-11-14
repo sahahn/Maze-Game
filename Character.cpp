@@ -3,6 +3,7 @@
 //
 
 #include "Character.h"
+#include <iostream>
 
 
 /*
@@ -16,6 +17,11 @@ int Character::getSize() const {
 
 int Character::getSpeed() const {
     return speed;
+}
+
+void Character::setLocation(int xL, int yL) {
+    location.x = xL;
+    location.y = yL;
 }
 
 void Character::update() {
@@ -115,10 +121,12 @@ Enemy::Enemy(int X, int Y, int s, int sp) {
 }
 
 
-void Enemy::draw(int X, int Y, int pXShift, int pYShift, double angle) const {
+void Enemy::draw(int pXShift, int pYShift, double angle) const {
 
-    X = (X * SCALE) - yShift + pYShift;
-    Y = (Y * SCALE) - xShift + pXShift;
+    int X, Y;
+
+    X = (location.x * SCALE) - yShift + pYShift;
+    Y = (location.y * SCALE) - xShift + pXShift;
 
     X += (SCALE/2) - (size/2);
     Y += (SCALE/2) - (size/2);
@@ -157,6 +165,21 @@ void Enemy::draw(int X, int Y, int pXShift, int pYShift, double angle) const {
 
     glEnd();
 
+}
+
+void Enemy::moveL() {
+    yShift += speed;
+
+}
+void Enemy::moveR() {
+    yShift -= speed;
+
+}
+void Enemy::moveU() {
+    xShift -= speed;
+}
+void Enemy::moveD(){
+    xShift += speed;
 }
 
 

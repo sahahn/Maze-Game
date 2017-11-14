@@ -11,6 +11,7 @@ Tile::Tile() {
     wall = true;
     wasHere = false;
     correctPath = false;
+    end = false;
 }
 
 bool Tile::getWall() const {
@@ -25,6 +26,10 @@ bool Tile::getCorrectPath() const {
     return correctPath;
 }
 
+bool Tile::getEnd() const {
+    return end;
+}
+
 void Tile::setWall(bool b) {
     wall = b;
 }
@@ -37,6 +42,11 @@ void Tile::setCorrectPath(bool b) {
     correctPath = b;
 }
 
+void Tile::setEnd(bool b) {
+    end = b;
+}
+
+
 //Take in coordinates in the way the array is stored, convert it to pixel coordinates
 void Tile::draw(int x, int y, int xShift, int yShift, double angle) const {
     
@@ -45,7 +55,14 @@ void Tile::draw(int x, int y, int xShift, int yShift, double angle) const {
     }
 
     else {
-        glColor3f(1, 0, 1);
+
+        if (end) {
+            glColor3f(1,.5,.5);
+
+        }
+        else {
+            glColor3f(1, 0, 1);
+        }
     }
 
     x = (x * SCALE) + yShift;

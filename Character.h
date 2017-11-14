@@ -20,8 +20,10 @@ public:
     int yShift;
 
     int getSize() const;
-
     int getSpeed() const;
+    //Point getLocation() const;  Not needed!
+
+    void setLocation(int xL, int yL);
 
     void update();
 
@@ -30,6 +32,7 @@ protected:
     int size;
     int speed;
     static const int sBoundary = (SCALE / 2);
+    Point location; //Location on screen
 
 };
 
@@ -39,7 +42,7 @@ public:
 
     Player();
     void draw() const;
-    Point location; //Location on screen
+
 
 };
 
@@ -51,7 +54,12 @@ public:
     Enemy();
     Enemy(int X, int Y);
     Enemy(int X, int Y, int s, int sp);
-    void draw(int X, int Y, int pXShift, int pYShift, double angle) const;
+    void draw(int pXShift, int pYShift, double angle) const;
+
+    void moveL();
+    void moveR();
+    void moveU();
+    void moveD();
 
 };
 

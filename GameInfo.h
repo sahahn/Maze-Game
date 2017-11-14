@@ -22,6 +22,8 @@ static const int SCREEN_WIDTH = 1000;
 static const int SCOPE = 3;
 static const int START_X = 3;
 static const int START_Y = 3;
+static const int END_X = 10;
+static const int END_Y = 10;
 
 struct Point {   // Declare Point struct type
     int x;   // Declare member types

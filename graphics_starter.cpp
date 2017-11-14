@@ -44,14 +44,14 @@ void init() {
     rState = false;
 
     e = Enemy(10, 10, 20, 10);
-    e2 = Enemy(10, 10, 20, 1);
+    e2 = Enemy(10, 10, 20, 5);
 
 }
 
 
 
 /*
- * Calculate collisions
+ * Calculate collisions + Balance rotation
  */
 void calcShift(int x, int y) {
 
@@ -196,18 +196,18 @@ void display() {
             map.maze[i][j].draw(x,y,p.xShift,p.yShift,angleR);
 
             if ((e.x == i) && (e.y == j)) {
-
-                e.draw(x,y,p.xShift,p.yShift,angleR);
+                e.setLocation(x,y);
             }
 
             if ((e2.x == i) && (e2.y == j)) {
-
-                e2.draw(x,y,p.xShift,p.yShift,angleR);
+                e2.setLocation(x,y);
             }
 
         }
     }
 
+    e.draw(p.xShift,p.yShift,angleR);
+    e2.draw(p.xShift,p.yShift,angleR);
     p.draw(); //Draw the player
 
     glFlush();  // Render now
@@ -307,38 +307,42 @@ void follow_path(Enemy &E) {
     }
 
     if (map.maze[E.x+1][E.y].getCorrectPath()) {
-        E.yShift -= E.getSpeed();
+        E.moveR();
     }
 
     else if (map.maze[E.x-1][E.y].getCorrectPath()) {
-        E.yShift += E.getSpeed();
+        E.moveL();
     }
 
     else if (map.maze[E.x][E.y+1].getCorrectPath()) {
-        E.xShift -= E.getSpeed();
+        E.moveU();
     }
 
     else if (map.maze[E.x][E.y-1].getCorrectPath()) {
-        E.xShift += E.getSpeed();
+       E.moveD();
     }
 
         //When in the players square, different movement behavior
     else if ((p.x == E.x) && (p.y == E.y)) {
 
         if (p.yShift > E.yShift) {
-            E.yShift += E.getSpeed();
+            E.moveL();
         }
 
-        if (p.yShift < E.yShift) {
-            E.yShift -= E.getSpeed();
+        else if (p.yShift < E.yShift) {
+            E.moveR();
         }
 
-        if (p.xShift < E.xShift) {
-            E.xShift -= E.getSpeed();
+        else if (p.xShift < E.xShift) {
+            E.moveU();
         }
 
-        if (p.xShift > E.xShift) {
-            E.xShift += E.getSpeed();
+        else if (p.xShift > E.xShift) {
+            E.moveD();
+        }
+
+        else {
+            cout << "you got got" << endl;
         }
     }
 
@@ -371,6 +375,10 @@ void timer(int extra) {
         }
 
         p.update();
+
+        if ((p.x == END_X) && (p.y == END_Y)) {
+            cout << "done" << endl;
+        }
 
         map.solve_maze(e.x, e.y, p.x, p.y);
         follow_path(e);

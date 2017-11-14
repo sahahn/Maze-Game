@@ -17,11 +17,15 @@ Maze::Maze() {
         remove = rand() % wallList.size();
         removeOperation(remove);
     }
+
+    maze[END_X][END_Y].setWall(false);
+    maze[END_X][END_Y].setEnd(true);
 }
 
 Maze::Maze(int x, int y) {
 
     maze[x][y].setWall(false);
+
     addWall(x, y);
 
     int remove;
@@ -30,6 +34,9 @@ Maze::Maze(int x, int y) {
         remove = rand() % wallList.size();
         removeOperation(remove);
     }
+
+    maze[END_X][END_Y].setWall(false);
+    maze[END_X][END_Y].setEnd(true);
 
 }
 
