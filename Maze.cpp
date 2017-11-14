@@ -10,6 +10,7 @@ Maze::Maze() {
 
     maze[START_X][START_Y].setWall(false);
     addWall(START_X, START_Y);
+
     int remove;
 
     while (wallList.size() != 0) {
@@ -22,8 +23,6 @@ Maze::Maze(int x, int y) {
 
     maze[x][y].setWall(false);
     addWall(x, y);
-    maze[10][10].setWall(false);
-    addWall(10,10);
 
     int remove;
 

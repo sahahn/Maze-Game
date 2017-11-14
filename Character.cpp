@@ -53,26 +53,13 @@ Player::Player() {
     y = START_Y;
 
     xShift = 0;
-    yShift = 0;
+    yShift = 10;
 
 
 }
 
-Player::Player(int X, int Y) {
-    size = 20;
-    speed = 20;
-    location.x = (SCREEN_WIDTH / 2) - (size/2);
-    location.y = (SCREEN_HEIGHT / 2) - (size/2);
 
-    x = X;  //Starting location in the maze array
-    y = Y;
-
-    xShift = 0;
-    yShift = 0;
-}
-
-
-void Player::draw(int X, int Y, int pXShift, int pYShift, double angle) const {
+void Player::draw() const {
 
     glBegin(GL_QUADS);
     glColor3f(1, 1, 0);
@@ -96,9 +83,6 @@ Enemy::Enemy() {
     size = 20;
     speed = 15;
 
-    location.x = 1;
-    location.y = 1;
-
     x = 10;
     y = 10;
 
@@ -112,8 +96,16 @@ Enemy::Enemy(int X, int Y) {
     size = 20;
     speed = 10;
 
-    location.x = 1;
-    location.y = 1;
+    x = X;
+    y = Y;
+
+    xShift = 0;
+    yShift = 0;
+}
+
+Enemy::Enemy(int X, int Y, int s, int sp) {
+    size = s;
+    speed = sp;
 
     x = X;
     y = Y;

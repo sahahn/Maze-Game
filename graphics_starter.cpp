@@ -15,21 +15,19 @@ using namespace std;
 Maze map; //Calling the maze object
 int wd;
 Player p;
-Enemy e;
-Enemy e2;
+Enemy e, e2;
 
 bool keys[128]; //Holds value of key presses and releases
 
 int angle; //angle of screen tilt in degrees
 double angleR; //angle in radians
 
-
 //Used in keeping track of playing location in array and checking for collisions
 int hBoundary;
 
 bool wall; //flag value for collisions
 
-bool rState;
+bool rState; //flag for rotation
 
 void init() {
     map = Maze();
@@ -44,15 +42,10 @@ void init() {
     hBoundary = ((SCALE-p.getSize()) / 2);
 
     rState = false;
-    
-    //TEMP
-    e = Enemy(10, 10);
-    e2 = Enemy();
 
-    map.solve_maze(e.x, e.y, p.x, p.y);
-    map.solve_maze(e2.x, e2.y, p.x, p.y);
+    e = Enemy(10, 10, 20, 10);
+    e2 = Enemy(10, 10, 20, 1);
 
-    ////////////////////
 }
 
 
@@ -112,11 +105,13 @@ void calcShift(int x, int y) {
             p.xShift = hBoundary;
             wall = true;
         }
+
     }
 
     else if (temp1 < (-hBoundary)) {
 
         if (temp2 > hBoundary) {
+
             if (map.maze[p.x - 1][p.y + 1].getWall()) {
                 p.xShift = -hBoundary;
                 p.yShift = hBoundary;
@@ -213,8 +208,7 @@ void display() {
         }
     }
 
-    p.draw(1,1,1,1,1.0); //Draw the player
-
+    p.draw(); //Draw the player
 
     glFlush();  // Render now
 }
@@ -231,8 +225,6 @@ void kbd(unsigned char key, int x, int y)
 
     //key 32 is space, I just have that rotate the map here
     if (key == 32) {
-        //angle = (angle + 90) % 360;
-        //angleR = angle * (M_PI /180);
         rState = true; //Animated transition
     }
 
@@ -246,27 +238,21 @@ void kbdS(int key, int x, int y) {
     switch(key) {
 
         case GLUT_KEY_DOWN:
-
             keys[GLUT_KEY_DOWN] = true;
-
             break;
+
         case GLUT_KEY_LEFT:
-
             keys[GLUT_KEY_LEFT] = true;
-
             break;
-        case GLUT_KEY_RIGHT:
 
+        case GLUT_KEY_RIGHT:
             keys[GLUT_KEY_RIGHT] = true;
             break;
 
         case GLUT_KEY_UP:
-
             keys[GLUT_KEY_UP] = true;
-
             break;
     }
-
     glutPostRedisplay();
 }
 
@@ -278,37 +264,33 @@ void keyUp (int key, int x, int y) {
 
         case GLUT_KEY_DOWN:
             keys[GLUT_KEY_DOWN] = false;
-
             break;
+
         case GLUT_KEY_LEFT:
-
             keys[GLUT_KEY_LEFT] = false;
-
             break;
+
         case GLUT_KEY_RIGHT:
             keys[GLUT_KEY_RIGHT] = false;
-
             break;
 
         case GLUT_KEY_UP:
-
             keys[GLUT_KEY_UP] = false;
             break;
     }
 
 }
 
-//void cursor(int x, int y) {
-//
+void cursor(int x, int y) {
+
 
   //  glutPostRedisplay();
-//}
+}
 
-//void mousemov(int x, int y) {
+void mousemov(int x, int y) {
 
-
-//    glutPostRedisplay();
-//}
+    //glutPostRedisplay();
+}
 
 // button will be GLUT_LEFT_BUTTON or GLUT_RIGHT_BUTTON
 // state will be GLUT_UP or GLUT_DOWN
@@ -343,27 +325,21 @@ void follow_path(Enemy &E) {
         //When in the players square, different movement behavior
     else if ((p.x == E.x) && (p.y == E.y)) {
 
-
         if (p.yShift > E.yShift) {
             E.yShift += E.getSpeed();
-
         }
 
         if (p.yShift < E.yShift) {
             E.yShift -= E.getSpeed();
-
         }
 
         if (p.xShift < E.xShift) {
             E.xShift -= E.getSpeed();
-
         }
 
         if (p.xShift > E.xShift) {
             E.xShift += E.getSpeed();
-
         }
-
     }
 
 

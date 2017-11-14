@@ -25,14 +25,12 @@ public:
 
     void update();
 
-    virtual void draw(int X, int Y, int pXShift, int pYShift, double angle) const = 0; //Make the class pure virtual
-
 protected:
 
-    Point location; //Location on screen
     int size;
     int speed;
     static const int sBoundary = (SCALE / 2);
+
 };
 
 
@@ -40,8 +38,9 @@ class Player : public Character {
 public:
 
     Player();
-    Player(int X, int Y);
-    void draw(int X, int Y, int pXShift, int pYShift, double angle) const override;
+    void draw() const;
+    Point location; //Location on screen
+
 };
 
 
@@ -51,7 +50,9 @@ public:
 
     Enemy();
     Enemy(int X, int Y);
-    void draw(int X, int Y, int pXShift, int pYShift, double angle) const override;
+    Enemy(int X, int Y, int s, int sp);
+    void draw(int X, int Y, int pXShift, int pYShift, double angle) const;
+
 };
 
 
