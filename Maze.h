@@ -22,10 +22,11 @@ public:
      * Constructors
      */
     Maze();
+
     /*
      * Int x and y must be greater than or equal to 1 and less then height(-1), and width(-1) respectively.
      * This constructor calls the starting point for maze generation in a different spot, since w/
-     * Prim's algorithim the edges closer to the start have a lower effective weight.
+     * Prim's algorithm the edges closer to the start have a lower effective weight.
      */
     Maze(int x, int y);
 

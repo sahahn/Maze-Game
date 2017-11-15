@@ -13,15 +13,20 @@ class Character {
 
 public:
 
-    //Location in the array
+    //Location in the maze array
     int x;
     int y;
+
+    //Shifted position within the location
     int xShift;
     int yShift;
 
+    //Temp values for intended movement, i.e. only
+    //updated to xShift, yShift if a valid movement.
     int temp1;
     int temp2;
 
+    //The "Hard Boundary" specific to each character, used in collision detection.
     int hBoundary;
 
     int getSize() const;
@@ -47,9 +52,7 @@ public:
 
     Player();
     void draw() const;
-    void calcMove(int x, int y, double angleR);
-
-
+    void calcMove(int xDelta, int yDelta, double angleR);
 };
 
 
@@ -58,17 +61,10 @@ class Enemy : public Character {
 public:
 
     Enemy();
-    Enemy(int X, int Y);
     Enemy(int X, int Y, int s, int sp);
-    void draw(int pXShift, int pYShift, double angle) const;
 
+    void draw(int pXShift, int pYShift, double angleR) const;
     void calcMove(int x, int y);
-
-    void moveL();
-    void moveR();
-    void moveU();
-    void moveD();
-
 };
 
 

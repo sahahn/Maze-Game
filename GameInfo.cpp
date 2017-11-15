@@ -8,7 +8,7 @@
 /*
  * Takes in an x and y, and an angle in radians and returns the location of the point rotated around the center
  */
-Point cp(int x, int y, double Angle) {
+Point rotate(int x, int y, double Angle) {
 
     x-= (SCREEN_WIDTH / 2);
     y-= (SCREEN_HEIGHT / 2);

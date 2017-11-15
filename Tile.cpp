@@ -69,7 +69,7 @@ void Tile::draw(int x, int y, int xShift, int yShift, double angle) const {
     y = (y * SCALE) + xShift;
 
 
-    //Convery to pixel coordinates
+    //Convert to pixel coordinates
     glBegin(GL_QUADS);
 
     if (angle == 0) {
@@ -87,10 +87,10 @@ void Tile::draw(int x, int y, int xShift, int yShift, double angle) const {
     else {
 
         Point p1,p2,p3,p4;
-        p1 = cp(y,x,angle);
-        p2 = cp((y+SCALE),x,angle);
-        p3 = cp((y+SCALE),(x+SCALE),angle);
-        p4 = cp(y,(x+SCALE),angle);
+        p1 = rotate(y,x,angle);
+        p2 = rotate((y+SCALE),x,angle);
+        p3 = rotate((y+SCALE),(x+SCALE),angle);
+        p4 = rotate(y,(x+SCALE),angle);
 
         glVertex2i(p1.x,p1.y);
         glVertex2i(p2.x,p2.y);

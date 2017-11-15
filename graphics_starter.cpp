@@ -283,69 +283,80 @@ void mouse(int button, int state, int x, int y) {
 //glutPostRedisplay();
 }
 
-
+//Implements the logic for any Enemy to follow the correct path to the player
 void follow_path(Enemy &E) {
 
-    if (map.maze[E.x][E.y].getCorrectPath()) {
-        map.maze[E.x][E.y].setCorrectPath(false);
-    }
-
+    //Move Right
     if (map.maze[E.x+1][E.y].getCorrectPath()) {
+
+        //First calculate move, then doMove, same for all movement.
         E.calcMove(0,-E.getSpeed());
         doMove(E);
-        //E.moveR();
     }
 
+    //Move Left
     else if (map.maze[E.x-1][E.y].getCorrectPath()) {
+
         E.calcMove(0,E.getSpeed());
         doMove(E);
-        //E.moveL();
     }
 
+    //Move Up
     else if (map.maze[E.x][E.y+1].getCorrectPath()) {
+
         E.calcMove(-E.getSpeed(),0);
         doMove(E);
-        //E.moveU();
     }
 
+    //Move Down
     else if (map.maze[E.x][E.y-1].getCorrectPath()) {
+
         E.calcMove(E.getSpeed(),0);
         doMove(E);
-        //E.moveD();
     }
 
-        //When in the players square, different movement behavior
+    //When in the player's tile, behave differently
+    //Specifically, compensate between the difference in player and enemy x and yShift.
     else if ((p.x == E.x) && (p.y == E.y)) {
 
         if (p.yShift > E.yShift) {
-            E.moveL();
+
+            E.calcMove(0,E.getSpeed());
+            doMove(E);
         }
 
         else if (p.yShift < E.yShift) {
-            E.moveR();
+
+            E.calcMove(0,-E.getSpeed());
+            doMove(E);
         }
 
         else if (p.xShift < E.xShift) {
-            E.moveU();
+
+            E.calcMove(-E.getSpeed(),0);
+            doMove(E);
         }
 
         else if (p.xShift > E.xShift) {
-            E.moveD();
+
+            E.calcMove(E.getSpeed(),0);
+            doMove(E);
         }
 
+        //If no further adjustments, you got tagged!
+        //If we want to make it easier to get tagged, we can change how this func works,
+        //right now they have to get right up in your face,
+        //but we can easily add collision detection between Enemy and Player, instead.
         else {
-            cout << "you got got" << endl;
+            cout << "You got Got!" << endl;
         }
     }
 
-
+    //Update with new array locations
     E.update();
 }
 
 void timer(int extra) {
-    //slowly rotate for fun
-    //angle = (angle + 1) % 360;
-    //angleR = angle * (M_PI /180);
 
     if (!rState) {
 
@@ -372,7 +383,7 @@ void timer(int extra) {
         p.update();
 
         if ((p.x == END_X) && (p.y == END_Y)) {
-            cout << "done" << endl;
+            cout << "You win... " << endl;
         }
 
         map.solve_maze(e.x, e.y, p.x, p.y);
