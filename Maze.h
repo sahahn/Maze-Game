@@ -19,16 +19,9 @@ class Maze {
 public:
 
     /*
-     * Constructors
+     * Constructor, uses global Constants
      */
     Maze();
-
-    /*
-     * Int x and y must be greater than or equal to 1 and less then height(-1), and width(-1) respectively.
-     * This constructor calls the starting point for maze generation in a different spot, since w/
-     * Prim's algorithm the edges closer to the start have a lower effective weight.
-     */
-    Maze(int x, int y);
 
     Tile maze[HEIGHT][WIDTH]; //Make the final maze w/ info public to easily get contents
 
@@ -36,13 +29,8 @@ public:
 
 
 private:
-    int scope;
     vector<point> wallList;
-    int startX, startY; // Starting x and y for solving maze
-    int endX, endY;     // End x and y for for solving maze
-
-
-
+    int endX, endY;     // End x and y for for solving maze, DIF THEN GLOBAL CONST
 
     void checkAndAdd(int x, int y);
     void removeOperation(int r);

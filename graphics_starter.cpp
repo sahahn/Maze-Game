@@ -38,7 +38,7 @@ void init() {
     rState = false;
 
     e = Enemy(10, 10, 20, 1);
-    e2 = Enemy(10, 10, 20, 1);
+    e2 = Enemy(10, 11, 20, 1);
 
 }
 
@@ -192,6 +192,10 @@ void display() {
 
     e.draw(p.xShift,p.yShift,angleR);
     e2.draw(p.xShift,p.yShift,angleR);
+
+    e.resetLoc();
+    e2.resetLoc();
+
     p.draw(); //Draw the player
 
     glFlush();  // Render now

@@ -204,6 +204,11 @@ void Enemy::calcMove(int x, int y) {
     temp2 = yShift + y;
 }
 
+void Enemy::resetLoc() {
+    location.x = -2;
+    location.y = -2;
+}
+
 
 
 

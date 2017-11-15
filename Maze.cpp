@@ -6,35 +6,19 @@
 
 Maze::Maze() {
 
-    scope = SCOPE;
-
+    //Set the start point, to be not a wall, and add it to the list
     maze[START_X][START_Y].setWall(false);
     addWall(START_X, START_Y);
 
     int remove;
 
+    //Go through randomly and remove walls
     while (wallList.size() != 0) {
         remove = rand() % wallList.size();
         removeOperation(remove);
     }
 
-    maze[END_X][END_Y].setWall(false);
-    maze[END_X][END_Y].setEnd(true);
-}
-
-Maze::Maze(int x, int y) {
-
-    maze[x][y].setWall(false);
-
-    addWall(x, y);
-
-    int remove;
-
-    while (wallList.size() != 0) {
-        remove = rand() % wallList.size();
-        removeOperation(remove);
-    }
-
+    //Set the end of the maze, to not a wall, and to be the end
     maze[END_X][END_Y].setWall(false);
     maze[END_X][END_Y].setEnd(true);
 
@@ -45,7 +29,7 @@ void Maze::checkAndAdd(int x, int y) {
     if (maze[x][y].getWall()) {
 
         //Check if the point is already in the list
-        if (std::find(wallList.begin(), wallList.end(), point((x),y)) != wallList.end()) {
+        if (std::find(wallList.begin(), wallList.end(), point(x,y)) != wallList.end()) {
         }
             //Only add if not already present
         else {
@@ -54,50 +38,52 @@ void Maze::checkAndAdd(int x, int y) {
     }
 }
 
+
+//Adds all available walls
 void Maze::addWall(int x, int y) {
 
-
-    if ((x+1) < (HEIGHT-scope)) {
-        checkAndAdd((x+1),y);
+    if ((x + 1) < (HEIGHT - SCOPE)) {
+        checkAndAdd((x + 1), y);
     }
 
-    if ((x-1) > scope-1) {
-        checkAndAdd((x-1),y);
+    if ((x - 1) > SCOPE - 1) {
+        checkAndAdd((x - 1), y);
     }
 
-    if ((y+1) < (WIDTH-scope)) {
-        checkAndAdd(x,(y+1));
+    if ((y + 1) < (WIDTH - SCOPE)) {
+        checkAndAdd(x,(y + 1));
     }
 
-    if ((y-1) > scope-1) {
-        checkAndAdd(x,(y-1));
+    if ((y - 1) > SCOPE - 1) {
+        checkAndAdd(x ,(y - 1));
     }
 }
 
+//Removes a random wall from the wallList, if it is a valid removal
 void Maze::removeOperation(int r) {
     int count = 0;
     int x = wallList[r].getX();
     int y = wallList[r].getY();
 
-    if ((x+1) < (HEIGHT-scope)) {
+    if ((x+1) < (HEIGHT-SCOPE)) {
         if (maze[x+1][y].getWall() == false) {
             count += 1;
         }
     }
 
-    if ((x-1) > scope-1) {
+    if ((x-1) > SCOPE-1) {
         if (maze[x-1][y].getWall() == false) {
             count += 1;
         }
     }
 
-    if ((y+1) < (WIDTH-scope)) {
+    if ((y+1) < (WIDTH-SCOPE)) {
         if (maze[x][y+1].getWall() == false) {
             count += 1;
         }
     }
 
-    if ((y-1) > scope-1) {
+    if ((y-1) > SCOPE-1) {
         if (maze[x][y-1].getWall() == false) {
             count += 1;
         }
@@ -149,7 +135,7 @@ bool Maze::recursiveSolve(int x, int y) {
         }
     }
 
-    if (y != HEIGHT - 1) {            // Checks if not on bottom edge
+    if (y != HEIGHT - 1) {                      // Checks if not on bottom edge
         if (recursiveSolve(x, y + 1)) {        // Recalls method one down
             maze[x][y].setCorrectPath(true);  // Sets that path value to true;
             return true;
@@ -170,9 +156,6 @@ void Maze::solve_maze(int s_x, int s_y, int e_x, int e_y) {
         }
     }
 
-
-    startX = s_x;
-    startY = s_y;
     endX = e_x;
     endY = e_y;
 

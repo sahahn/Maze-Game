@@ -65,6 +65,7 @@ public:
 
     void draw(int pXShift, int pYShift, double angleR) const;
     void calcMove(int x, int y);
+    void resetLoc();
 };
 
 
