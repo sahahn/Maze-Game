@@ -19,6 +19,11 @@ public:
     int xShift;
     int yShift;
 
+    int temp1;
+    int temp2;
+
+    int hBoundary;
+
     int getSize() const;
     int getSpeed() const;
     //Point getLocation() const;  Not needed!
@@ -42,6 +47,7 @@ public:
 
     Player();
     void draw() const;
+    void calcMove(int x, int y, double angleR);
 
 
 };
@@ -55,6 +61,8 @@ public:
     Enemy(int X, int Y);
     Enemy(int X, int Y, int s, int sp);
     void draw(int pXShift, int pYShift, double angle) const;
+
+    void calcMove(int x, int y);
 
     void moveL();
     void moveR();

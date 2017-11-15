@@ -13,15 +13,13 @@ Maze map; //Calling the maze object
 int wd;
 Player p;
 Enemy e, e2;
-const double M_PI = 3.14159265358;
+//const double M_PI = 3.14159265358;
 
 bool keys[128]; //Holds value of key presses and releases
 
 int angle; //angle of screen tilt in degrees
 double angleR; //angle in radians
 
-//Used in keeping track of playing location in array and checking for collisions
-int hBoundary;
 
 bool wall; //flag value for collisions
 
@@ -37,8 +35,6 @@ void init() {
 
     angle = 0;
 
-    hBoundary = ((SCALE-p.getSize()) / 2);
-
     rState = false;
 
     e = Enemy(10, 10, 20, 1);
@@ -47,93 +43,83 @@ void init() {
 }
 
 
-
-/*
- * Calculate collisions + Balance rotation
- */
-void calcShift(int x, int y) {
-
-    int temp1, temp2;
+void doMove(Character &C) {
 
     wall = false;
 
-    temp1 = rint(p.xShift + ((x * cos(-angleR)) - (y * sin(-angleR))));
-    temp2 = rint(p.yShift + ((y * cos(-angleR)) + (x * sin(-angleR))));
+    if (C.temp2 < (-C.hBoundary)) {
+        if (C.temp1 > C.hBoundary) {
+            if (map.maze[C.x + 1][C.y - 1].getWall()) {
 
-    if (temp2 < (-hBoundary)) {
-
-        if (temp1 > hBoundary) {
-            if (map.maze[p.x + 1][p.y - 1].getWall()) {
-
-                p.xShift = hBoundary;
-                p.yShift = -hBoundary;
+                C.xShift = C.hBoundary;
+                C.yShift = -C.hBoundary;
                 wall = true;
             }
         }
 
-        else if (temp1 < (-hBoundary)) {
-            if (map.maze[p.x + 1][p.y + 1].getWall()) {
+        if (C.temp1 < (-C.hBoundary)) {
+            if (map.maze[C.x + 1][C.y + 1].getWall()) {
 
-                p.xShift = -hBoundary;
-                p.yShift = -hBoundary;
+                C.xShift = -C.hBoundary;
+                C.yShift = -C.hBoundary;
                 wall = true;
             }
         }
 
-        else if (map.maze[p.x+1][p.y].getWall()) {
+        if (map.maze[C.x+1][C.y].getWall()) {
 
-            p.yShift = -hBoundary;
+            C.yShift = -C.hBoundary;
             wall = true;
         }
     }
 
-    else if (temp1 > (hBoundary)) {
+    if (C.temp1 > (C.hBoundary)) {
 
-        if (temp2 > hBoundary) {
-            if (map.maze[p.x - 1][p.y - 1].getWall()) {
+        if (C.temp2 > C.hBoundary) {
+            if (map.maze[C.x - 1][C.y - 1].getWall()) {
 
-                p.xShift = hBoundary;
-                p.yShift = hBoundary;
+                C.xShift = C.hBoundary;
+                C.yShift = C.hBoundary;
                 wall = true;
             }
         }
 
-        else if (map.maze[p.x][p.y-1].getWall()) {
+        if (map.maze[C.x][C.y-1].getWall()) {
 
-            p.xShift = hBoundary;
+            C.xShift = C.hBoundary;
             wall = true;
         }
 
     }
 
-    else if (temp1 < (-hBoundary)) {
+    if (C.temp1 < (-C.hBoundary)) {
 
-        if (temp2 > hBoundary) {
+        if (C.temp2 > C.hBoundary) {
 
-            if (map.maze[p.x - 1][p.y + 1].getWall()) {
-                p.xShift = -hBoundary;
-                p.yShift = hBoundary;
+            if (map.maze[C.x - 1][C.y + 1].getWall()) {
+                C.xShift = -C.hBoundary;
+                C.yShift = C.hBoundary;
                 wall = true;
             }
         }
 
-        else if (map.maze[p.x][p.y+1].getWall()) {
-            p.xShift = -hBoundary;
+        if (map.maze[C.x][C.y+1].getWall()) {
+            C.xShift = -C.hBoundary;
             wall = true;
         }
     }
 
-    else if (temp2 > (hBoundary)) {
+    if (C.temp2 > (C.hBoundary)) {
 
-        if (map.maze[p.x-1][p.y].getWall()) {
-            p.yShift = hBoundary;
+        if (map.maze[C.x-1][C.y].getWall()) {
+            C.yShift = C.hBoundary;
             wall = true;
         }
     }
 
     if (!wall) {
-        p.xShift = temp1;
-        p.yShift = temp2;
+        C.xShift = C.temp1;
+        C.yShift = C.temp2;
     }
 }
 
@@ -305,19 +291,27 @@ void follow_path(Enemy &E) {
     }
 
     if (map.maze[E.x+1][E.y].getCorrectPath()) {
-        E.moveR();
+        E.calcMove(0,-E.getSpeed());
+        doMove(E);
+        //E.moveR();
     }
 
     else if (map.maze[E.x-1][E.y].getCorrectPath()) {
-        E.moveL();
+        E.calcMove(0,E.getSpeed());
+        doMove(E);
+        //E.moveL();
     }
 
     else if (map.maze[E.x][E.y+1].getCorrectPath()) {
-        E.moveU();
+        E.calcMove(-E.getSpeed(),0);
+        doMove(E);
+        //E.moveU();
     }
 
     else if (map.maze[E.x][E.y-1].getCorrectPath()) {
-       E.moveD();
+        E.calcMove(E.getSpeed(),0);
+        doMove(E);
+        //E.moveD();
     }
 
         //When in the players square, different movement behavior
@@ -356,19 +350,23 @@ void timer(int extra) {
     if (!rState) {
 
         if (keys[GLUT_KEY_DOWN]) {
-            calcShift(0, -p.getSpeed());
+            p.calcMove(0, -p.getSpeed(),angleR);
+            doMove(p);
         }
 
         if (keys[GLUT_KEY_LEFT]) {
-            calcShift(p.getSpeed(), 0);
+            p.calcMove(p.getSpeed(), 0,angleR);
+            doMove(p);
         }
 
         if (keys[GLUT_KEY_UP]) {
-            calcShift(0, p.getSpeed());
+            p.calcMove(0, p.getSpeed(),angleR);
+            doMove(p);
         }
 
         if (keys[GLUT_KEY_RIGHT]) {
-            calcShift(-p.getSpeed(), 0);
+            p.calcMove(-p.getSpeed(), 0,angleR);
+            doMove(p);
         }
 
         p.update();
@@ -387,7 +385,7 @@ void timer(int extra) {
 
     else {
 
-        angle = (angle + 3) % 360;
+        angle = (angle + 1) % 360;
         angleR = angle * (M_PI /180);
 
         if (angle % 90 == 0) {

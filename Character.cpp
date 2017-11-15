@@ -61,6 +61,8 @@ Player::Player() {
     xShift = 0;
     yShift = 10;
 
+    hBoundary = ((SCALE-size) / 2);
+
 
 }
 
@@ -81,6 +83,12 @@ void Player::draw() const {
     glEnd();
 }
 
+void Player::calcMove(int x, int y, double angleR) {
+
+    temp1 = rint(xShift + ((x * cos(-angleR)) - (y * sin(-angleR))));
+    temp2 = rint(yShift + ((y * cos(-angleR)) + (x * sin(-angleR))));
+}
+
 /*
  * Enemy Class
  */
@@ -94,6 +102,7 @@ Enemy::Enemy() {
 
     xShift = 0;
     yShift = 0;
+    hBoundary = ((SCALE-size) / 2);
 
 }
 
@@ -107,6 +116,7 @@ Enemy::Enemy(int X, int Y) {
 
     xShift = 0;
     yShift = 0;
+    hBoundary = ((SCALE-size) / 2);
 }
 
 Enemy::Enemy(int X, int Y, int s, int sp) {
@@ -118,6 +128,7 @@ Enemy::Enemy(int X, int Y, int s, int sp) {
 
     xShift = 0;
     yShift = 0;
+    hBoundary = ((SCALE-size) / 2);
 }
 
 
@@ -161,10 +172,12 @@ void Enemy::draw(int pXShift, int pYShift, double angle) const {
         glVertex2i(p4.x,p4.y);
     }
 
-
-
     glEnd();
+}
 
+void Enemy::calcMove(int x, int y) {
+    temp1 = xShift + x;
+    temp2 = yShift + y;
 }
 
 void Enemy::moveL() {
