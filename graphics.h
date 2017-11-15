@@ -1,6 +1,6 @@
 #ifndef graphics_h
 #define graphics_h
-
+#include "Tile.h"
 #include <stdlib.h>
 #ifdef _WIN32
 #include <windows.h>
@@ -13,6 +13,9 @@
 #else
 #include <GL/glut.h>
 #endif
+
+
+void calcShift(int x, int y);
 
 // Program initialization NOT OpenGL/GLUT dependent,
 // as we haven't created a GLUT window yet
@@ -32,8 +35,11 @@ void kbd(unsigned char key, int x, int y);
 // Trap and process special keyboard events
 void kbdS(int key, int x, int y);
 
-// Handle "mouse cursor moved" events 
+// Handle "mouse cursor moved" events
 void cursor(int x, int y);
+
+//To handle drag function
+void mousemov(int x, int y);
 
 // Calls itself after a specified time
 void timer(int extra);
@@ -42,5 +48,7 @@ void timer(int extra);
 void mouse(int button, int state, int x, int y);
 
 int graphicsPlay(int argc, char *argv[]);
+
+void betterKeys();
 
 #endif /* graphics_h */
