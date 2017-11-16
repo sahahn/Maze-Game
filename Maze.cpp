@@ -29,11 +29,11 @@ void Maze::checkAndAdd(int x, int y) {
     if (maze[x][y].getWall()) {
 
         //Check if the point is already in the list
-        if (std::find(wallList.begin(), wallList.end(), point(x,y)) != wallList.end()) {
+        if (std::find(wallList.begin(), wallList.end(), MazePoint(x,y)) != wallList.end()) {
         }
             //Only add if not already present
         else {
-            wallList.push_back(point((x),y));
+            wallList.push_back(MazePoint((x),y));
         }
     }
 }

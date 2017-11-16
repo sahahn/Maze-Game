@@ -7,6 +7,7 @@
 
 
 #include <cmath>
+
 // Global settings for use in Graphics,cpp, Tile.cpp, Player.cpp, and Maze.cpp
 // Include GameInfo.h to access fields.
 

@@ -29,7 +29,7 @@ public:
 
 
 private:
-    vector<point> wallList;
+    vector<MazePoint> wallList;
     int endX, endY;     // End x and y for for solving maze, DIF THEN GLOBAL CONST
 
     void checkAndAdd(int x, int y);

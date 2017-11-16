@@ -5,6 +5,7 @@
 #include "graphics.h"
 #include <iostream>
 #include "Maze.h"
+#include "Character.h"
 using namespace std;
 
 
@@ -444,7 +445,7 @@ void timer(int extra) {
     else {
 
         angle = (angle + 1) % 360;
-        angleR = angle * (LUKE_M_PI /180);
+        angleR = angle * (M_PI /180);
 
         if (angle % 90 == 0) {
             rState = 0;
