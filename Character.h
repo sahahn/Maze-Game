@@ -31,6 +31,9 @@ public:
 
     int getSize() const;
     int getSpeed() const;
+
+    void setSize(int sizeIn);
+    void setSpeed(int speedIn);
     //Point getLocation() const;  Not needed!
 
     void setLocation(int xL, int yL);

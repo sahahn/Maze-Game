@@ -7,13 +7,18 @@
 #include "Maze.h"
 #include "Character.h"
 using namespace std;
+// this function makes it easy to print out testing information
+void testWithBool(string testName, bool pass) {
+    cout << "Test " << testName << (pass ? " passed." : " FAILED!!!") << endl;
+}
+
 
 
 Maze map; //Calling the maze object
 int wd;
 Player p;
 Enemy e, e2;
-//const double M_PI = 3.14159265358;
+const double M_PI = 3.14159265358;
 
 bool keys[128]; //Holds value of key presses and releases
 
@@ -26,6 +31,18 @@ bool wall; //flag value for collisions
 bool rState; //flag for rotation
 
 void init() {
+// TESTING
+    if (TESTING) {
+        Player testPlayer = Player();
+
+        testPlayer.setSize(10);
+        testWithBool("player > getSize", testPlayer.getSize() == 10);
+        testPlayer.setSize(-10);
+        testWithBool("player > getSize", testPlayer.getSize() == 10);
+
+    }
+// TESTING END
+
     map = Maze();
     p = Player();
 

@@ -19,6 +19,14 @@ int Character::getSpeed() const {
     return speed;
 }
 
+void Character::setSize(int sizeIn) {
+    size = (sizeIn > 0) ? sizeIn : size;
+}
+
+void Character::setSpeed(int speedIn) {
+    speed = (speedIn > 0) ? speedIn : speed;
+}
+
 //Sets the characters location on the screen, used mostly for enemy,
 //but could be used for the Player for some sort of end game animation.
 void Character::setLocation(int xL, int yL) {
