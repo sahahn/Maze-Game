@@ -69,6 +69,10 @@ Player::Player() {
     size = 20;
     speed = 2;
 
+    // constantly updated speed of player.
+    currentVelocity = DoublePoint{0,0};
+    velocityMovementBuffer = DoublePoint{0,0};
+
     //Set the player to be centered on the screen
     location.x = (SCREEN_WIDTH / 2) - (size/2);
     location.y = (SCREEN_HEIGHT / 2) - (size/2);
@@ -136,6 +140,34 @@ void Player::calcMove(int xDelta, int yDelta, double angleR) {
 
 void Player::setPlayerRotation(double angR) {
     playerRotation = angR;
+}
+
+void Player::updateVelocity(int x, int y) {
+    currentVelocity.x = x;
+    currentVelocity.y = y;
+}
+
+DoublePoint Player::getVelocity() const {
+    return currentVelocity;
+}
+
+DoublePoint Player::getMovementBuffer() const {
+    return velocityMovementBuffer;
+}
+
+void Player::taperXVelocity() {
+    currentVelocity.x /= 1.05;
+    if (velocityMovementBuffer.x > 1 || velocityMovementBuffer.x < -1){
+        velocityMovementBuffer.x = 0;
+    }
+    velocityMovementBuffer.x += currentVelocity.x;
+}
+void Player::taperYVelocity() {
+    currentVelocity.y /= 1.05;
+    if (velocityMovementBuffer.y > 1 || velocityMovementBuffer.y < -1){
+        velocityMovementBuffer.y = 0;
+    }
+    velocityMovementBuffer.y += currentVelocity.y;
 }
 
 /*

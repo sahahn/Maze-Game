@@ -31,6 +31,10 @@ struct Point {   // Declare Point struct type
     int x;   // Declare member types
     int y;
 };
+struct DoublePoint {   // Declare Point struct type
+    double x;   // Declare member types (doubles)
+    double y;
+};
 
 /*
  * Takes in an x and y, and an angle in radians and returns the location of the point rotated around the center
