@@ -336,28 +336,28 @@ void follow_path(Enemy &E) {
     if (map.maze[E.x+1][E.y].getCorrectPath()) {
 
         //First calculate move, then doMove, same for all movement.
-        E.calcMove(0,-E.getSpeed());
+        E.calcMove(0,-E.getSpeed(),0);
         doMove(E);
     }
 
     //Move Left
     else if (map.maze[E.x-1][E.y].getCorrectPath()) {
 
-        E.calcMove(0,E.getSpeed());
+        E.calcMove(0,E.getSpeed(),0);
         doMove(E);
     }
 
     //Move Up
     else if (map.maze[E.x][E.y+1].getCorrectPath()) {
 
-        E.calcMove(-E.getSpeed(),0);
+        E.calcMove(-E.getSpeed(),0,0);
         doMove(E);
     }
 
     //Move Down
     else if (map.maze[E.x][E.y-1].getCorrectPath()) {
 
-        E.calcMove(E.getSpeed(),0);
+        E.calcMove(E.getSpeed(),0,0);
         doMove(E);
     }
 
@@ -367,25 +367,25 @@ void follow_path(Enemy &E) {
 
         if (p.yShift > E.yShift) {
 
-            E.calcMove(0,E.getSpeed());
+            E.calcMove(0,E.getSpeed(),0);
             doMove(E);
         }
 
         else if (p.yShift < E.yShift) {
 
-            E.calcMove(0,-E.getSpeed());
+            E.calcMove(0,-E.getSpeed(),0);
             doMove(E);
         }
 
         else if (p.xShift < E.xShift) {
 
-            E.calcMove(-E.getSpeed(),0);
+            E.calcMove(-E.getSpeed(),0,0);
             doMove(E);
         }
 
         else if (p.xShift > E.xShift) {
 
-            E.calcMove(E.getSpeed(),0);
+            E.calcMove(E.getSpeed(),0,0);
             doMove(E);
         }
 

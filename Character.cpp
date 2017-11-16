@@ -221,9 +221,9 @@ void Enemy::draw(int pXShift, int pYShift, double angleR) const {
 
 //Like the player calcMove, but no need to adjust for rotation,
 //simply sets the temp values.
-void Enemy::calcMove(int x, int y) {
-    temp1 = xShift + x;
-    temp2 = yShift + y;
+void Enemy::calcMove(int xDelta, int yDelta, double angleR) {
+    temp1 = xShift + xDelta;
+    temp2 = yShift + yDelta;
 }
 
 void Enemy::resetLoc() {

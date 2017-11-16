@@ -37,6 +37,8 @@ public:
 
     void update();
 
+    virtual void calcMove(int xDelta, int yDelta, double angleR) = 0;
+
 protected:
 
     int size;
@@ -52,7 +54,7 @@ public:
 
     Player();
     void draw() const;
-    void calcMove(int xDelta, int yDelta, double angleR);
+    void calcMove(int xDelta, int yDelta, double angleR) override;
     void setPlayerRotation(double angR);
 
 private:
@@ -68,7 +70,7 @@ public:
     Enemy(int X, int Y, int s, int sp);
 
     void draw(int pXShift, int pYShift, double angleR) const;
-    void calcMove(int x, int y);
+    void calcMove(int xDelta, int yDelta, double angleR) override;
     void resetLoc();
 
 };
