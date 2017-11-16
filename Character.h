@@ -53,6 +53,10 @@ public:
     Player();
     void draw() const;
     void calcMove(int xDelta, int yDelta, double angleR);
+    void setPlayerRotation(double angR);
+
+private:
+    double playerRotation;
 };
 
 
@@ -66,6 +70,7 @@ public:
     void draw(int pXShift, int pYShift, double angleR) const;
     void calcMove(int x, int y);
     void resetLoc();
+
 };
 
 

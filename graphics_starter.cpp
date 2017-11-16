@@ -216,8 +216,48 @@ void kbd(unsigned char key, int x, int y)
         rState = true; //Animated transition
     }
 
-    glutPostRedisplay();
+    switch (key) {
 
+        case 's':
+            keys[GLUT_KEY_DOWN] = true;
+            break;
+
+        case 'a':
+            keys[GLUT_KEY_LEFT] = true;
+            break;
+
+        case 'd':
+            keys[GLUT_KEY_RIGHT] = true;
+            break;
+
+        case 'w':
+            keys[GLUT_KEY_UP] = true;
+            break;
+    }
+
+    glutPostRedisplay();
+}
+
+void kbu(unsigned char key, int x, int y) {
+
+    switch (key) {
+
+        case 's':
+            keys[GLUT_KEY_DOWN] = false;
+            break;
+
+        case 'a':
+            keys[GLUT_KEY_LEFT] = false;
+            break;
+
+        case 'd':
+            keys[GLUT_KEY_RIGHT] = false;
+            break;
+
+        case 'w':
+            keys[GLUT_KEY_UP] = false;
+            break;
+    }
 }
 
 
@@ -266,16 +306,18 @@ void keyUp (int key, int x, int y) {
             keys[GLUT_KEY_UP] = false;
             break;
     }
-
 }
 
 void cursor(int x, int y) {
+    double ang;
+    ang = atan2(y - (SCREEN_HEIGHT / 2), x - (SCREEN_WIDTH / 2));
 
-
-    //  glutPostRedisplay();
+    p.setPlayerRotation(ang);
+      //glutPostRedisplay();
 }
 
 void mousemov(int x, int y) {
+
 
     //glutPostRedisplay();
 }
@@ -440,6 +482,8 @@ int graphicsPlay(int argc, char** argv) {
     // works for numbers, letters, spacebar, etc.
     glutKeyboardFunc(kbd);
 
+    glutKeyboardUpFunc(kbu);
+
     // register special event: function keys, arrows, etc.
     glutSpecialFunc(kbdS);
 
@@ -450,9 +494,9 @@ int graphicsPlay(int argc, char** argv) {
 
 
     // handles mouse movement
-    //    glutPassiveMotionFunc(cursor);
+    glutPassiveMotionFunc(cursor);
 
-    //  glutMotionFunc(mousemov);
+    //glutMotionFunc(mousemov);
 
     // handles mouse click
     glutMouseFunc(mouse);
