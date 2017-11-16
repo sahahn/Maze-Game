@@ -13,7 +13,7 @@ Maze map; //Calling the maze object
 int wd;
 Player p;
 Enemy e, e2;
-const double M_PI = 3.14159265358;
+//const double M_PI = 3.14159265358;
 
 bool keys[128]; //Holds value of key presses and releases
 

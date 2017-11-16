@@ -4,8 +4,6 @@
 
 #include "Tile.h"
 #include "GameInfo.h"
-#include <iostream>
-#include <math.h>
 
 Tile::Tile() {
     wall = true;
@@ -99,30 +97,30 @@ void Tile::draw(int x, int y, int xShift, int yShift, double angle) const {
     }
 }
 
-point::point() {
+MazePoint::MazePoint() {
     x = 0;
     y = 0;
 }
 
-point::point(int X, int Y) {
+MazePoint::MazePoint(int X, int Y) {
     x = X;
     y = Y;
 }
 
-int point::getX() const {
+int MazePoint::getX() const {
     return x;
 }
-int point::getY() const {
+int MazePoint::getY() const {
     return y;
 }
-void point::setX(int X) {
+void MazePoint::setX(int X) {
     x = X;
 }
-void point::setY(int Y) {
+void MazePoint::setY(int Y) {
     y = Y;
 }
 
-bool point::operator ==(const point &b) const {
+bool MazePoint::operator ==(const MazePoint &b) const {
     if ((x == b.getX()) && (y == b.getY())) {
         return true;
     }

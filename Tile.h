@@ -41,18 +41,18 @@ private:
 /*
  * point class is used in generating the maze class
  */
-class point {
+class MazePoint {
 public:
-    point();
+    MazePoint();
 
-    point(int X, int Y);
+    MazePoint(int X, int Y);
 
     int getX() const;
     int getY() const;
     void setX(int X);
     void setY(int Y);
 
-    bool operator ==(const point &b) const;
+    bool operator ==(const MazePoint &b) const;
 
 private:
     int x;

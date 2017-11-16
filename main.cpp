@@ -16,9 +16,31 @@ int main(int argc, char** argv){
         Player testPlayer = Player();
 
         testPlayer.setSize(10);
-        testWithBool("player > getSize", testPlayer.getSize() == 10);
+        testWithBool("Player > getSize", testPlayer.getSize() == 10);
         testPlayer.setSize(-10);
-        testWithBool("player > getSize", testPlayer.getSize() == 10);
+        testWithBool("Player > getSize", testPlayer.getSize() == 10);
+
+
+        Tile testTile = Tile();
+
+        testTile.setWall(true);
+        testWithBool("Tile > setWall", testTile.getWall() == true);
+        testTile.setEnd(true);
+        testWithBool("Tile > setEnd", testTile.getEnd() == true);
+        testTile.setWasHere(true);
+        testWithBool("Tile > setWashere", testTile.getWasHere() == true);
+        testTile.setCorrectPath(true);
+        testWithBool("Tile > setCorrectPath", testTile.getCorrectPath() == true);
+
+        MazePoint testMazePoint1 = MazePoint();
+        MazePoint testMazePoint2 = MazePoint(5,5);
+
+        testMazePoint1.setX(5);
+        testWithBool("MazePoint > setX", testMazePoint1.getX() == 5);
+        testMazePoint1.setY(5);
+        testWithBool("MazePoint > setY", testMazePoint1.getY() == 5);
+        testWithBool("MazePoint > == overload", testMazePoint1 == testMazePoint2);
+
 
     }
     // TESTING END
