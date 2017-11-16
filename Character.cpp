@@ -33,6 +33,10 @@ void Character::setLocation(int xL, int yL) {
     location.y = yL;
 }
 
+Point Character::getLocation() {
+    return location;
+}
+
 //The update function is used by Player and Enemies, and acts by checking to see if
 //after a movement, the Character has moved into a different x,y location within the map,
 //and subsequently updates either the x or y, along with the xShift and yShift to reflect this change.
@@ -126,8 +130,8 @@ void Player::draw() const {
 //to compensate for the later applied rotation.
 void Player::calcMove(int xDelta, int yDelta, double angleR) {
 
-    temp1 = rint(xShift + ((xDelta * cos(-angleR)) - (yDelta * sin(-angleR))));
-    temp2 = rint(yShift + ((yDelta * cos(-angleR)) + (xDelta * sin(-angleR))));
+    temp1 = (int)rint(xShift + ((xDelta * cos(-angleR)) - (yDelta * sin(-angleR))));
+    temp2 = (int)rint(yShift + ((yDelta * cos(-angleR)) + (xDelta * sin(-angleR))));
 }
 
 void Player::setPlayerRotation(double angR) {

@@ -2,6 +2,7 @@
 #define graphics_h
 #include "Tile.h"
 #include <stdlib.h>
+#include "Character.h"
 #ifdef _WIN32
 #include <windows.h>
 #else

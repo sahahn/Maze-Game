@@ -37,6 +37,7 @@ public:
     //Point getLocation() const;  Not needed!
 
     void setLocation(int xL, int yL);
+    Point getLocation();
 
     void update();
 

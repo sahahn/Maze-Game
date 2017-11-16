@@ -1,7 +1,5 @@
 #include <iostream>
 #include "graphics.h"
-#include "GameInfo.h"
-#include "Character.h"
 using namespace std;
 // test variable
 bool testsPassed = true;
@@ -16,9 +14,19 @@ int main(int argc, char** argv){
         Player testPlayer = Player();
 
         testPlayer.setSize(10);
-        testWithBool("player > getSize", testPlayer.getSize() == 10);
+        testWithBool("Character > setSize", testPlayer.getSize() == 10);
         testPlayer.setSize(-10);
-        testWithBool("player > getSize", testPlayer.getSize() == 10);
+        testWithBool("Character > getSize", testPlayer.getSize() == 10);
+        testPlayer.setSpeed(10);
+        testWithBool("Character > setSpeed", testPlayer.getSpeed() == 10);
+        testPlayer.setSpeed(-10);
+        testWithBool("Character > getSpeed", testPlayer.getSpeed() == 10);
+        testPlayer.setLocation(4,-3);
+        testWithBool("Character > setLocation & getLocation", testPlayer.getLocation().x == 4 && testPlayer.getLocation().y == -3);
+//        testPlayer.calcMove(1,1,0);
+//        testPlayer.update();
+//        doMove(testPlayer);
+//        testWithBool("Character > calcMove & update", testPlayer.getLocation().x == 5 && testPlayer.getLocation().y == -2);
 
     }
     // TESTING END
