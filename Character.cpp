@@ -5,7 +5,6 @@
 #include "Character.h"
 #include <iostream>
 
-
 /*
  * Character Abstract Class
  */
@@ -79,13 +78,13 @@ Player::Player() {
 
     //hBoundary, or Hard Boundary is used in doMove, and reflects the size of the Character
     hBoundary = ((SCALE-size) / 2);
-
-
+    playerRotation = 0;
 }
 
 //Draws the player, NOTE: although enemy also has a draw function, it requires different parameters
 //so I did not think there was a use in creating a virtual function to override.
 void Player::draw() const {
+
 
     glBegin(GL_QUADS);
     glColor3f(1, 1, 0);
@@ -99,6 +98,25 @@ void Player::draw() const {
     glVertex2i(location.x, (location.y+size));
 
     glEnd();
+
+    //If we want to make the player rotate  uncomment this code!
+    /*
+    glBegin(GL_QUADS);
+    glColor3f(1, 1, 0);
+
+    Point p1,p2,p3,p4;
+
+    p1 = rotate(location.x, location.y, playerRotation);
+    p2 = rotate((location.x+size),location.y, playerRotation);
+    p3 = rotate((location.x+size),(location.y+size), playerRotation);
+    p4 = rotate(location.x, (location.y+size), playerRotation);
+
+    glVertex2i(p1.x, p1.y); //TL
+    glVertex2i(p2.x, p2.y); //TR
+    glVertex2i(p3.x, p3.y); //BR
+    glVertex2i(p4.x, p4.y); //BL
+
+    glEnd(); */
 }
 
 //calcMove takes in an xDelta, and yDelta along with the current angle in radians.
@@ -110,6 +128,10 @@ void Player::calcMove(int xDelta, int yDelta, double angleR) {
 
     temp1 = rint(xShift + ((xDelta * cos(-angleR)) - (yDelta * sin(-angleR))));
     temp2 = rint(yShift + ((yDelta * cos(-angleR)) + (xDelta * sin(-angleR))));
+}
+
+void Player::setPlayerRotation(double angR) {
+    playerRotation = angR;
 }
 
 /*
@@ -207,9 +229,9 @@ void Enemy::draw(int pXShift, int pYShift, double angleR) const {
 
 //Like the player calcMove, but no need to adjust for rotation,
 //simply sets the temp values.
-void Enemy::calcMove(int x, int y) {
-    temp1 = xShift + x;
-    temp2 = yShift + y;
+void Enemy::calcMove(int xDelta, int yDelta, double angleR) {
+    temp1 = xShift + xDelta;
+    temp2 = yShift + yDelta;
 }
 
 void Enemy::resetLoc() {

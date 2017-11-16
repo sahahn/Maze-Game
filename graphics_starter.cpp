@@ -233,8 +233,48 @@ void kbd(unsigned char key, int x, int y)
         rState = true; //Animated transition
     }
 
-    glutPostRedisplay();
+    switch (key) {
 
+        case 's':
+            keys[GLUT_KEY_DOWN] = true;
+            break;
+
+        case 'a':
+            keys[GLUT_KEY_LEFT] = true;
+            break;
+
+        case 'd':
+            keys[GLUT_KEY_RIGHT] = true;
+            break;
+
+        case 'w':
+            keys[GLUT_KEY_UP] = true;
+            break;
+    }
+
+    glutPostRedisplay();
+}
+
+void kbu(unsigned char key, int x, int y) {
+
+    switch (key) {
+
+        case 's':
+            keys[GLUT_KEY_DOWN] = false;
+            break;
+
+        case 'a':
+            keys[GLUT_KEY_LEFT] = false;
+            break;
+
+        case 'd':
+            keys[GLUT_KEY_RIGHT] = false;
+            break;
+
+        case 'w':
+            keys[GLUT_KEY_UP] = false;
+            break;
+    }
 }
 
 
@@ -283,16 +323,18 @@ void keyUp (int key, int x, int y) {
             keys[GLUT_KEY_UP] = false;
             break;
     }
-
 }
 
 void cursor(int x, int y) {
+    double ang;
+    ang = atan2(y - (SCREEN_HEIGHT / 2), x - (SCREEN_WIDTH / 2));
 
-
-    //  glutPostRedisplay();
+    p.setPlayerRotation(ang);
+      //glutPostRedisplay();
 }
 
 void mousemov(int x, int y) {
+
 
     //glutPostRedisplay();
 }
@@ -311,28 +353,28 @@ void follow_path(Enemy &E) {
     if (map.maze[E.x+1][E.y].getCorrectPath()) {
 
         //First calculate move, then doMove, same for all movement.
-        E.calcMove(0,-E.getSpeed());
+        E.calcMove(0,-E.getSpeed(),0);
         doMove(E);
     }
 
     //Move Left
     else if (map.maze[E.x-1][E.y].getCorrectPath()) {
 
-        E.calcMove(0,E.getSpeed());
+        E.calcMove(0,E.getSpeed(),0);
         doMove(E);
     }
 
     //Move Up
     else if (map.maze[E.x][E.y+1].getCorrectPath()) {
 
-        E.calcMove(-E.getSpeed(),0);
+        E.calcMove(-E.getSpeed(),0,0);
         doMove(E);
     }
 
     //Move Down
     else if (map.maze[E.x][E.y-1].getCorrectPath()) {
 
-        E.calcMove(E.getSpeed(),0);
+        E.calcMove(E.getSpeed(),0,0);
         doMove(E);
     }
 
@@ -342,25 +384,25 @@ void follow_path(Enemy &E) {
 
         if (p.yShift > E.yShift) {
 
-            E.calcMove(0,E.getSpeed());
+            E.calcMove(0,E.getSpeed(),0);
             doMove(E);
         }
 
         else if (p.yShift < E.yShift) {
 
-            E.calcMove(0,-E.getSpeed());
+            E.calcMove(0,-E.getSpeed(),0);
             doMove(E);
         }
 
         else if (p.xShift < E.xShift) {
 
-            E.calcMove(-E.getSpeed(),0);
+            E.calcMove(-E.getSpeed(),0,0);
             doMove(E);
         }
 
         else if (p.xShift > E.xShift) {
 
-            E.calcMove(E.getSpeed(),0);
+            E.calcMove(E.getSpeed(),0,0);
             doMove(E);
         }
 
@@ -457,6 +499,8 @@ int graphicsPlay(int argc, char** argv) {
     // works for numbers, letters, spacebar, etc.
     glutKeyboardFunc(kbd);
 
+    glutKeyboardUpFunc(kbu);
+
     // register special event: function keys, arrows, etc.
     glutSpecialFunc(kbdS);
 
@@ -467,9 +511,9 @@ int graphicsPlay(int argc, char** argv) {
 
 
     // handles mouse movement
-    //    glutPassiveMotionFunc(cursor);
+    glutPassiveMotionFunc(cursor);
 
-    //  glutMotionFunc(mousemov);
+    //glutMotionFunc(mousemov);
 
     // handles mouse click
     glutMouseFunc(mouse);
