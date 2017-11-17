@@ -2,7 +2,6 @@
 #define graphics_h
 #include "Tile.h"
 #include <stdlib.h>
-#include "Character.h"
 #ifdef _WIN32
 #include <windows.h>
 #else
@@ -16,8 +15,6 @@
 #endif
 
 
-void calcShift(int x, int y);
-
 // Program initialization NOT OpenGL/GLUT dependent,
 // as we haven't created a GLUT window yet
 void init(void);
@@ -25,31 +22,24 @@ void init(void);
 // Initialize OpenGL Graphics
 void InitGL(void);
 
-// Callback functions for GLUT */
-
-// Draw the window - this is where all the GL actions are
-void display(void);
-
-// Trap and process alphanumeric keyboard events
 void kbd(unsigned char key, int x, int y);
 
-// Trap and process special keyboard events
+void kbu(unsigned char key, int x, int y);
+
 void kbdS(int key, int x, int y);
 
-// Handle "mouse cursor moved" events
+void keyUp (int key, int x, int y);
+
 void cursor(int x, int y);
 
-//To handle drag function
 void mousemov(int x, int y);
 
-// Calls itself after a specified time
-void timer(int extra);
-
-// Handle mouse button pressed and released events
 void mouse(int button, int state, int x, int y);
 
-int graphicsPlay(int argc, char *argv[]);
+void display();
 
-void betterKeys();
+void timer(int extra);
+
+int graphicsPlay(int argc, char *argv[]);
 
 #endif /* graphics_h */

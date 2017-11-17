@@ -20,6 +20,8 @@ int Character::getSpeed() const {
 
 void Character::setSize(int sizeIn) {
     size = (sizeIn > 0) ? sizeIn : size;
+
+    hBoundary = ((SCALE-size) / 2);
 }
 
 void Character::setSpeed(int speedIn) {
@@ -109,8 +111,8 @@ Player::Player() {
     velocityMovementBuffer = DoublePoint{0,0};
 
     //Set the player to be centered on the screen
-    location.x = (SCREEN_WIDTH / 2) - (size/2);
-    location.y = (SCREEN_HEIGHT / 2) - (size/2);
+    location.x = (SCREEN_WIDTH / 2);
+    location.y = (SCREEN_HEIGHT / 2);
 
     //Set the starting location in the maze array, as defined in GameInfo
     x = START_X;
@@ -128,17 +130,21 @@ Player::Player() {
 //so I did not think there was a use in creating a virtual function to override.
 void Player::draw() const {
 
+    int X,Y;
+
+    X = location.x - (size/2);
+    Y = location.y - (size/2);
 
     glBegin(GL_QUADS);
     glColor3f(1, 1, 0);
     // top left corner
-    glVertex2i(location.x, location.y);
+    glVertex2i(X, Y);
     // top right corner
-    glVertex2i((location.x+size),location.y);
+    glVertex2i(X + size ,Y);
     // bottom right corner
-    glVertex2i((location.x+size),(location.y+size));
+    glVertex2i(X + size, Y + size);
     // bottom left corner
-    glVertex2i(location.x, (location.y+size));
+    glVertex2i(X, Y + size);
 
     glEnd();
 
@@ -149,10 +155,10 @@ void Player::draw() const {
 
     Point p1,p2,p3,p4;
 
-    p1 = rotate(location.x, location.y, playerRotation);
-    p2 = rotate((location.x+size),location.y, playerRotation);
-    p3 = rotate((location.x+size),(location.y+size), playerRotation);
-    p4 = rotate(location.x, (location.y+size), playerRotation);
+    p1 = rotate(X, Y, playerRotation);
+    p2 = rotate((X+size),Y, playerRotation);
+    p3 = rotate((X+size),(Y+size), playerRotation);
+    p4 = rotate(X, (Y+size), playerRotation);
 
     glVertex2i(p1.x, p1.y); //TL
     glVertex2i(p2.x, p2.y); //TR
@@ -171,6 +177,10 @@ void Player::calcMove(int xDelta, int yDelta, double angleR) {
 
     temp1 = (int)rint(xShift + ((xDelta * cos(-angleR)) - (yDelta * sin(-angleR))));
     temp2 = (int)rint(yShift + ((yDelta * cos(-angleR)) + (xDelta * sin(-angleR))));
+}
+
+double Player::getPlayerRotation() const {
+    return playerRotation;
 }
 
 void Player::setPlayerRotation(double angR) {
@@ -196,9 +206,11 @@ Enemy::Enemy() {
     //hBoundary, same as with Player, must be calculated depending on size.
     hBoundary = ((SCALE-size) / 2);
 
+    type = Flipper;
+
 }
 
-Enemy::Enemy(int X, int Y, int s, int sp) {
+Enemy::Enemy(int X, int Y, int s, int sp, eType e) {
     size = s;
     speed = sp;
 
@@ -210,6 +222,16 @@ Enemy::Enemy(int X, int Y, int s, int sp) {
 
     //hBoundary, same as with Player, must be calculated depending on size.
     hBoundary = ((SCALE-size) / 2);
+
+    type = e;
+}
+
+eType Enemy::getType() const {
+    return type;
+}
+
+void Enemy::setType(eType e) {
+    type = e;
 }
 
 
@@ -235,8 +257,21 @@ void Enemy::draw(int pXShift, int pYShift, double angleR) const {
 
     glBegin(GL_QUADS);
 
-    //This is uh some sort of weird green, I've just been putting random colors to be honest...
-    glColor3f(0, 1, .5);
+    //Color is based on enemy type
+    switch (type) {
+
+        case (Flipper):
+            glColor3f(0, 1, .5);
+            break;
+
+        case (Sizer):
+            glColor3f(0, .1, .5);
+            break;
+
+        default:
+            glColor3f(1,1,1);
+            break;
+    }
 
     //If no rotation, no use in calculating shifted locations...
     //though this optimization most likely is not needed, we can delete it, I don't care.

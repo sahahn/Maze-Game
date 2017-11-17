@@ -25,14 +25,38 @@ int main(int argc, char** argv){
         testWithBool("Character > getSpeed", testPlayer.getSpeed() == 10);
         testPlayer.setLocation(4,-3);
         testWithBool("Character > setLocation & getLocation", testPlayer.getLocation().x == 4 && testPlayer.getLocation().y == -3);
+        testPlayer.setSize(50);
+        testWithBool("Character > hBoundary", testPlayer.hBoundary == ((SCALE-50) / 2));
 
-        testWithBool("Player > getSize", testPlayer.getSize() == 10);
         testPlayer.calcMove(10,10,90);
         testWithBool("Player > calcMove", ((testPlayer.temp1) == 4 && (testPlayer.temp2 == -13)));
         testPlayer.xShift = SCALE;
         testPlayer.yShift = -SCALE;
         testPlayer.update();
         testWithBool("Player > update", ((testPlayer.xShift == 0) && (testPlayer.yShift == 0)));
+
+        testPlayer.setPlayerRotation(3.5);
+        testWithBool("Player > set&getPlayerRotation", testPlayer.getPlayerRotation() == 3.5);
+        testPlayer.updateVelocity(10,10);
+        testWithBool("Player > update&getVelcoity", testPlayer.getVelocity().x == 10 && testPlayer.getVelocity().y == 10);
+        testPlayer.flipVelocity();
+        testWithBool("Player > flipVelcoity", testPlayer.getVelocity().x == -10 && testPlayer.getVelocity().y == -10);
+
+        testPlayer.taperXVelocity();
+        testPlayer.taperYVelocity();
+        testWithBool("Player > taperX&YVelocity", testPlayer.getVelocity().x > -10 && testPlayer.getVelocity().y > -10);
+
+        Enemy testEnemy = Enemy(20,20,10,1,Flipper);
+        testWithBool("Enemy > Non-Default Constructor", testEnemy.x == 20 && testEnemy.y == 20
+            && testEnemy.getSize() == 10 && testEnemy.getSpeed() == 1);
+
+        testEnemy.calcMove(10,10,0);
+        testWithBool("Enemy > calcMove", testEnemy.temp1 == 10 && testEnemy.temp2 == 10);
+        testEnemy.resetLoc();
+        testWithBool("Enemy > resetLoc", testEnemy.getLocation().x == -2 && testEnemy.getLocation().y == -2);
+        testEnemy.setType(Flipper);
+        testWithBool("Enemy > get&setType", testEnemy.getType() == Flipper);
+
 
         Point testRotate = rotate(600,600,(90*(LUKE_M_PI /180)));
         testWithBool("GameInfo > rotate", ((testRotate.x == 400) && (testRotate.y)));
@@ -56,9 +80,8 @@ int main(int argc, char** argv){
         testMazePoint1.setY(5);
         testWithBool("MazePoint > setY", testMazePoint1.getY() == 5);
         testWithBool("MazePoint > == overload", testMazePoint1 == testMazePoint2);
-
-
     }
+
     // TESTING END
     if (testsPassed) {
         cout << "All tests PASSED!" << endl;

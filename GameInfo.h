@@ -68,7 +68,6 @@ public:
 
 private:
 
-
     //Called at the end of the game,
     //prompts user for name, and does the file IO.
     //Will change when we have menus.

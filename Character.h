@@ -8,6 +8,8 @@
 #include "graphics.h"
 #include "GameInfo.h"
 
+enum eType {Flipper, Sizer};
+
 class Character {
 
 
@@ -69,24 +71,33 @@ public:
     Player();
     void draw() const;
     void calcMove(int xDelta, int yDelta, double angleR) override;
+
+    double getPlayerRotation() const;
     void setPlayerRotation(double angR);
+
 
 private:
     double playerRotation;
-
 };
-
-
 
 class Enemy : public Character {
 public:
 
     Enemy();
-    Enemy(int X, int Y, int s, int sp);
+    Enemy(int X, int Y, int s, int sp, eType e);
+
+    eType getType() const;
+    void setType(eType e);
 
     void draw(int pXShift, int pYShift, double angleR) const;
     void calcMove(int xDelta, int yDelta, double angleR) override;
     void resetLoc();
+
+
+private:
+
+    eType type;
+
 
 };
 
