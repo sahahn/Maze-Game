@@ -37,6 +37,7 @@ public:
     //Point getLocation() const;  Not needed!
 
     void setLocation(int xL, int yL);
+    Point getLocation();
 
     void update();
 
@@ -59,9 +60,16 @@ public:
     void draw() const;
     void calcMove(int xDelta, int yDelta, double angleR) override;
     void setPlayerRotation(double angR);
+    void updateVelocity(int x, int y);
+    DoublePoint getVelocity() const;
+    DoublePoint getMovementBuffer() const;
+    void taperXVelocity();
+    void taperYVelocity();
 
 private:
     double playerRotation;
+    DoublePoint currentVelocity;
+    DoublePoint velocityMovementBuffer;
 };
 
 

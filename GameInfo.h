@@ -7,6 +7,7 @@
 
 
 #include <cmath>
+
 // Global settings for use in Graphics,cpp, Tile.cpp, Player.cpp, and Maze.cpp
 // Include GameInfo.h to access fields.
 
@@ -29,6 +30,10 @@ static const bool TESTING = true;
 struct Point {   // Declare Point struct type
     int x;   // Declare member types
     int y;
+};
+struct DoublePoint {   // Declare Point struct type
+    double x;   // Declare member types (doubles)
+    double y;
 };
 
 /*

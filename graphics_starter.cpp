@@ -412,23 +412,39 @@ void timer(int extra) {
         if (keys[GLUT_KEY_DOWN]) {
             p.calcMove(0, -p.getSpeed(),angleR);
             doMove(p);
+            p.updateVelocity(0, -p.getSpeed());
         }
 
         if (keys[GLUT_KEY_LEFT]) {
             p.calcMove(p.getSpeed(), 0,angleR);
             doMove(p);
+            p.updateVelocity(p.getSpeed(), 0);
         }
 
         if (keys[GLUT_KEY_UP]) {
             p.calcMove(0, p.getSpeed(),angleR);
             doMove(p);
+            p.updateVelocity(0, p.getSpeed());
         }
 
         if (keys[GLUT_KEY_RIGHT]) {
             p.calcMove(-p.getSpeed(), 0,angleR);
             doMove(p);
+            p.updateVelocity(-p.getSpeed(), 0);
         }
 
+        if (!keys[GLUT_KEY_DOWN] && !keys[GLUT_KEY_UP]) {
+            p.calcMove((int)p.getMovementBuffer().x, 0,angleR);
+            doMove(p);
+            p.taperXVelocity();
+            if (p.getMovementBuffer().x != 0) cout << p.getMovementBuffer().x << endl;
+        }
+        if (!keys[GLUT_KEY_LEFT] && !keys[GLUT_KEY_RIGHT]) {
+            p.calcMove(0, (int)p.getMovementBuffer().y,angleR);
+            doMove(p);
+            p.taperYVelocity();
+            if (p.getMovementBuffer().y != 0) cout << p.getMovementBuffer().y << endl;
+        }
         p.update();
 
         if ((p.x == END_X) && (p.y == END_Y)) {

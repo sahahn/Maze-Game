@@ -16,9 +16,42 @@ int main(int argc, char** argv){
         Player testPlayer = Player();
 
         testPlayer.setSize(10);
-        testWithBool("player > getSize", testPlayer.getSize() == 10);
+        testWithBool("Character > setSize", testPlayer.getSize() == 10);
         testPlayer.setSize(-10);
-        testWithBool("player > getSize", testPlayer.getSize() == 10);
+        testWithBool("Character > getSize", testPlayer.getSize() == 10);
+        testPlayer.setSpeed(10);
+        testWithBool("Character > setSpeed", testPlayer.getSpeed() == 10);
+        testPlayer.setSpeed(-10);
+        testWithBool("Character > getSpeed", testPlayer.getSpeed() == 10);
+        testPlayer.setLocation(4,-3);
+        testWithBool("Character > setLocation & getLocation", testPlayer.getLocation().x == 4 && testPlayer.getLocation().y == -3);
+//        testPlayer.calcMove(1,1,0);
+//        testPlayer.update();
+//        doMove(testPlayer);
+//        testWithBool("Character > calcMove & update", testPlayer.getLocation().x == 5 && testPlayer.getLocation().y == -2);
+        testWithBool("Player > getSize", testPlayer.getSize() == 10);
+
+
+        Tile testTile = Tile();
+
+        testTile.setWall(true);
+        testWithBool("Tile > setWall", testTile.getWall() == true);
+        testTile.setEnd(true);
+        testWithBool("Tile > setEnd", testTile.getEnd() == true);
+        testTile.setWasHere(true);
+        testWithBool("Tile > setWashere", testTile.getWasHere() == true);
+        testTile.setCorrectPath(true);
+        testWithBool("Tile > setCorrectPath", testTile.getCorrectPath() == true);
+
+        MazePoint testMazePoint1 = MazePoint();
+        MazePoint testMazePoint2 = MazePoint(5,5);
+
+        testMazePoint1.setX(5);
+        testWithBool("MazePoint > setX", testMazePoint1.getX() == 5);
+        testMazePoint1.setY(5);
+        testWithBool("MazePoint > setY", testMazePoint1.getY() == 5);
+        testWithBool("MazePoint > == overload", testMazePoint1 == testMazePoint2);
+
 
     }
     // TESTING END
