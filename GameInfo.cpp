@@ -30,20 +30,27 @@ Point rotate(int x, int y, double Angle) {
 
 using namespace std;
 
-GameInfo::GameInfo(){
+GameInfo::GameInfo() {
     score.got = 0;
     score.name = "";
     score.time = 0.0;
-//    start = clock();
+    score.completed = false;
+    startTime = clock();
+}
+
+void GameInfo::end() {
+    endTimer();
+    saveScore();
+    exit(0);
 }
 
 /**
  * Timing currently fails to compile
  */
-void GameInfo::saveScore(){
+void GameInfo::saveScore() {
 
     cout << "Enter a name ";
-    while(!(cin >> score.name)){
+    while(!(cin >> score.name)) {
         junk();
         cout << "Enter a name ";
     }
@@ -54,28 +61,44 @@ void GameInfo::saveScore(){
     if (fileOut) {
         fileOut << score.name << "\n"
                 << "Time: " << score.time << " s\n"
-                << "gotchas: " << score.time << " gots\n";
+                << "gotchas: " << score.got << " gots\n";
+
+        if (score.completed) {
+            fileOut << "Completed: Yes!\n";
+        } else {
+            fileOut << "Completed: Nope\n";
+        }
+
         string list = "=========================\n";
 
         cout << list;
         cout << score.name << "\n"
              << "Time: " << score.time << " s\n"
-             << "gotchas: " << score.time << " gots\n";
+             << "gotchas: " << score.got << " gots\n";
+
+        if (score.completed) {
+            cout << "Completed: Yes\n";
+        } else {
+            cout << "Completed: Nope\n";
+        }
+
+        cout << list;
         fileOut.close();
     }
-    else{
+
+    else {
         cout << "Error opening file" << endl;
     }
 }
 
-//void GameInfo::endTimer(){
-//    score.time = (clock() - start) / (double) CLOCKS_PER_SEC;
-//}
+void GameInfo::endTimer() {
+    score.time = (clock() - startTime) / (double) CLOCKS_PER_SEC;
+}
 
 /**
  * Clears bad user input from the cin stream.
  */
-void GameInfo::junk(){
+void GameInfo::junk() {
     cin.clear();
     string junk;
     getline(cin,junk);

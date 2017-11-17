@@ -1,18 +1,8 @@
-fred
-Time: 10 s
-gotchas: 10 gots
-lars
-Time: 10 s
-gotchas: 10 gots
-sally
-Time: 10 s
-gotchas: 10 gots
-reynold
-Time: 10 s
-gotchas: 10 gots
-the
-Time: 0 s
+Ron
+Time: 1.72323 s
+gotchas: 2 gots
+Completed: Yes!
+tim
+Time: 0.669773 s
 gotchas: 0 gots
-Jeff
-Time: 0 s
-gotchas: 0 gots
+Completed: Nope

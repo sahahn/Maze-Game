@@ -1,5 +1,5 @@
 //
-// Created by sage on 10/30/17.
+// Created by 34u-jH
 //
 
 #include "graphics.h"
@@ -12,22 +12,18 @@ using namespace std;
 
 
 Maze map; //Calling the maze object
-int wd;
 Player p;
 Enemy e, e2;
 GameInfo game;
-clock_t start;
-//const double M_PI = 3.14159265358; //Needs to stay as M_PI, mine won't compile as LUKE_M_PI
+
+int wd;
 
 bool keys[128]; //Holds value of key presses and releases
 
 int angle; //angle of screen tilt in degrees
 double angleR; //angle in radians
 
-
-bool wall; //flag value for collisions
-
-bool rState; //flag for rotation
+bool rState; //Flag for rotation
 
 void init() {
     game = GameInfo();
@@ -45,8 +41,6 @@ void init() {
 
     e = Enemy(10, 10, 20, 1);
     e2 = Enemy(10, 11, 20, 1);
-
-    start = clock();
 }
 
 
@@ -122,22 +116,22 @@ bool doMove(Character &C) {
         }
     }
 
-    if (!wall) {
-        C.xShift = C.temp1;
-        C.yShift = C.temp2;
-        return true;
-    }
-}
+    //If it reaches this point, there is no wall, update normally
+    C.xShift = C.temp1;
+    C.yShift = C.temp2;
+    return true;
 
+}
 
 /* Initialize OpenGL Graphics */
 void initGL() {
     // Set "clearing" or background color
-    glClearColor(0, 0, 0, 0); // Changed color to blue
+    glClearColor(0, 0, 0, 0); // Changed color to black
 }
 
-/* Handler for window-repaint event. Call back when the window first appears and
- whenever the window needs to be re-painted. */
+/*
+ * Main display loop
+ */
 void display() {
     // tell OpenGL to use the whole window for drawing
     glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -152,8 +146,8 @@ void display() {
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-    //This part is a little sketchy too, but basically the lower boundaries and upper boundaries
-    //lb1 and up1 ect.. are used to keep what is displayed from trying to render parts that are not in the array
+    //lb and up refer to lower bound and upper bound, and are there as error checks to
+    //make sure the program doesn't attempt to render outside of the maze array.
     int lb1 = p.x - SCOPE;
     int upb1 = p.x + SCOPE;
     int lb2 = p.y - SCOPE;
@@ -183,40 +177,48 @@ void display() {
         int y = -1;
 
         for (int j = lb2; j < upb2+1; j++, y++) {
-            map.maze[i][j].draw(x,y,p.xShift,p.yShift,angleR);
 
+            //For each position in the array being drawn, i and j, tell the
+            //tile piece to draw it at relative location x and y, according to
+            //also the players x and yShift and the current angle of the screen.
+            map.maze[i][j].draw(x, y, p.xShift, p.yShift, angleR);
+
+            //If any enemies are in one of the squares,
+            //store the location of that square in there location field.
             if ((e.x == i) && (e.y == j)) {
-                e.setLocation(x,y);
+                e.setLocation(x, y);
             }
 
             if ((e2.x == i) && (e2.y == j)) {
-                e2.setLocation(x,y);
+                e2.setLocation(x, y);
             }
-
         }
     }
 
+    //Render enemies, specifically after the maze tiles are displayed.
     e.draw(p.xShift,p.yShift,angleR);
     e2.draw(p.xShift,p.yShift,angleR);
 
+    //Reset the enemies locations, solves a bug.
     e.resetLoc();
     e2.resetLoc();
 
-    p.draw(); //Draw the player
+    //Draw the player
+    p.draw();
 
-    glFlush();  // Render now
+    // Render now
+    glFlush();
 }
 
 
-// http://www.theasciicode.com.ar/ascii-control-characters/escape-ascii-code-27.html
 void kbd(unsigned char key, int x, int y)
 {
     // escape
     if (key == 27) {
-        glutDestroyWindow(wd);
-        game.saveScore();
         cout << "its ova actually tho" << endl;
-        exit(0);
+        glutDestroyWindow(wd);
+
+        game.end();
     }
 
     //key 32 is space, I just have that rotate the map here
@@ -373,35 +375,39 @@ void follow_path(Enemy &E) {
     //Specifically, compensate between the difference in player and enemy x and yShift.
     else if ((p.x == E.x) && (p.y == E.y)) {
 
-        if (p.yShift > E.yShift) {
+        //First check for collision with the player, if no collision...
+        if ((p.xShift + p.getSize() < E.xShift) || (E.xShift + E.getSize() < p.xShift) ||
+                (p.yShift + p.getSize() < E.yShift) || (E.yShift + E.getSize() < p.yShift)) {
 
-            E.calcMove(0,E.getSpeed(),0);
-            doMove(E);
+
+            if (p.yShift > E.yShift) {
+
+                E.calcMove(0, E.getSpeed(), 0);
+                doMove(E);
+
+            } else if (p.yShift < E.yShift) {
+
+                E.calcMove(0, -E.getSpeed(), 0);
+                doMove(E);
+
+            } else if (p.xShift < E.xShift) {
+
+                E.calcMove(-E.getSpeed(), 0, 0);
+                doMove(E);
+
+            } else if (p.xShift > E.xShift) {
+
+                E.calcMove(E.getSpeed(), 0, 0);
+                doMove(E);
+            }
         }
 
-        else if (p.yShift < E.yShift) {
-
-            E.calcMove(0,-E.getSpeed(),0);
-            doMove(E);
-        }
-
-        else if (p.xShift < E.xShift) {
-
-            E.calcMove(-E.getSpeed(),0,0);
-            doMove(E);
-        }
-
-        else if (p.xShift > E.xShift) {
-
-            E.calcMove(E.getSpeed(),0,0);
-            doMove(E);
-        }
-
-        //If no further adjustments, you got tagged!
-        //If we want to make it easier to get tagged, we can change how this func works,
-        //right now they have to get right up in your face,
-        //but we can easily add collision detection between Enemy and Player, instead.
+        //If a collision then, flip the player, and reset the location of the enemy!
         else {
+
+            rState = true;
+            E.x = END_X;
+            E.y = END_Y;
             cout << "You got Got!" << endl;
             game.score.got++;  // Player gets got
         }
@@ -427,6 +433,7 @@ void timer(int extra) {
 
         if (keys[GLUT_KEY_LEFT]) {
             p.calcMove(p.getSpeed(), 0,angleR);
+
             if (doMove(p)) {
                 p.updateVelocity(p.getSpeed(), 0);
             } else {
@@ -436,6 +443,7 @@ void timer(int extra) {
 
         if (keys[GLUT_KEY_UP]) {
             p.calcMove(0, p.getSpeed(),angleR);
+
             if (doMove(p)) {
                 p.updateVelocity(0, p.getSpeed());
             } else {
@@ -445,6 +453,7 @@ void timer(int extra) {
 
         if (keys[GLUT_KEY_RIGHT]) {
             p.calcMove(-p.getSpeed(), 0,angleR);
+
             if (doMove(p)) {
                 p.updateVelocity(-p.getSpeed(), 0);
             } else {
@@ -454,6 +463,7 @@ void timer(int extra) {
 
         if (!keys[GLUT_KEY_DOWN] && !keys[GLUT_KEY_UP]) {
             p.calcMove((int)p.getMovementBuffer().x, 0,angleR);
+
             if (doMove(p)) {
                 p.taperXVelocity();
             } else {
@@ -463,6 +473,7 @@ void timer(int extra) {
         }
         if (!keys[GLUT_KEY_LEFT] && !keys[GLUT_KEY_RIGHT]) {
             p.calcMove(0, (int)p.getMovementBuffer().y,angleR);
+
             if (doMove(p)) {
                 p.taperYVelocity();
             } else {
@@ -472,9 +483,15 @@ void timer(int extra) {
         }
         p.update();
 
+        //If you reach the END_X and END_Y square you win!
         if ((p.x == END_X) && (p.y == END_Y)) {
-            cout << "You win... " << endl;
-            game.score.time = (clock() - start) / (double) CLOCKS_PER_SEC;
+            cout << "You win! " << endl;
+
+            //Mark as completed and end game.
+            game.score.completed = true;
+
+            glutDestroyWindow(wd);
+            game.end();
         }
 
         map.solve_maze(e.x, e.y, p.x, p.y);
@@ -488,14 +505,12 @@ void timer(int extra) {
     else {
 
         angle = (angle + 1) % 360;
-        angleR = angle * (M_PI /180);
+        angleR = angle * (LUKE_M_PI /180);
 
         if (angle % 90 == 0) {
             rState = 0;
         }
     }
-
-
 
     glutPostRedisplay();
     glutTimerFunc(3, timer, 0);
@@ -535,8 +550,6 @@ int graphicsPlay(int argc, char** argv) {
     glutSpecialUpFunc(keyUp); // Tell GLUT to use the method "keyUp" for key up events
 
     glutSetKeyRepeat(0); //This func makes it so key repeats are off
-
-
 
     // handles mouse movement
     glutPassiveMotionFunc(cursor);

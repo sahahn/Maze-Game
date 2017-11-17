@@ -10,34 +10,40 @@
 #include <ctime>
 #include <string>
 
+using namespace std;
+
 // Global settings for use in Graphics,cpp, Tile.cpp, Player.cpp, and Maze.cpp
 // Include GameInfo.h to access fields.
 
-// This is also where we might want to add in file I/O for game saves.
-// I'm thinking we can use srand(int x) to save seeds of maps to output file,
-// and then load them to regenerate the same level.
-
-static const int HEIGHT = 100;
-static const int WIDTH = 100;
-static const int SCALE = 200;
-static const int SCREEN_HEIGHT = 1000;
-static const int SCREEN_WIDTH = 1000;
-static const int SCOPE = 3;
-static const int START_X = 3;
-static const int START_Y = 3;
+const int HEIGHT = 100;
+const int WIDTH = 100;
+const int SCALE = 200;
+const int SCREEN_HEIGHT = 1000;
+const int SCREEN_WIDTH = 1000;
+const int SCOPE = 3;
+const int START_X = 3;
+const int START_Y = 3;
 static const int END_X = 10;
-static const int END_Y = 10;
+const int END_Y = 10;
 const double LUKE_M_PI = 3.14159265358;
-static const bool TESTING = true;
+const bool TESTING = true;
 
 
 struct Point {   // Declare Point struct type
     int x;   // Declare member types
     int y;
 };
+
 struct DoublePoint {   // Declare Point struct type
     double x;   // Declare member types (doubles)
     double y;
+};
+
+struct Score{
+    int got;
+    double time;
+    string name;
+    bool completed;
 };
 
 /*
@@ -45,27 +51,33 @@ struct DoublePoint {   // Declare Point struct type
  */
 Point rotate(int x, int y, double Angle);
 
-struct Score{
-    int got;
-    double time;
-    std::string name;
-};
-
-using namespace std;
-
+/*
+ * The actual GameInfo class is used for file IO
+ */
 class GameInfo {
 public:
-    Score score;
 
+    //Default constructor
     GameInfo();
 
-    void saveScore();
+    Score score;
 
-    void endTimer();
+    //Calls saveScore and endTimer in one function
+    void end();
+
 
 private:
-    static clock_t start;
 
+
+    //Called at the end of the game,
+    //prompts user for name, and does the file IO.
+    //Will change when we have menus.
+    void saveScore();
+
+    //Also called at end of game, calculates the time passed since start in seconds
+    void endTimer();
+
+    clock_t startTime;
     void junk();
 };
 
