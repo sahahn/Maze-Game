@@ -6,6 +6,7 @@
 #include <iostream>
 #include "Maze.h"
 #include "Character.h"
+#include <ctime>
 using namespace std;
 
 
@@ -13,7 +14,9 @@ Maze map; //Calling the maze object
 int wd;
 Player p;
 Enemy e, e2;
-const double LUKE_M_PI = 3.14159265358;
+GameInfo game;
+clock_t start;
+//const double M_PI = 3.14159265358;
 
 bool keys[128]; //Holds value of key presses and releases
 
@@ -26,7 +29,7 @@ bool wall; //flag value for collisions
 bool rState; //flag for rotation
 
 void init() {
-
+    game = GameInfo();
 
     map = Maze();
     p = Player();
@@ -42,6 +45,7 @@ void init() {
     e = Enemy(10, 10, 20, 1);
     e2 = Enemy(10, 11, 20, 1);
 
+    start = clock();
 }
 
 
@@ -209,7 +213,10 @@ void kbd(unsigned char key, int x, int y)
 {
     // escape
     if (key == 27) {
+        game.saveScore();
+        cout << "its ova actually tho" << endl;
         glutDestroyWindow(wd);
+
         exit(0);
     }
 
@@ -397,6 +404,7 @@ void follow_path(Enemy &E) {
         //but we can easily add collision detection between Enemy and Player, instead.
         else {
             cout << "You got Got!" << endl;
+            game.score.got++;  // Player gets got
         }
     }
 
@@ -448,6 +456,7 @@ void timer(int extra) {
 
         if ((p.x == END_X) && (p.y == END_Y)) {
             cout << "You win... " << endl;
+            game.score.time = (clock() - start) / (double) CLOCKS_PER_SEC;
         }
 
         map.solve_maze(e.x, e.y, p.x, p.y);
@@ -461,14 +470,12 @@ void timer(int extra) {
     else {
 
         angle = (angle + 1) % 360;
-        angleR = angle * (LUKE_M_PI /180);
+        angleR = angle * (M_PI /180);
 
         if (angle % 90 == 0) {
             rState = 0;
         }
     }
-
-
 
     glutPostRedisplay();
     glutTimerFunc(3, timer, 0);
@@ -495,6 +502,7 @@ int graphicsPlay(int argc, char** argv) {
 
     // Our own OpenGL initialization
     initGL();
+
 
     // register keyboard press event processing function
     // works for numbers, letters, spacebar, etc.
@@ -527,4 +535,5 @@ int graphicsPlay(int argc, char** argv) {
 
 
     return 0;
+
 }

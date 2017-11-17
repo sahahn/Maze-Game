@@ -1,0 +1,18 @@
+fred
+Time: 10 s
+gotchas: 10 gots
+lars
+Time: 10 s
+gotchas: 10 gots
+sally
+Time: 10 s
+gotchas: 10 gots
+reynold
+Time: 10 s
+gotchas: 10 gots
+the
+Time: 0 s
+gotchas: 0 gots
+Jeff
+Time: 0 s
+gotchas: 0 gots

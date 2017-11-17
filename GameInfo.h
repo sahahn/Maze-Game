@@ -7,6 +7,8 @@
 
 
 #include <cmath>
+#include <ctime>
+#include <string>
 
 // Global settings for use in Graphics,cpp, Tile.cpp, Player.cpp, and Maze.cpp
 // Include GameInfo.h to access fields.
@@ -27,6 +29,7 @@ static const int END_X = 10;
 static const int END_Y = 10;
 static const bool TESTING = true;
 
+
 struct Point {   // Declare Point struct type
     int x;   // Declare member types
     int y;
@@ -41,6 +44,29 @@ struct DoublePoint {   // Declare Point struct type
  */
 Point rotate(int x, int y, double Angle);
 
+struct Score{
+    int got;
+    double time;
+    std::string name;
+};
+
+using namespace std;
+
+class GameInfo {
+public:
+    Score score;
+
+    GameInfo();
+
+    void saveScore();
+
+    void endTimer();
+
+private:
+    static clock_t start;
+
+    void junk();
+};
 
 
 #endif //GRAPHICS_GAMEINFO_H
