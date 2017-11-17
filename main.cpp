@@ -25,12 +25,17 @@ int main(int argc, char** argv){
         testWithBool("Character > getSpeed", testPlayer.getSpeed() == 10);
         testPlayer.setLocation(4,-3);
         testWithBool("Character > setLocation & getLocation", testPlayer.getLocation().x == 4 && testPlayer.getLocation().y == -3);
-//        testPlayer.calcMove(1,1,0);
-//        testPlayer.update();
-//        doMove(testPlayer);
-//        testWithBool("Character > calcMove & update", testPlayer.getLocation().x == 5 && testPlayer.getLocation().y == -2);
-        testWithBool("Player > getSize", testPlayer.getSize() == 10);
 
+        testWithBool("Player > getSize", testPlayer.getSize() == 10);
+        testPlayer.calcMove(10,10,90);
+        testWithBool("Player > calcMove", ((testPlayer.temp1) == 4 && (testPlayer.temp2 == -13)));
+        testPlayer.xShift = SCALE;
+        testPlayer.yShift = -SCALE;
+        testPlayer.update();
+        testWithBool("Player > update", ((testPlayer.xShift == 0) && (testPlayer.yShift == 0)));
+
+        Point testRotate = rotate(600,600,(90*(LUKE_M_PI /180)));
+        testWithBool("GameInfo > rotate", ((testRotate.x == 400) && (testRotate.y)));
 
         Tile testTile = Tile();
 
