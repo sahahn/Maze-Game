@@ -7,6 +7,7 @@
 #include "Maze.h"
 #include "Character.h"
 #include <ctime>
+#include <math.h>
 using namespace std;
 
 
@@ -16,7 +17,7 @@ Player p;
 Enemy e, e2;
 GameInfo game;
 clock_t start;
-//const double M_PI = 3.14159265358;
+//const double M_PI = 3.14159265358; //Needs to stay as M_PI, mine won't compile as LUKE_M_PI
 
 bool keys[128]; //Holds value of key presses and releases
 
@@ -49,9 +50,7 @@ void init() {
 }
 
 
-void doMove(Character &C) {
-
-    wall = false;
+bool doMove(Character &C) {
 
     if (C.temp2 < (-C.hBoundary)) {
         if (C.temp1 > C.hBoundary) {
@@ -59,7 +58,7 @@ void doMove(Character &C) {
 
                 C.xShift = C.hBoundary;
                 C.yShift = -C.hBoundary;
-                wall = true;
+                return false;;
             }
         }
 
@@ -68,14 +67,14 @@ void doMove(Character &C) {
 
                 C.xShift = -C.hBoundary;
                 C.yShift = -C.hBoundary;
-                wall = true;
+                return false;;
             }
         }
 
         if (map.maze[C.x+1][C.y].getWall()) {
 
             C.yShift = -C.hBoundary;
-            wall = true;
+            return false;;
         }
     }
 
@@ -86,14 +85,14 @@ void doMove(Character &C) {
 
                 C.xShift = C.hBoundary;
                 C.yShift = C.hBoundary;
-                wall = true;
+                return false;;
             }
         }
 
         if (map.maze[C.x][C.y-1].getWall()) {
 
             C.xShift = C.hBoundary;
-            wall = true;
+            return false;;
         }
 
     }
@@ -105,13 +104,13 @@ void doMove(Character &C) {
             if (map.maze[C.x - 1][C.y + 1].getWall()) {
                 C.xShift = -C.hBoundary;
                 C.yShift = C.hBoundary;
-                wall = true;
+                return false;;
             }
         }
 
         if (map.maze[C.x][C.y+1].getWall()) {
             C.xShift = -C.hBoundary;
-            wall = true;
+            return false;;
         }
     }
 
@@ -119,13 +118,14 @@ void doMove(Character &C) {
 
         if (map.maze[C.x-1][C.y].getWall()) {
             C.yShift = C.hBoundary;
-            wall = true;
+            return false;;
         }
     }
 
     if (!wall) {
         C.xShift = C.temp1;
         C.yShift = C.temp2;
+        return true;
     }
 }
 
@@ -213,10 +213,9 @@ void kbd(unsigned char key, int x, int y)
 {
     // escape
     if (key == 27) {
+        glutDestroyWindow(wd);
         game.saveScore();
         cout << "its ova actually tho" << endl;
-        glutDestroyWindow(wd);
-
         exit(0);
     }
 
@@ -418,39 +417,58 @@ void timer(int extra) {
 
         if (keys[GLUT_KEY_DOWN]) {
             p.calcMove(0, -p.getSpeed(),angleR);
-            doMove(p);
-            p.updateVelocity(0, -p.getSpeed());
+
+            if (doMove(p)) {
+                p.updateVelocity(0, -p.getSpeed());
+            } else {
+                p.flipVelocity();
+            }
         }
 
         if (keys[GLUT_KEY_LEFT]) {
             p.calcMove(p.getSpeed(), 0,angleR);
-            doMove(p);
-            p.updateVelocity(p.getSpeed(), 0);
+            if (doMove(p)) {
+                p.updateVelocity(p.getSpeed(), 0);
+            } else {
+                p.flipVelocity();
+            }
         }
 
         if (keys[GLUT_KEY_UP]) {
             p.calcMove(0, p.getSpeed(),angleR);
-            doMove(p);
-            p.updateVelocity(0, p.getSpeed());
+            if (doMove(p)) {
+                p.updateVelocity(0, p.getSpeed());
+            } else {
+                p.flipVelocity();
+            }
         }
 
         if (keys[GLUT_KEY_RIGHT]) {
             p.calcMove(-p.getSpeed(), 0,angleR);
-            doMove(p);
-            p.updateVelocity(-p.getSpeed(), 0);
+            if (doMove(p)) {
+                p.updateVelocity(-p.getSpeed(), 0);
+            } else {
+                p.flipVelocity();
+            }
         }
 
         if (!keys[GLUT_KEY_DOWN] && !keys[GLUT_KEY_UP]) {
             p.calcMove((int)p.getMovementBuffer().x, 0,angleR);
-            doMove(p);
-            p.taperXVelocity();
-            if (p.getMovementBuffer().x != 0) cout << p.getMovementBuffer().x << endl;
+            if (doMove(p)) {
+                p.taperXVelocity();
+            } else {
+                p.flipVelocity();
+            }
+            //if (p.getMovementBuffer().x != 0) cout << p.getMovementBuffer().x << endl;
         }
         if (!keys[GLUT_KEY_LEFT] && !keys[GLUT_KEY_RIGHT]) {
             p.calcMove(0, (int)p.getMovementBuffer().y,angleR);
-            doMove(p);
-            p.taperYVelocity();
-            if (p.getMovementBuffer().y != 0) cout << p.getMovementBuffer().y << endl;
+            if (doMove(p)) {
+                p.taperYVelocity();
+            } else {
+                p.flipVelocity();
+            }
+            //if (p.getMovementBuffer().y != 0) cout << p.getMovementBuffer().y << endl;
         }
         p.update();
 
@@ -477,6 +495,8 @@ void timer(int extra) {
         }
     }
 
+
+
     glutPostRedisplay();
     glutTimerFunc(3, timer, 0);
 }
@@ -502,7 +522,6 @@ int graphicsPlay(int argc, char** argv) {
 
     // Our own OpenGL initialization
     initGL();
-
 
     // register keyboard press event processing function
     // works for numbers, letters, spacebar, etc.
@@ -535,5 +554,4 @@ int graphicsPlay(int argc, char** argv) {
 
 
     return 0;
-
 }

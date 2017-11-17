@@ -43,12 +43,22 @@ public:
 
     virtual void calcMove(int xDelta, int yDelta, double angleR) = 0;
 
+    void updateVelocity(int x, int y);
+    DoublePoint getVelocity() const;
+    DoublePoint getMovementBuffer() const;
+    void taperXVelocity();
+    void taperYVelocity();
+    void flipVelocity();
+
 protected:
 
     int size;
     int speed;
     static const int sBoundary = (SCALE / 2);
     Point location; //Location on screen
+
+    DoublePoint currentVelocity;
+    DoublePoint velocityMovementBuffer;
 
 };
 
@@ -60,16 +70,10 @@ public:
     void draw() const;
     void calcMove(int xDelta, int yDelta, double angleR) override;
     void setPlayerRotation(double angR);
-    void updateVelocity(int x, int y);
-    DoublePoint getVelocity() const;
-    DoublePoint getMovementBuffer() const;
-    void taperXVelocity();
-    void taperYVelocity();
 
 private:
     double playerRotation;
-    DoublePoint currentVelocity;
-    DoublePoint velocityMovementBuffer;
+
 };
 
 

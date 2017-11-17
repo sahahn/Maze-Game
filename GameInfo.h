@@ -27,6 +27,7 @@ static const int START_X = 3;
 static const int START_Y = 3;
 static const int END_X = 10;
 static const int END_Y = 10;
+const double LUKE_M_PI = 3.14159265358;
 static const bool TESTING = true;
 
 
