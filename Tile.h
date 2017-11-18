@@ -4,13 +4,16 @@
 
 #ifndef GRAPHICS_TILE_H
 #define GRAPHICS_TILE_H
+
 #include "graphics.h"
 #include <math.h>
 
 class Tile {
 public:
+    // constructors
     Tile();
 
+    // getters
     bool getWall() const;
 
     bool getWasHere() const;
@@ -19,6 +22,7 @@ public:
 
     bool getEnd() const;
 
+    // setters
     void setWall(bool b);
 
     void setWasHere(bool b);
@@ -27,6 +31,7 @@ public:
 
     void setEnd(bool b);
 
+    // renders a single tile of the maze
     void draw(int x, int y, int xShift, int yShift, double angle) const;
 
 private:
@@ -43,16 +48,22 @@ private:
  */
 class MazePoint {
 public:
+    // constructors
     MazePoint();
 
     MazePoint(int X, int Y);
 
+    // getters and setters
     int getX() const;
+
     int getY() const;
+
     void setX(int X);
+
     void setY(int Y);
 
-    bool operator ==(const MazePoint &b) const;
+    // overrides the == operator to work for points in the maze for easy comparison
+    bool operator==(const MazePoint &b) const;
 
 private:
     int x;

@@ -38,7 +38,7 @@ void init() {
     e1 = Enemy(10, 10, 20, 1, Sizer);
     e2 = Enemy(10, 11, 20, 1, Flipper);
 
-    for (int i =0; i < 128; i++) {
+    for (int i = 0; i < 128; i++) {
         keys[i] = false;
     }
 
@@ -119,7 +119,7 @@ void kbu(unsigned char key, int x, int y) {
 
 void kbdS(int key, int x, int y) {
 
-    switch(key) {
+    switch (key) {
 
         case GLUT_KEY_DOWN:
             keys[GLUT_KEY_DOWN] = true;
@@ -141,10 +141,10 @@ void kbdS(int key, int x, int y) {
 }
 
 
-void keyUp (int key, int x, int y) {
+void keyUp(int key, int x, int y) {
 
 
-    switch(key) {
+    switch (key) {
 
         case GLUT_KEY_DOWN:
             keys[GLUT_KEY_DOWN] = false;
@@ -226,11 +226,11 @@ void display() {
     //so by starting with -1, the maze generates from 1 square off the screen
     int x = -1;
 
-    for (int i = lb1; i < upb1+1; i++, x++) {
+    for (int i = lb1; i < upb1 + 1; i++, x++) {
 
         int y = -1;
 
-        for (int j = lb2; j < upb2+1; j++, y++) {
+        for (int j = lb2; j < upb2 + 1; j++, y++) {
 
             //For each position in the array being drawn, i and j, tell the
             //tile piece to draw it at relative location x and y, according to
@@ -250,8 +250,8 @@ void display() {
     }
 
     //Render enemies, specifically after the maze tiles are displayed.
-    e1.draw(p.xShift,p.yShift,angleR);
-    e2.draw(p.xShift,p.yShift,angleR);
+    e1.draw(p.xShift, p.yShift, angleR);
+    e2.draw(p.xShift, p.yShift, angleR);
 
     //Reset the enemies locations, solves a bug.
     e1.resetLoc();
@@ -294,7 +294,7 @@ bool doMove(Character &C) {
             }
         }
 
-        if (map.maze[C.x+1][C.y].getWall()) {
+        if (map.maze[C.x + 1][C.y].getWall()) {
 
             C.yShift = -C.hBoundary;
             return false;
@@ -312,7 +312,7 @@ bool doMove(Character &C) {
             }
         }
 
-        if (map.maze[C.x][C.y-1].getWall()) {
+        if (map.maze[C.x][C.y - 1].getWall()) {
 
             C.xShift = C.hBoundary;
             return false;
@@ -331,7 +331,7 @@ bool doMove(Character &C) {
             }
         }
 
-        if (map.maze[C.x][C.y+1].getWall()) {
+        if (map.maze[C.x][C.y + 1].getWall()) {
             C.xShift = -C.hBoundary;
             return false;
         }
@@ -339,7 +339,7 @@ bool doMove(Character &C) {
 
     if (C.temp2 > (C.hBoundary)) {
 
-        if (map.maze[C.x-1][C.y].getWall()) {
+        if (map.maze[C.x - 1][C.y].getWall()) {
             C.yShift = C.hBoundary;
             return false;
         }
@@ -357,41 +357,41 @@ bool doMove(Character &C) {
 void follow_path(Enemy &E) {
 
     //Move Right
-    if (map.maze[E.x+1][E.y].getCorrectPath()) {
+    if (map.maze[E.x + 1][E.y].getCorrectPath()) {
 
         //First calculate move, then doMove, same for all movement.
-        E.calcMove(0,-E.getSpeed(),0);
+        E.calcMove(0, -E.getSpeed(), 0);
         doMove(E);
     }
 
-    //Move Left
-    else if (map.maze[E.x-1][E.y].getCorrectPath()) {
+        //Move Left
+    else if (map.maze[E.x - 1][E.y].getCorrectPath()) {
 
-        E.calcMove(0,E.getSpeed(),0);
+        E.calcMove(0, E.getSpeed(), 0);
         doMove(E);
     }
 
-    //Move Up
-    else if (map.maze[E.x][E.y+1].getCorrectPath()) {
+        //Move Up
+    else if (map.maze[E.x][E.y + 1].getCorrectPath()) {
 
-        E.calcMove(-E.getSpeed(),0,0);
+        E.calcMove(-E.getSpeed(), 0, 0);
         doMove(E);
     }
 
-    //Move Down
-    else if (map.maze[E.x][E.y-1].getCorrectPath()) {
+        //Move Down
+    else if (map.maze[E.x][E.y - 1].getCorrectPath()) {
 
-        E.calcMove(E.getSpeed(),0,0);
+        E.calcMove(E.getSpeed(), 0, 0);
         doMove(E);
     }
 
-    //When in the player's tile, behave differently
-    //Specifically, compensate between the difference in player and enemy x and yShift.
+        //When in the player's tile, behave differently
+        //Specifically, compensate between the difference in player and enemy x and yShift.
     else if ((p.x == E.x) && (p.y == E.y)) {
 
         //First check for collision with the player, if no collision...
         if (p.xShift + p.getSize() < E.xShift || E.xShift + E.getSize() < p.xShift ||
-                p.yShift + p.getSize() < E.yShift || E.yShift + E.getSize() < p.yShift) {
+            p.yShift + p.getSize() < E.yShift || E.yShift + E.getSize() < p.yShift) {
 
             //Get closer to the player,
             if (p.yShift > E.yShift) {
@@ -416,16 +416,14 @@ void follow_path(Enemy &E) {
             }
         }
 
-        //If a collision then,
+            //If a collision then,
         else {
 
             if (E.getType() == Flipper) {
 
                 //Flip the screen 90 degrees
                 rState = true;
-            }
-
-            else if (E.getType() == Sizer) {
+            } else if (E.getType() == Sizer) {
 
                 //Increase the Players size
                 p.setSize(p.getSize() + 1);
@@ -452,7 +450,7 @@ void timer(int extra) {
     if (!rState) {
 
         if (keys[GLUT_KEY_DOWN]) {
-            p.calcMove(0, -p.getSpeed(),angleR);
+            p.calcMove(0, -p.getSpeed(), angleR);
 
             if (doMove(p)) {
                 p.updateVelocity(0, -p.getSpeed());
@@ -462,7 +460,7 @@ void timer(int extra) {
         }
 
         if (keys[GLUT_KEY_LEFT]) {
-            p.calcMove(p.getSpeed(), 0,angleR);
+            p.calcMove(p.getSpeed(), 0, angleR);
 
             if (doMove(p)) {
                 p.updateVelocity(p.getSpeed(), 0);
@@ -472,7 +470,7 @@ void timer(int extra) {
         }
 
         if (keys[GLUT_KEY_UP]) {
-            p.calcMove(0, p.getSpeed(),angleR);
+            p.calcMove(0, p.getSpeed(), angleR);
 
             if (doMove(p)) {
                 p.updateVelocity(0, p.getSpeed());
@@ -482,7 +480,7 @@ void timer(int extra) {
         }
 
         if (keys[GLUT_KEY_RIGHT]) {
-            p.calcMove(-p.getSpeed(), 0,angleR);
+            p.calcMove(-p.getSpeed(), 0, angleR);
 
             if (doMove(p)) {
                 p.updateVelocity(-p.getSpeed(), 0);
@@ -492,7 +490,7 @@ void timer(int extra) {
         }
 
         if (!keys[GLUT_KEY_DOWN] && !keys[GLUT_KEY_UP]) {
-            p.calcMove((int)p.getMovementBuffer().x, 0,angleR);
+            p.calcMove((int) p.getMovementBuffer().x, 0, angleR);
 
             if (doMove(p)) {
                 p.taperXVelocity();
@@ -502,7 +500,7 @@ void timer(int extra) {
             //if (p.getMovementBuffer().x != 0) cout << p.getMovementBuffer().x << endl;
         }
         if (!keys[GLUT_KEY_LEFT] && !keys[GLUT_KEY_RIGHT]) {
-            p.calcMove(0, (int)p.getMovementBuffer().y,angleR);
+            p.calcMove(0, (int) p.getMovementBuffer().y, angleR);
 
             if (doMove(p)) {
                 p.taperYVelocity();
@@ -530,12 +528,10 @@ void timer(int extra) {
         map.solve_maze(e2.x, e2.y, p.x, p.y);
         follow_path(e2);
 
-    }
-
-    else {
+    } else {
 
         angle = (angle + 1) % 360;
-        angleR = angle * (LUKE_M_PI /180);
+        angleR = angle * (LUKE_M_PI / 180);
 
         if (angle % 90 == 0) {
             rState = 0;
@@ -548,7 +544,7 @@ void timer(int extra) {
 
 
 /* Main function: GLUT runs as a console application starting at main()  */
-int graphicsPlay(int argc, char** argv) {
+int graphicsPlay(int argc, char **argv) {
 
     init();
 
@@ -559,8 +555,8 @@ int graphicsPlay(int argc, char** argv) {
 
     glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    glutInitWindowPosition((glutGet(GLUT_SCREEN_WIDTH)-SCREEN_WIDTH)/2,
-                           (glutGet(GLUT_SCREEN_HEIGHT)-SCREEN_HEIGHT)/2);
+    glutInitWindowPosition((glutGet(GLUT_SCREEN_WIDTH) - SCREEN_WIDTH) / 2,
+                           (glutGet(GLUT_SCREEN_HEIGHT) - SCREEN_HEIGHT) / 2);
 
     //Create the window
     wd = glutCreateWindow("Some game or something");

@@ -39,7 +39,7 @@ struct DoublePoint {   // Declare Point struct type
     double y;
 };
 
-struct Score{
+struct Score {
     int got;
     double time;
     string name;
@@ -77,6 +77,7 @@ private:
     void endTimer();
 
     clock_t startTime;
+
     void junk();
 };
 

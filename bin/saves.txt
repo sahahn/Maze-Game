@@ -6,3 +6,15 @@ tim
 Time: 0.669773 s
 gotchas: 0 gots
 Completed: Nope
+luke
+Time: 44.773 s
+gotchas: 6 gots
+Completed: Yes!
+luke
+Time: 115.381 s
+gotchas: 12 gots
+Completed: Yes!
+luikesefad
+Time: 193.593 s
+gotchas: 188 gots
+Completed: Yes!

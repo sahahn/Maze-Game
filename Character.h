@@ -8,11 +8,11 @@
 #include "graphics.h"
 #include "GameInfo.h"
 
-enum eType {Flipper, Sizer};
+enum eType {
+    Flipper, Sizer
+};
 
 class Character {
-
-
 public:
 
     //Location in the maze array
@@ -31,25 +31,41 @@ public:
     //The "Hard Boundary" specific to each character, used in collision detection.
     int hBoundary;
 
+    // Getters
     int getSize() const;
+
     int getSpeed() const;
 
+    // Getters
     void setSize(int sizeIn);
-    void setSpeed(int speedIn);
-    //Point getLocation() const;  Not needed!
 
+    void setSpeed(int speedIn);
+
+
+    //Sets the characters location on the screen, used mostly for enemy,
+    //but could be used for the Player for some sort of end game animation.
     void setLocation(int xL, int yL);
+
     Point getLocation();
 
+    //The update function is used by Player and Enemies, and acts by checking to see if
+    //after a movement, the Character has moved into a different x,y location within the map,
+    //and subsequently updates either the x or y, along with the xShift and yShift to reflect this change.
     void update();
 
+    // Our abstract method that is overriden in both player and enemy child classes
     virtual void calcMove(int xDelta, int yDelta, double angleR) = 0;
 
     void updateVelocity(int x, int y);
+
     DoublePoint getVelocity() const;
+
     DoublePoint getMovementBuffer() const;
+
     void taperXVelocity();
+
     void taperYVelocity();
+
     void flipVelocity();
 
 protected:
@@ -59,6 +75,10 @@ protected:
     static const int sBoundary = (SCALE / 2);
     Point location; //Location on screen
 
+    // These values are used when calculating velocity of the player.
+    // Velocity movement buffer allow us to move the player less than a pixel
+    // every time the time function is called in the graphics.cpp file, by remembering
+    // the last time you moved and how much you should have moved since then.
     DoublePoint currentVelocity;
     DoublePoint velocityMovementBuffer;
 
@@ -68,11 +88,23 @@ protected:
 class Player : public Character {
 public:
 
+    // Constructor
     Player();
+
+    //Draws the player, NOTE: although enemy also has a draw function, it requires different parameters
+    //so I did not think there was a use in creating a virtual function to override.
     void draw() const;
+
+    //calcMove takes in an xDelta, and yDelta along with the current angle in radians.
+    //The purpose of the function is to calculate the corrected movement for the player,
+    //such that even if the map is rotated the up arrow, for example, will always make the player move up.
+    //So instead of xDelta 10, yDelta 0, for up, it adds xDelta 10 shifted in the opposite direction,
+    //to compensate for the later applied rotation.
     void calcMove(int xDelta, int yDelta, double angleR) override;
 
+    // getter and setter for rotation
     double getPlayerRotation() const;
+
     void setPlayerRotation(double angR);
 
 
@@ -82,15 +114,27 @@ private:
 
 class Enemy : public Character {
 public:
-
+    // Constructors
     Enemy();
+
     Enemy(int X, int Y, int s, int sp, eType e);
 
+    // getter
     eType getType() const;
+
+    // setter
     void setType(eType e);
 
+    //Note: The draw function for the Enemy, and Tile piece are quite close.
+    //In order to draw the Enemy relative to the Player, the players xShift and yShift,
+    //along with the current angle in radians is needed.
     void draw(int pXShift, int pYShift, double angleR) const;
+
+    //Like the player calcMove, but no need to adjust for rotation,
+    //simply sets the temp values.
     void calcMove(int xDelta, int yDelta, double angleR) override;
+
+    // Sets location to a default
     void resetLoc();
 
 

@@ -1,9 +1,13 @@
 #ifndef graphics_h
 #define graphics_h
+
 #include "Tile.h"
 #include <stdlib.h>
+
 #ifdef _WIN32
+
 #include <windows.h>
+
 #else
 #include <sys/time.h>
 #endif
@@ -11,7 +15,9 @@
 #ifdef __APPLE__
 #include <GLUT/glut.h>
 #else
+
 #include <GL/glut.h>
+
 #endif
 
 
@@ -28,7 +34,7 @@ void kbu(unsigned char key, int x, int y);
 
 void kbdS(int key, int x, int y);
 
-void keyUp (int key, int x, int y);
+void keyUp(int key, int x, int y);
 
 void cursor(int x, int y);
 

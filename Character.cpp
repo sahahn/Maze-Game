@@ -21,7 +21,7 @@ int Character::getSpeed() const {
 void Character::setSize(int sizeIn) {
     size = (sizeIn > 0) ? sizeIn : size;
 
-    hBoundary = ((SCALE-size) / 2);
+    hBoundary = ((SCALE - size) / 2);
 }
 
 void Character::setSpeed(int speedIn) {
@@ -79,14 +79,15 @@ DoublePoint Character::getMovementBuffer() const {
 
 void Character::taperXVelocity() {
     currentVelocity.x /= 1.02;
-    if (velocityMovementBuffer.x > 1 || velocityMovementBuffer.x < -1){
+    if (velocityMovementBuffer.x > 1 || velocityMovementBuffer.x < -1) {
         velocityMovementBuffer.x = 0;
     }
     velocityMovementBuffer.x += currentVelocity.x;
 }
+
 void Character::taperYVelocity() {
     currentVelocity.y /= 1.05;
-    if (velocityMovementBuffer.y > 1 || velocityMovementBuffer.y < -1){
+    if (velocityMovementBuffer.y > 1 || velocityMovementBuffer.y < -1) {
         velocityMovementBuffer.y = 0;
     }
     velocityMovementBuffer.y += currentVelocity.y;
@@ -107,8 +108,8 @@ Player::Player() {
     speed = 2;
 
     // constantly updated speed of player.
-    currentVelocity = DoublePoint{0,0};
-    velocityMovementBuffer = DoublePoint{0,0};
+    currentVelocity = DoublePoint{0, 0};
+    velocityMovementBuffer = DoublePoint{0, 0};
 
     //Set the player to be centered on the screen
     location.x = (SCREEN_WIDTH / 2);
@@ -122,7 +123,7 @@ Player::Player() {
     yShift = 0;
 
     //hBoundary, or Hard Boundary is used in doMove, and reflects the size of the Character
-    hBoundary = ((SCALE-size) / 2);
+    hBoundary = ((SCALE - size) / 2);
     playerRotation = 0;
 }
 
@@ -130,17 +131,17 @@ Player::Player() {
 //so I did not think there was a use in creating a virtual function to override.
 void Player::draw() const {
 
-    int X,Y;
+    int X, Y;
 
-    X = location.x - (size/2);
-    Y = location.y - (size/2);
+    X = location.x - (size / 2);
+    Y = location.y - (size / 2);
 
     glBegin(GL_QUADS);
     glColor3f(1, 1, 0);
     // top left corner
     glVertex2i(X, Y);
     // top right corner
-    glVertex2i(X + size ,Y);
+    glVertex2i(X + size, Y);
     // bottom right corner
     glVertex2i(X + size, Y + size);
     // bottom left corner
@@ -175,8 +176,8 @@ void Player::draw() const {
 //to compensate for the later applied rotation.
 void Player::calcMove(int xDelta, int yDelta, double angleR) {
 
-    temp1 = (int)rint(xShift + ((xDelta * cos(-angleR)) - (yDelta * sin(-angleR))));
-    temp2 = (int)rint(yShift + ((yDelta * cos(-angleR)) + (xDelta * sin(-angleR))));
+    temp1 = (int) rint(xShift + ((xDelta * cos(-angleR)) - (yDelta * sin(-angleR))));
+    temp2 = (int) rint(yShift + ((yDelta * cos(-angleR)) + (xDelta * sin(-angleR))));
 }
 
 double Player::getPlayerRotation() const {
@@ -204,7 +205,7 @@ Enemy::Enemy() {
     yShift = 0;
 
     //hBoundary, same as with Player, must be calculated depending on size.
-    hBoundary = ((SCALE-size) / 2);
+    hBoundary = ((SCALE - size) / 2);
 
     type = Flipper;
 
@@ -221,7 +222,7 @@ Enemy::Enemy(int X, int Y, int s, int sp, eType e) {
     yShift = 0;
 
     //hBoundary, same as with Player, must be calculated depending on size.
-    hBoundary = ((SCALE-size) / 2);
+    hBoundary = ((SCALE - size) / 2);
 
     type = e;
 }
@@ -252,8 +253,8 @@ void Enemy::draw(int pXShift, int pYShift, double angleR) const {
     Y = (location.y * SCALE) - xShift + pXShift;
 
     //Next set X and Y to reflect the top left corner of the Enemy.
-    X += (SCALE/2) - (size/2);
-    Y += (SCALE/2) - (size/2);
+    X += (SCALE / 2) - (size / 2);
+    Y += (SCALE / 2) - (size / 2);
 
     glBegin(GL_QUADS);
 
@@ -269,7 +270,7 @@ void Enemy::draw(int pXShift, int pYShift, double angleR) const {
             break;
 
         default:
-            glColor3f(1,1,1);
+            glColor3f(1, 1, 1);
             break;
     }
 
@@ -285,17 +286,15 @@ void Enemy::draw(int pXShift, int pYShift, double angleR) const {
         glVertex2i((Y + size), X);          //TR
         glVertex2i((Y + size), (X + size)); //BR
         glVertex2i(Y, (X + size));          //BL
-    }
-
-    else {
+    } else {
 
         //If the map is currently rotated, call the global rotate function, which returns rotated points
-        Point p1,p2,p3,p4;
+        Point p1, p2, p3, p4;
 
         p1 = rotate(Y, X, angleR);
         p2 = rotate((Y + size), X, angleR);
-        p3 = rotate((Y + size),(X + size), angleR);
-        p4 = rotate(Y ,(X + size), angleR);
+        p3 = rotate((Y + size), (X + size), angleR);
+        p4 = rotate(Y, (X + size), angleR);
 
         glVertex2i(p1.x, p1.y); //TL
         glVertex2i(p2.x, p2.y); //TR
