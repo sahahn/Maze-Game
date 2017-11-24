@@ -12,7 +12,21 @@
 #include <memory>
 #include <algorithm>
 #include "GameInfo.h"
+#include<bits/stdc++.h>
 using namespace std;
+
+
+//Pairs for solving maze
+typedef pair<int, int> Pair;
+typedef pair<double, Pair> pPair;
+
+// cell for use with A star algorithim
+struct MazeCell {
+
+    //Stores parent + a star fields f,g,h
+    Pair parent;
+    double f, g, h;
+};
 
 class Maze {
 
@@ -25,13 +39,18 @@ public:
 
     Tile maze[HEIGHT][WIDTH]; //Make the final maze w/ info public to easily get contents
 
-    // This method solves the maze for the enemies based on the position of the enemy and the player
-    void solve_maze(int s_x, int s_y, int e_x, int e_y);
+    //void solve_maze(int s_x, int s_y, int e_x, int e_y);
+
+    void aStarSearch(int s_x, int s_y, int e_x, int e_y);
+
+    int getNextX() const;
+    int getNextY() const;
 
 
 private:
     vector<MazePoint> wallList;
-    int endX, endY;     // End x and y for for solving maze, DIF THEN GLOBAL CONST
+    //int endX, endY;
+    int nextX, nextY;
 
     // attempts to add a wall, if there isn't a wall in the position already
     void checkAndAdd(int x, int y);
@@ -41,8 +60,18 @@ private:
 
     //Adds all available walls
     void addWall(int x, int y);
-    // solves the maze (documentation inside function by line comments)
-    bool recursiveSolve (int x, int y);
+
+    //bool recursiveSolve (int x, int y);
+
+    bool checkBound(int row, int col);
+
+    bool checkWall(int row, int col);
+
+    bool isDest(int row, int col, Pair dest);
+
+    double calcH(int row, int col, Pair dest);
+
+    void setNextMove(MazeCell cellInfo[][WIDTH], Pair dest);
 
 };
 
