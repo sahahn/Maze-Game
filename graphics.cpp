@@ -9,8 +9,8 @@
 
 using namespace std;
 
-//Declare the main game object, map, player, enemies, game
-Maze map;
+//Declare the main game object, maze, player, enemies, game
+Maze m;
 Player p;
 Enemy e1, e2;
 GameInfo game;
@@ -31,7 +31,7 @@ bool rState;
 //Initialize
 void init() {
     game = GameInfo();
-    map = Maze();
+    m = Maze();
     p = Player();
 
     //First two positions are starting location, then size and lastly speed.
@@ -67,7 +67,7 @@ void kbd(unsigned char key, int x, int y) {
         game.end();
     }
 
-    //key 32 is space, I just have that rotate the map here
+    //key 32 is space, I just have that rotate the maze here
     if (key == 32) {
         rState = true; //Animated transition
     }
@@ -239,7 +239,7 @@ void display() {
             //For each position in the array being drawn, i and j, tell the
             //tile piece to draw it at relative location x and y, according to
             //also the players x and yShift and the current angle of the screen.
-            map.maze[i][j].draw(x, y, p.xShift, p.yShift, angleR);
+            m.maze[i][j].draw(x, y, p.xShift, p.yShift, angleR);
 
             //If any enemies are in one of the squares,
             //store the location of that square in there location field.
@@ -283,7 +283,7 @@ bool doMove(Character &C) {
     //The following logic checks all eight, and reacts accordingly to which one was triggered
     if (C.temp2 < (-C.hBoundary)) {
         if (C.temp1 > C.hBoundary) {
-            if (map.maze[C.x + 1][C.y - 1].getWall()) {
+            if (m.maze[C.x + 1][C.y - 1].getWall()) {
 
                 C.xShift = C.hBoundary;
                 C.yShift = -C.hBoundary;
@@ -292,7 +292,7 @@ bool doMove(Character &C) {
         }
 
         if (C.temp1 < (-C.hBoundary)) {
-            if (map.maze[C.x + 1][C.y + 1].getWall()) {
+            if (m.maze[C.x + 1][C.y + 1].getWall()) {
 
                 C.xShift = -C.hBoundary;
                 C.yShift = -C.hBoundary;
@@ -300,7 +300,7 @@ bool doMove(Character &C) {
             }
         }
 
-        if (map.maze[C.x + 1][C.y].getWall()) {
+        if (m.maze[C.x + 1][C.y].getWall()) {
 
             C.yShift = -C.hBoundary;
             return false;
@@ -310,7 +310,7 @@ bool doMove(Character &C) {
     if (C.temp1 > (C.hBoundary)) {
 
         if (C.temp2 > C.hBoundary) {
-            if (map.maze[C.x - 1][C.y - 1].getWall()) {
+            if (m.maze[C.x - 1][C.y - 1].getWall()) {
 
                 C.xShift = C.hBoundary;
                 C.yShift = C.hBoundary;
@@ -318,7 +318,7 @@ bool doMove(Character &C) {
             }
         }
 
-        if (map.maze[C.x][C.y - 1].getWall()) {
+        if (m.maze[C.x][C.y - 1].getWall()) {
 
             C.xShift = C.hBoundary;
             return false;
@@ -330,14 +330,14 @@ bool doMove(Character &C) {
 
         if (C.temp2 > C.hBoundary) {
 
-            if (map.maze[C.x - 1][C.y + 1].getWall()) {
+            if (m.maze[C.x - 1][C.y + 1].getWall()) {
                 C.xShift = -C.hBoundary;
                 C.yShift = C.hBoundary;
                 return false;
             }
         }
 
-        if (map.maze[C.x][C.y + 1].getWall()) {
+        if (m.maze[C.x][C.y + 1].getWall()) {
             C.xShift = -C.hBoundary;
             return false;
         }
@@ -345,7 +345,7 @@ bool doMove(Character &C) {
 
     if (C.temp2 > (C.hBoundary)) {
 
-        if (map.maze[C.x - 1][C.y].getWall()) {
+        if (m.maze[C.x - 1][C.y].getWall()) {
             C.yShift = C.hBoundary;
             return false;
         }
@@ -359,41 +359,46 @@ bool doMove(Character &C) {
     return true;
 }
 
+
 //Implements the logic for an Enemy to follow the correct path to the player.
 void follow_path(Enemy &E) {
 
-    //Move Right
-    if (map.maze[E.x + 1][E.y].getCorrectPath()) {
+    //Check if in players square
+    if (!(m.getNextX() == -2)) {
 
-        //First calculate move, then doMove, same for all movement.
-        E.calcMove(0, -E.getSpeed(), 0);
-        doMove(E);
-    }
+        //Move Right
+        if (m.getNextX() > E.x) {
 
-        //Move Left
-    else if (map.maze[E.x - 1][E.y].getCorrectPath()) {
+            //First calculate move, then doMove, same for all movement.
+            E.calcMove(0, -E.getSpeed(), 0);
+            doMove(E);
+        }
 
-        E.calcMove(0, E.getSpeed(), 0);
-        doMove(E);
-    }
+            //Move Left
+        else if (m.getNextX() < E.x) {
 
-        //Move Up
-    else if (map.maze[E.x][E.y + 1].getCorrectPath()) {
+            E.calcMove(0, E.getSpeed(), 0);
+            doMove(E);
+        }
 
-        E.calcMove(-E.getSpeed(), 0, 0);
-        doMove(E);
-    }
+            //Move Up
+        else if (m.getNextY() > E.y) {
 
-        //Move Down
-    else if (map.maze[E.x][E.y - 1].getCorrectPath()) {
+            E.calcMove(-E.getSpeed(), 0, 0);
+            doMove(E);
+        }
 
-        E.calcMove(E.getSpeed(), 0, 0);
-        doMove(E);
+            //Move Down
+        else if (m.getNextY() < E.y) {
+
+            E.calcMove(E.getSpeed(), 0, 0);
+            doMove(E);
+        }
     }
 
         //When in the player's tile, behave differently
         //Specifically, compensate between the difference in player and enemy x and yShift.
-    else if ((p.x == E.x) && (p.y == E.y)) {
+    else {
 
         //First check for collision with the player, if no collision...
         if (p.xShift + p.getSize() < E.xShift || E.xShift + E.getSize() < p.xShift ||
@@ -528,11 +533,12 @@ void timer(int extra) {
             game.end();
         }
 
-        map.solve_maze(e1.x, e1.y, p.x, p.y);
+        m.aStarSearch(e1.x,e1.y,p.x,p.y);
         follow_path(e1);
 
-        map.solve_maze(e2.x, e2.y, p.x, p.y);
+        m.aStarSearch(e2.x,e2.y,p.x,p.y);
         follow_path(e2);
+
 
     } else {
 
