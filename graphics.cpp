@@ -223,7 +223,7 @@ void display() {
     }
 
     // render the players light
-    p.playerLight.renderLight((p.y)*SCALE+(-p.xShift), (p.x)*SCALE+(-p.yShift), map);
+    p.playerLight.renderLight((p.y)*SCALE+(-p.xShift), (p.x)*SCALE+(-p.yShift), m);
 
 
     //x and y here are the relative locations to be rendered on the screen,
