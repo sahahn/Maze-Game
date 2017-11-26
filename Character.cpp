@@ -106,6 +106,7 @@ void Character::flipVelocity() {
 Player::Player() {
     size = 20;
     speed = 2;
+    playerLight = Light();
 
     // constantly updated speed of player.
     currentVelocity = DoublePoint{0, 0};
@@ -136,6 +137,7 @@ void Player::draw() const {
     X = location.x - (size / 2);
     Y = location.y - (size / 2);
 
+
     glBegin(GL_QUADS);
     glColor3f(1, 1, 0);
     // top left corner
@@ -148,6 +150,7 @@ void Player::draw() const {
     glVertex2i(X, Y + size);
 
     glEnd();
+
 
     //If we want to make the player rotate  uncomment this code!
     /*

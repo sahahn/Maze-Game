@@ -59,7 +59,7 @@ void Tile::draw(int x, int y, int xShift, int yShift, double angle) const {
 
         }
         else {
-            glColor3f(1, 0, 1);
+            glColor3f(0, 0, 0);
         }
     }
 
@@ -70,7 +70,7 @@ void Tile::draw(int x, int y, int xShift, int yShift, double angle) const {
     //Convert to pixel coordinates
     glBegin(GL_QUADS);
 
-    if (angle == 0) {
+    if (angle == 0 && (wall || end)) {
         // top left corner
         glVertex2i(y, x);
         // top right corner
@@ -83,17 +83,18 @@ void Tile::draw(int x, int y, int xShift, int yShift, double angle) const {
     }
         //If using the rotate func,
     else {
+        if (wall || end) {
+            Point p1, p2, p3, p4;
+            p1 = rotate(y, x, angle);
+            p2 = rotate((y + SCALE), x, angle);
+            p3 = rotate((y + SCALE), (x + SCALE), angle);
+            p4 = rotate(y, (x + SCALE), angle);
 
-        Point p1,p2,p3,p4;
-        p1 = rotate(y,x,angle);
-        p2 = rotate((y+SCALE),x,angle);
-        p3 = rotate((y+SCALE),(x+SCALE),angle);
-        p4 = rotate(y,(x+SCALE),angle);
-
-        glVertex2i(p1.x,p1.y);
-        glVertex2i(p2.x,p2.y);
-        glVertex2i(p3.x,p3.y);
-        glVertex2i(p4.x,p4.y);
+            glVertex2i(p1.x, p1.y);
+            glVertex2i(p2.x, p2.y);
+            glVertex2i(p3.x, p3.y);
+            glVertex2i(p4.x, p4.y);
+        }
     }
 }
 

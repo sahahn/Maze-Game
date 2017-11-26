@@ -18,3 +18,35 @@ luikesefad
 Time: 193.593 s
 gotchas: 188 gots
 Completed: Yes!
+luke
+Time: 100.44 s
+gotchas: 9 gots
+Completed: Yes!
+h
+Time: 4.449 s
+gotchas: 0 gots
+Completed: Yes!
+luke
+Time: 34.345 s
+gotchas: 10 gots
+Completed: Yes!
+h;l;
+Time: 55.193 s
+gotchas: 4 gots
+Completed: Yes!
+l
+Time: 78.196 s
+gotchas: 12 gots
+Completed: Yes!
+k
+Time: 120.39 s
+gotchas: 21 gots
+Completed: Yes!
+g
+Time: 40.044 s
+gotchas: 8 gots
+Completed: Yes!
+dsf
+Time: 20.664 s
+gotchas: 2 gots
+Completed: Yes!

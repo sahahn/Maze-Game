@@ -7,6 +7,7 @@
 
 #include "graphics.h"
 #include "GameInfo.h"
+#include "Light.h"
 
 enum eType {
     Flipper, Sizer
@@ -87,6 +88,7 @@ protected:
 
 class Player : public Character {
 public:
+    Light playerLight;
 
     // Constructor
     Player();

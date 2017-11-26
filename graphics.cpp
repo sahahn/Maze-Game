@@ -222,6 +222,10 @@ void display() {
         upb2 = HEIGHT;
     }
 
+    // render the players light
+    p.playerLight.renderLight((p.y)*SCALE+(-p.xShift), (p.x)*SCALE+(-p.yShift), map);
+
+
     //x and y here are the relative locations to be rendered on the screen,
     //so by starting with -1, the maze generates from 1 square off the screen
     int x = -1;
@@ -249,6 +253,7 @@ void display() {
         }
     }
 
+
     //Render enemies, specifically after the maze tiles are displayed.
     e1.draw(p.xShift, p.yShift, angleR);
     e2.draw(p.xShift, p.yShift, angleR);
@@ -256,6 +261,7 @@ void display() {
     //Reset the enemies locations, solves a bug.
     e1.resetLoc();
     e2.resetLoc();
+
 
     //Draw the player
     p.draw();
