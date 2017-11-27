@@ -47,7 +47,7 @@ void Tile::setEnd(bool b) {
 
 //Take in coordinates in the way the array is stored, convert it to pixel coordinates
 void Tile::draw(int x, int y, int xShift, int yShift, double angle) const {
-    
+
     if (wall) {
         glColor3f(0, 0, 0);
     }

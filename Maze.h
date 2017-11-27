@@ -63,6 +63,12 @@ private:
 
     //bool recursiveSolve (int x, int y);
 
+    //Adds a 3x4 room starting at x y coordinates
+    void addRoom(Point loc);
+
+    //Adds a room starting at location and builds to size
+    void addRoom(Point loc, Point size);
+
     bool checkBound(int row, int col);
 
     bool checkWall(int row, int col);

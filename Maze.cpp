@@ -24,6 +24,10 @@ Maze::Maze() {
     maze[END_X][END_Y].setWall(false);
     maze[END_X][END_Y].setEnd(true);
 
+    addRoom({5, 4});
+
+    addRoom((Point) {12,10}, (Point) {2,2});
+
 }
 
 void Maze::checkAndAdd(int x, int y) {
@@ -421,6 +425,23 @@ int Maze::getNextY() const {
     return nextY;
 }
 
+void Maze::addRoom(Point loc){
+    for(int i = loc.x; i < loc.x + 4; i++){
+        for(int j = loc.y; j < loc.y + 3; j++){
+            maze[j][i].setWall(false);
+        }
+    }
+
+
+}
+
+void Maze::addRoom(Point loc, Point size) {
+    for (int i = loc.x; i < loc.x + size.x + 4; i++) {
+        for (int j = loc.y; j < loc.y + size.y + 3; j++) {
+            maze[j][i].setWall(false);
+        }
+    }
+}
 
 /*    IMPLIMENTATION TO SOLVE PERFECT MAZE
 bool Maze::recursiveSolve(int x, int y) {

@@ -44,9 +44,6 @@ void GameInfo::end() {
     exit(0);
 }
 
-/**
- * Timing currently fails to compile
- */
 void GameInfo::saveScore() {
 
     cout << "Enter a name ";
@@ -93,6 +90,7 @@ void GameInfo::saveScore() {
 
 void GameInfo::endTimer() {
     score.time = (clock() - startTime) / (double) CLOCKS_PER_SEC;
+    cout << CLOCKS_PER_SEC << endl;
 }
 
 /**

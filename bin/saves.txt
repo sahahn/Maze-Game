@@ -1,20 +1,28 @@
-Ron
-Time: 1.72323 s
-gotchas: 2 gots
-Completed: Yes!
-tim
-Time: 0.669773 s
+a
+Time: 1.2856 s
 gotchas: 0 gots
 Completed: Nope
-luke
-Time: 44.773 s
-gotchas: 6 gots
+as
+Time: 1.91958 s
+gotchas: 0 gots
+Completed: Nope
+as
+Time: 9.45329 s
+gotchas: 0 gots
+Completed: Nope
+as
+Time: 1.42228 s
+gotchas: 0 gots
+Completed: Nope
+as
+Time: 8.19254 s
+gotchas: 7 gots
 Completed: Yes!
-luke
-Time: 115.381 s
-gotchas: 12 gots
-Completed: Yes!
-luikesefad
-Time: 193.593 s
-gotchas: 188 gots
-Completed: Yes!
+as
+Time: 5.39884 s
+gotchas: 0 gots
+Completed: Nope
+worm
+Time: 4.68323 s
+gotchas: 0 gots
+Completed: Nope
