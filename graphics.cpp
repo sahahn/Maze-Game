@@ -28,6 +28,8 @@ double angleR;
 //Global flag for rotation
 bool rState;
 
+int miniTick;
+
 //Initialize
 void init() {
     game = GameInfo();
@@ -46,6 +48,8 @@ void init() {
     angleR = 0;
 
     rState = false;
+
+    miniTick = 0;
 }
 
 // Initialize OpenGL Graphics
@@ -375,6 +379,11 @@ void timer(int extra) {
 
     if (!rState) {
 
+        miniTick++;
+        if (miniTick == 2) {
+            miniTick = 0;
+        }
+
         if (keys[GLUT_KEY_DOWN]) {
             p.calcMove(0, -p.getSpeed(), angleR);
 
@@ -448,11 +457,15 @@ void timer(int extra) {
             game.end();
         }
 
-        m.aStarSearch(e1.x,e1.y,p.x,p.y);
+
+        m.aStarSearch(e1.x, e1.y, p.x, p.y);
         follow_path(e1);
 
-        m.aStarSearch(e2.x,e2.y,p.x,p.y);
-        follow_path(e2);
+        if (miniTick == 1) {
+
+            m.aStarSearch(e2.x, e2.y, p.x, p.y);
+            follow_path(e2);
+        }
 
 
     } else {

@@ -355,7 +355,8 @@ void Enemy::draw(int pXShift, int pYShift, double angleR) const {
     center.x = (p1.x + p2.x) / 2;
     center.y = (p1.y + p4.y) / 2;
 
-    int distance = (abs((SCREEN_WIDTH / 2) - center.x) + abs((SCREEN_HEIGHT/2) - center.y));
+    double distance = sqrt(pow((center.x - (SCREEN_WIDTH / 2)),2) + pow((center.y - (SCREEN_HEIGHT/2)),2));
+
 
 
     //Color is based on enemy type
@@ -363,12 +364,12 @@ void Enemy::draw(int pXShift, int pYShift, double angleR) const {
 
 
         case (Flipper):
-            glColor3f(0, .5 - (distance / 250), .7 - (distance / 250));
+            glColor3f(.6 - (distance / 250) , 1 - (distance / 260), .8 - (distance / 260));
             break;
 
         case (Sizer):
 
-            glColor3f(.7 - (distance / 250), .1 - (distance / 250), 0);
+            glColor3f(.6 - (distance / 250), .6 - (distance / 260), 1 - (distance / 260));
             break;
 
         default:
