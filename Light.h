@@ -7,9 +7,10 @@
 
 #include "graphics.h"
 #include "Maze.h"
+
 class Light {
 public:
-    void renderLight(int x, int y, Maze &m) const;
+    void renderLight(int pX, int pY, int pXShift, int pYShift, Maze &m) const;
     Light();
 };
 #endif //PROJECT6_CS120_LIGHT_H
