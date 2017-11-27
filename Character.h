@@ -24,14 +24,6 @@ public:
     int xShift;
     int yShift;
 
-    //Temp values for intended movement, i.e. only
-    //updated to xShift, yShift if a valid movement.
-    int temp1;
-    int temp2;
-
-    //The "Hard Boundary" specific to each character, used in collision detection.
-    int hBoundary;
-
     // Getters
     int getSize() const;
 
@@ -57,6 +49,8 @@ public:
     // Our abstract method that is overriden in both player and enemy child classes
     virtual void calcMove(int xDelta, int yDelta, double angleR) = 0;
 
+    bool doMove(Maze &m);
+
     void updateVelocity(int x, int y);
 
     DoublePoint getVelocity() const;
@@ -73,6 +67,15 @@ protected:
 
     int size;
     int speed;
+
+    //Temp values for intended movement, i.e. only
+    //updated to xShift, yShift if a valid movement.
+    int temp1;
+    int temp2;
+
+    //The "Hard Boundary" specific to each character, used in collision detection.
+    int hBoundary;
+
     static const int sBoundary = (SCALE / 2);
     Point location; //Location on screen
 

@@ -9,7 +9,6 @@
  * Character Abstract Class
  */
 
-
 int Character::getSize() const {
     return size;
 }
@@ -64,6 +63,91 @@ void Character::update() {
     }
 }
 
+//Do move contains the important game logic for the player and enemies, for movement and collisions,
+//calcMove must be called beforehand which sets the temp values to the characters intended move.
+//doMove returns True if the move was valid, and False if there was a wall.
+bool Character::doMove(Maze &m) {
+
+    //There are eight possible collisions to check for in a grid based system.
+    //The following logic checks all eight, and reacts accordingly to which one was triggered
+    if (temp2 < (-hBoundary)) {
+        if (temp1 > hBoundary) {
+            if (m.maze[x + 1][y - 1].getWall()) {
+
+                xShift = hBoundary;
+                yShift = -hBoundary;
+                return false;
+            }
+        }
+
+        if (temp1 < (-hBoundary)) {
+            if (m.maze[x + 1][y + 1].getWall()) {
+
+                xShift = -hBoundary;
+                yShift = -hBoundary;
+                return false;
+            }
+        }
+
+        if (m.maze[x + 1][y].getWall()) {
+
+            yShift = -hBoundary;
+            return false;
+        }
+    }
+
+    if (temp1 > (hBoundary)) {
+
+        if (temp2 > hBoundary) {
+            if (m.maze[x - 1][y - 1].getWall()) {
+
+                xShift = hBoundary;
+                yShift = hBoundary;
+                return false;
+            }
+        }
+
+        if (m.maze[x][y - 1].getWall()) {
+
+            xShift = hBoundary;
+            return false;
+        }
+
+    }
+
+    if (temp1 < (-hBoundary)) {
+
+        if (temp2 > hBoundary) {
+
+            if (m.maze[x - 1][y + 1].getWall()) {
+                xShift = -hBoundary;
+                yShift = hBoundary;
+                return false;
+            }
+        }
+
+        if (m.maze[x][y + 1].getWall()) {
+            xShift = -hBoundary;
+            return false;
+        }
+    }
+
+    if (temp2 > (hBoundary)) {
+
+        if (m.maze[x - 1][y].getWall()) {
+            yShift = hBoundary;
+            return false;
+        }
+    }
+
+    //If it reaches this point, there is no wall, all cases were checked for,
+    //proceed with the valid movement
+    xShift = temp1;
+    yShift = temp2;
+
+    return true;
+}
+
 void Character::updateVelocity(int x, int y) {
     currentVelocity.x = x;
     currentVelocity.y = y;
@@ -104,7 +188,7 @@ void Character::flipVelocity() {
  * Player Class
  */
 Player::Player() {
-    size = 20;
+    size = 30;
     speed = 2;
     playerLight = Light();
 
@@ -261,15 +345,30 @@ void Enemy::draw(int pXShift, int pYShift, double angleR) const {
 
     glBegin(GL_QUADS);
 
+    Point p1, p2, p3, p4, center;
+
+    p1 = rotate(Y, X, angleR);
+    p2 = rotate((Y + size), X, angleR);
+    p3 = rotate((Y + size), (X + size), angleR);
+    p4 = rotate(Y, (X + size), angleR);
+
+    center.x = (p1.x + p2.x) / 2;
+    center.y = (p1.y + p4.y) / 2;
+
+    int distance = (abs((SCREEN_WIDTH / 2) - center.x) + abs((SCREEN_HEIGHT/2) - center.y));
+
+
     //Color is based on enemy type
     switch (type) {
 
+
         case (Flipper):
-            glColor3f(0, 1, .5);
+            glColor3f(0, .5 - (distance / 250), .7 - (distance / 250));
             break;
 
         case (Sizer):
-            glColor3f(0, .1, .5);
+
+            glColor3f(.7 - (distance / 250), .1 - (distance / 250), 0);
             break;
 
         default:
@@ -277,33 +376,11 @@ void Enemy::draw(int pXShift, int pYShift, double angleR) const {
             break;
     }
 
-    //If no rotation, no use in calculating shifted locations...
-    //though this optimization most likely is not needed, we can delete it, I don't care.
-    if (angleR == 0) {
+    glVertex2i(p1.x, p1.y); //TL
+    glVertex2i(p2.x, p2.y); //TR
+    glVertex2i(p3.x, p3.y); //BR
+    glVertex2i(p4.x, p4.y); //BL
 
-        //Note Y is called as x, and X as y, this is due to the conversion between array x and y, and pixel x and y.
-        //It's annoying, until you just make the swap here and don't think about it any more.
-
-
-        glVertex2i(Y, X);                   //TL
-        glVertex2i((Y + size), X);          //TR
-        glVertex2i((Y + size), (X + size)); //BR
-        glVertex2i(Y, (X + size));          //BL
-    } else {
-
-        //If the map is currently rotated, call the global rotate function, which returns rotated points
-        Point p1, p2, p3, p4;
-
-        p1 = rotate(Y, X, angleR);
-        p2 = rotate((Y + size), X, angleR);
-        p3 = rotate((Y + size), (X + size), angleR);
-        p4 = rotate(Y, (X + size), angleR);
-
-        glVertex2i(p1.x, p1.y); //TL
-        glVertex2i(p2.x, p2.y); //TR
-        glVertex2i(p3.x, p3.y); //BR
-        glVertex2i(p4.x, p4.y); //BL
-    }
 
     glEnd();
 }

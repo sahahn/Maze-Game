@@ -17,12 +17,12 @@ using namespace std;
 
 const int HEIGHT = 100;
 const int WIDTH = 100;
-const int SCALE = 200;
-const int SCREEN_HEIGHT = 1000;
-const int SCREEN_WIDTH = 1000;
-const int SCOPE = 3;
-const int START_X = 3;
-const int START_Y = 3;
+const int SCALE = 300;
+const int SCREEN_HEIGHT = 900;
+const int SCREEN_WIDTH = 900;
+const int SCOPE = 2;
+const int START_X = 2;
+const int START_Y = 2;
 const int END_X = 10;
 const int END_Y = 10;
 const double LUKE_M_PI = 3.14159265358;

@@ -51,7 +51,7 @@ void init() {
 // Initialize OpenGL Graphics
 void initGL() {
     // Set "clearing" or background color to black
-    glClearColor(0, 0, 0, 0);
+    glClearColor(.02,.02,.02,.02);
 }
 
 /**********************************************************************
@@ -255,7 +255,6 @@ void display() {
         }
     }
 
-
     //Render enemies, specifically after the maze tiles are displayed.
     e1.draw(p.xShift, p.yShift, angleR);
     e2.draw(p.xShift, p.yShift, angleR);
@@ -276,92 +275,6 @@ void display() {
  * Main Player and Character movement logic
  *********************************************************************/
 
-//Do move contains the important game logic for the player and enemies, for movement and collisions,
-//calcMove must be called beforehand which sets the temp values to the characters intended move.
-//doMove returns True if the move was valid, and False if there was a wall.
-bool doMove(Character &C) {
-
-    //There are eight possible collisions to check for in a grid based system.
-    //The following logic checks all eight, and reacts accordingly to which one was triggered
-    if (C.temp2 < (-C.hBoundary)) {
-        if (C.temp1 > C.hBoundary) {
-            if (m.maze[C.x + 1][C.y - 1].getWall()) {
-
-                C.xShift = C.hBoundary;
-                C.yShift = -C.hBoundary;
-                return false;
-            }
-        }
-
-        if (C.temp1 < (-C.hBoundary)) {
-            if (m.maze[C.x + 1][C.y + 1].getWall()) {
-
-                C.xShift = -C.hBoundary;
-                C.yShift = -C.hBoundary;
-                return false;
-            }
-        }
-
-        if (m.maze[C.x + 1][C.y].getWall()) {
-
-            C.yShift = -C.hBoundary;
-            return false;
-        }
-    }
-
-    if (C.temp1 > (C.hBoundary)) {
-
-        if (C.temp2 > C.hBoundary) {
-            if (m.maze[C.x - 1][C.y - 1].getWall()) {
-
-                C.xShift = C.hBoundary;
-                C.yShift = C.hBoundary;
-                return false;
-            }
-        }
-
-        if (m.maze[C.x][C.y - 1].getWall()) {
-
-            C.xShift = C.hBoundary;
-            return false;
-        }
-
-    }
-
-    if (C.temp1 < (-C.hBoundary)) {
-
-        if (C.temp2 > C.hBoundary) {
-
-            if (m.maze[C.x - 1][C.y + 1].getWall()) {
-                C.xShift = -C.hBoundary;
-                C.yShift = C.hBoundary;
-                return false;
-            }
-        }
-
-        if (m.maze[C.x][C.y + 1].getWall()) {
-            C.xShift = -C.hBoundary;
-            return false;
-        }
-    }
-
-    if (C.temp2 > (C.hBoundary)) {
-
-        if (m.maze[C.x - 1][C.y].getWall()) {
-            C.yShift = C.hBoundary;
-            return false;
-        }
-    }
-
-    //If it reaches this point, there is no wall, all cases were checked for,
-    //proceed with the valid movement
-    C.xShift = C.temp1;
-    C.yShift = C.temp2;
-
-    return true;
-}
-
-
 //Implements the logic for an Enemy to follow the correct path to the player.
 void follow_path(Enemy &E) {
 
@@ -373,28 +286,28 @@ void follow_path(Enemy &E) {
 
             //First calculate move, then doMove, same for all movement.
             E.calcMove(0, -E.getSpeed(), 0);
-            doMove(E);
+            E.doMove(m);
         }
 
             //Move Left
         else if (m.getNextX() < E.x) {
 
             E.calcMove(0, E.getSpeed(), 0);
-            doMove(E);
+            E.doMove(m);
         }
 
             //Move Up
         else if (m.getNextY() > E.y) {
 
             E.calcMove(-E.getSpeed(), 0, 0);
-            doMove(E);
+            E.doMove(m);
         }
 
             //Move Down
         else if (m.getNextY() < E.y) {
 
             E.calcMove(E.getSpeed(), 0, 0);
-            doMove(E);
+            E.doMove(m);
         }
     }
 
@@ -410,22 +323,22 @@ void follow_path(Enemy &E) {
             if (p.yShift > E.yShift) {
 
                 E.calcMove(0, E.getSpeed(), 0);
-                doMove(E);
+                E.doMove(m);
 
             } else if (p.yShift < E.yShift) {
 
                 E.calcMove(0, -E.getSpeed(), 0);
-                doMove(E);
+                E.doMove(m);
 
             } else if (p.xShift < E.xShift) {
 
                 E.calcMove(-E.getSpeed(), 0, 0);
-                doMove(E);
+                E.doMove(m);
 
             } else if (p.xShift > E.xShift) {
 
                 E.calcMove(E.getSpeed(), 0, 0);
-                doMove(E);
+                E.doMove(m);
             }
         }
 
@@ -465,7 +378,7 @@ void timer(int extra) {
         if (keys[GLUT_KEY_DOWN]) {
             p.calcMove(0, -p.getSpeed(), angleR);
 
-            if (doMove(p)) {
+            if (p.doMove(m)) {
                 p.updateVelocity(0, -p.getSpeed());
             } else {
                 p.flipVelocity();
@@ -475,7 +388,7 @@ void timer(int extra) {
         if (keys[GLUT_KEY_LEFT]) {
             p.calcMove(p.getSpeed(), 0, angleR);
 
-            if (doMove(p)) {
+            if (p.doMove(m)) {
                 p.updateVelocity(p.getSpeed(), 0);
             } else {
                 p.flipVelocity();
@@ -485,7 +398,7 @@ void timer(int extra) {
         if (keys[GLUT_KEY_UP]) {
             p.calcMove(0, p.getSpeed(), angleR);
 
-            if (doMove(p)) {
+            if (p.doMove(m)) {
                 p.updateVelocity(0, p.getSpeed());
             } else {
                 p.flipVelocity();
@@ -495,7 +408,7 @@ void timer(int extra) {
         if (keys[GLUT_KEY_RIGHT]) {
             p.calcMove(-p.getSpeed(), 0, angleR);
 
-            if (doMove(p)) {
+            if (p.doMove(m)) {
                 p.updateVelocity(-p.getSpeed(), 0);
             } else {
                 p.flipVelocity();
@@ -505,7 +418,7 @@ void timer(int extra) {
         if (!keys[GLUT_KEY_DOWN] && !keys[GLUT_KEY_UP]) {
             p.calcMove((int) p.getMovementBuffer().x, 0, angleR);
 
-            if (doMove(p)) {
+            if (p.doMove(m)) {
                 p.taperXVelocity();
             } else {
                 p.flipVelocity();
@@ -515,7 +428,7 @@ void timer(int extra) {
         if (!keys[GLUT_KEY_LEFT] && !keys[GLUT_KEY_RIGHT]) {
             p.calcMove(0, (int) p.getMovementBuffer().y, angleR);
 
-            if (doMove(p)) {
+            if (p.doMove(m)) {
                 p.taperYVelocity();
             } else {
                 p.flipVelocity();
