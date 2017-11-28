@@ -260,8 +260,8 @@ void display() {
     }
 
     //Render enemies, specifically after the maze tiles are displayed.
-    e1.draw(p.xShift, p.yShift, angleR);
-    e2.draw(p.xShift, p.yShift, angleR);
+    e1.draw(p, angleR);
+    e2.draw(p, angleR);
 
     //Reset the enemies locations, solves a bug.
     e1.resetLoc();

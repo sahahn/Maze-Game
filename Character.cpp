@@ -191,6 +191,7 @@ Player::Player() {
     size = 30;
     speed = 2;
     playerLight = Light();
+    playerLight.setRadius(300);
 
     // constantly updated speed of player.
     currentVelocity = DoublePoint{0, 0};
@@ -326,8 +327,9 @@ void Enemy::setType(eType e) {
 //Note: The draw function for the Enemy, and Tile piece are quite close.
 //In order to draw the Enemy relative to the Player, the players xShift and yShift,
 //along with the current angle in radians is needed.
-void Enemy::draw(int pXShift, int pYShift, double angleR) const {
-
+void Enemy::draw(Player &p, double angleR) const {
+    int pXShift = p.xShift;
+    int pYShift = p.yShift;
     //Temp values used in calculation
     int X, Y;
 
@@ -356,20 +358,18 @@ void Enemy::draw(int pXShift, int pYShift, double angleR) const {
     center.y = (p1.y + p4.y) / 2;
 
     double distance = sqrt(pow((center.x - (SCREEN_WIDTH / 2)),2) + pow((center.y - (SCREEN_HEIGHT/2)),2));
-
-
+    int playerLightRadius = p.playerLight.getRadius() + 10;
 
     //Color is based on enemy type
     switch (type) {
 
 
         case (Flipper):
-            glColor3f(.6 - (distance / 260) , 1 - (distance / 260), .8 - (distance / 260));
+            glColor3f(.6 - (distance / playerLightRadius) , 1 - (distance / playerLightRadius), .8 - (distance / playerLightRadius));
             break;
 
         case (Sizer):
-
-            glColor3f(.6 - (distance / 260), .6 - (distance / 260), 1 - (distance / 260));
+            glColor3f(.6 - (distance / playerLightRadius), .6 - (distance / playerLightRadius), 1 - (distance / playerLightRadius));
             break;
 
         default:

@@ -133,7 +133,7 @@ public:
     //Note: The draw function for the Enemy, and Tile piece are quite close.
     //In order to draw the Enemy relative to the Player, the players xShift and yShift,
     //along with the current angle in radians is needed.
-    void draw(int pXShift, int pYShift, double angleR) const;
+    void draw(Player &p, double angleR) const;
 
     //Like the player calcMove, but no need to adjust for rotation,
     //simply sets the temp values.

@@ -25,6 +25,22 @@ public:
      * @param angle - angle to render the maze at
      */
     void renderLight(int pX, int pY, int pXShift, int pYShift, Maze &m, int angle) const;
+
+    /**
+     * radius setter
+     * @param r - desired radius
+     */
+    void setRadius(int r);
+
+    /**
+     * radius getter
+     * @return current radius
+     */
+    int getRadius() const;
+
     Light();
+
+private:
+    int radius;
 };
 #endif //PROJECT6_CS120_LIGHT_H
