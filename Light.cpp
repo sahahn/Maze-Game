@@ -47,7 +47,7 @@ void Light::renderLight(int pX, int pY, int pXShift, int pYShift, Maze &m) const
     x = (pY) * SCALE + (-pXShift);
     y = (pX) * SCALE + (-pYShift);
 
-    double rad = 250.0;
+    double rad = 350.0;
     glBegin(GL_TRIANGLE_FAN);
     glColor3f(1, 1, 1);
     glVertex2i((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2));
@@ -57,7 +57,7 @@ void Light::renderLight(int pX, int pY, int pXShift, int pYShift, Maze &m) const
     for (double i = 0; i <= 2.0 * 3.14159265 + 0.05; i += 2.0 * 3.14159265 / 360.0) {
         int distance = 0;
         while (wallCheck(x + distance * cos(i), y + distance * sin(i), m, pX, pY) && distance < rad) {
-            distance += 2;
+            distance += 10;
         }
         tempRadArray.push_back(distance);
     }
