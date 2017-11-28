@@ -42,7 +42,7 @@ bool wallCheck(double x, double y, Maze &m, int pX, int pY) {
     return !(m.maze[X][Y].getWall());
 }
 
-void Light::renderLight(int pX, int pY, int pXShift, int pYShift, Maze &m) const {
+void Light::renderLight(int pX, int pY, int pXShift, int pYShift, Maze &m, int angle) const {
     double x, y;
     x = (pY) * SCALE + (-pXShift);
     y = (pX) * SCALE + (-pYShift);
@@ -54,7 +54,7 @@ void Light::renderLight(int pX, int pY, int pXShift, int pYShift, Maze &m) const
     glColor3f(.05, .05, .05);
 //    cout << x << " - " << y << endl;
     vector<int> tempRadArray;
-    for (double i = 0; i <= 2.0 * 3.14159265 + 0.05; i += 2.0 * 3.14159265 / 360.0) {
+    for (double i = 0; i <= 2.0 * 3.14159264; i += 2.0 * 3.14159265 / 360.0) {
         int distance = 0;
         while (wallCheck(x + distance * cos(i), y + distance * sin(i), m, pX, pY) && distance < rad) {
             distance += 10;
@@ -68,14 +68,29 @@ void Light::renderLight(int pX, int pY, int pXShift, int pYShift, Maze &m) const
     //    }
     //}
 
-    int j = 0;
-    for (double i = 0; i <= 2.0 * 3.14159265 + 0.05; i += 2.0 * 3.14159265 / 360.0) {
+    int j;
+
+    if (angle == 0) {
+        j = 0;
+    } else {
+        j = (360 - angle);
+    }
+
+    //the + .06 is to add 4 more rays, but it just reuses the distance from the first 4
+    for (double i = 0; i <= 2.0 * 3.14159264 + .06; i += 2.0 * 3.14159265  / 360.0) {
+
         int distance = tempRadArray[j];
 
         double color = 1 - (distance / rad);
 
         glColor3f(color,color,color);
         glVertex2i((SCREEN_WIDTH / 2) + distance * cos(i), (SCREEN_HEIGHT / 2) + distance * sin(i));
+
+
+        if (j == 359) {
+            j = -1;
+        }
+
         j++;
     }
     glEnd();
