@@ -364,12 +364,12 @@ void Enemy::draw(int pXShift, int pYShift, double angleR) const {
 
 
         case (Flipper):
-            glColor3f(.6 - (distance / 250) , 1 - (distance / 260), .8 - (distance / 260));
+            glColor3f(.6 - (distance / 260) , 1 - (distance / 260), .8 - (distance / 260));
             break;
 
         case (Sizer):
 
-            glColor3f(.6 - (distance / 250), .6 - (distance / 260), 1 - (distance / 260));
+            glColor3f(.6 - (distance / 260), .6 - (distance / 260), 1 - (distance / 260));
             break;
 
         default:

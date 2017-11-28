@@ -26,3 +26,7 @@ worm
 Time: 4.68323 s
 gotchas: 0 gots
 Completed: Nope
+luke
+Time: 37.1 s
+gotchas: 2 gots
+Completed: Yes!
