@@ -12,8 +12,10 @@ using namespace std;
 //Declare the main game object, maze, player, enemies, game
 Maze m;
 Player p;
-Enemy e1, e2;
+vector<Enemy> enemies(MAX_ENEMIES);
 GameInfo game;
+
+int numEnemies;
 
 int wd;
 
@@ -33,12 +35,18 @@ int miniTick;
 //Initialize
 void init() {
     game = GameInfo();
-    m = Maze();
-    p = Player();
+    m = Maze(1, true); //True for load live game
+    p = Player(m.getStartX(),m.getStartY());
 
-    //First two positions are starting location, then size and lastly speed.
-    e1 = Enemy(10, 10, 20, 1, Sizer);
-    e2 = Enemy(10, 11, 20, 1, Flipper);
+    numEnemies = m.enemyInfo.size();
+
+    for (int i = 0; i < numEnemies; i++) {
+        enemies[i] = Enemy(m.enemyInfo[i].first.first,
+                                    m.enemyInfo[i].first.second, eType(m.enemyInfo[i].second));
+    }
+
+    //enemies[0] = Enemy(4, 4,eType(5));
+    //enemies[1] = Enemy(4, 4, eType(5));
 
     for (int i = 0; i < 128; i++) {
         keys[i] = false;
@@ -249,23 +257,21 @@ void display() {
 
             //If any enemies are in one of the squares,
             //store the location of that square in there location field.
-            if ((e1.x == i) && (e1.y == j)) {
-                e1.setLocation(x, y);
-            }
+            for (int z = 0; z < numEnemies; z++) {
 
-            if ((e2.x == i) && (e2.y == j)) {
-                e2.setLocation(x, y);
+                if ((enemies[z].x == i) && (enemies[z].y == j)) {
+                    enemies[z].setLocation(x,y);
+                }
             }
         }
     }
 
     //Render enemies, specifically after the maze tiles are displayed.
-    e1.draw(p, angleR);
-    e2.draw(p, angleR);
+    for (int z = 0; z < numEnemies; z++) {
 
-    //Reset the enemies locations, solves a bug.
-    e1.resetLoc();
-    e2.resetLoc();
+        enemies[z].draw(p, angleR);
+        enemies[z].resetLoc();  //Fixes bug
+    }
 
 
     //Draw the player
@@ -285,34 +291,8 @@ void follow_path(Enemy &E) {
     //Check if in players square
     if (!(m.getNextX() == -2)) {
 
-        //Move Right
-        if (m.getNextX() > E.x) {
-
-            //First calculate move, then doMove, same for all movement.
-            E.calcMove(0, -E.getSpeed(), 0);
-            E.doMove(m);
-        }
-
-            //Move Left
-        else if (m.getNextX() < E.x) {
-
-            E.calcMove(0, E.getSpeed(), 0);
-            E.doMove(m);
-        }
-
-            //Move Up
-        else if (m.getNextY() > E.y) {
-
-            E.calcMove(-E.getSpeed(), 0, 0);
-            E.doMove(m);
-        }
-
-            //Move Down
-        else if (m.getNextY() < E.y) {
-
-            E.calcMove(E.getSpeed(), 0, 0);
-            E.doMove(m);
-        }
+        E.nextCalc(m.getNextX(),m.getNextY());
+        E.doMove(m);
     }
 
         //When in the player's tile, behave differently
@@ -360,8 +340,11 @@ void follow_path(Enemy &E) {
             }
 
             //Reset the location of the Enemy
-            E.x = END_X;
-            E.y = END_Y;
+            E.x = E.getSpawnX();
+            E.y = E.getSpawnY();
+
+            E.xShift = 0;
+            E.yShift = 0;
 
             //Update score
             game.score.got++;
@@ -446,9 +429,11 @@ void timer(int extra) {
         }
         p.update();
 
+
+
         //If you reach the END_X and END_Y square you win!
-        if ((p.x == END_X) && (p.y == END_Y)) {
-            cout << "You win! " << endl;
+        if (m.maze[p.x][p.y].getStati() == End) {
+                cout << "You win! " << endl;
 
             //Mark as completed and end game.
             game.score.completed = true;
@@ -458,17 +443,14 @@ void timer(int extra) {
         }
 
 
-        m.aStarSearch(e1.x, e1.y, p.x, p.y);
-        follow_path(e1);
+        for (int z = 0; z < numEnemies; z++) {
 
-        if (miniTick == 1) {
-
-            m.aStarSearch(e2.x, e2.y, p.x, p.y);
-            follow_path(e2);
+            m.aStarSearch(enemies[z].x, enemies[z].y, p.x, p.y);
+            follow_path(enemies[z]);
         }
 
 
-    } else {
+        } else {
 
         angle = (angle + 1) % 360;
         angleR = angle * (LUKE_M_PI / 180);

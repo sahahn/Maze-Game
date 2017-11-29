@@ -2,6 +2,7 @@
 #include "graphics.h"
 #include "GameInfo.h"
 #include "Character.h"
+#include "EditorGraphics.h"
 
 using namespace std;
 // test variable
@@ -14,6 +15,11 @@ void testWithBool(string testName, bool pass) {
 }
 
 int main(int argc, char **argv) {
+
+    graphicsPlay(argc, argv);
+
+    /*
+
     // TESTING
     if (TESTING) {
 
@@ -102,5 +108,7 @@ int main(int argc, char **argv) {
     } else {
         cout << "ERROR: A TEST FAILED!" << endl;
     }
+
+     */
     return 0;
 }

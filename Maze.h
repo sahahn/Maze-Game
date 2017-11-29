@@ -20,6 +20,10 @@ using namespace std;
 typedef pair<int, int> Pair;
 typedef pair<double, Pair> pPair;
 
+//For loading in enemies
+typedef pair<Pair, int> eInfo;
+
+
 // cell for use with A star algorithim
 struct MazeCell {
 
@@ -36,21 +40,51 @@ public:
      * Constructor, uses global Constants
      */
     Maze();
+    Maze(int l, bool edit);
+    Maze(int sX, int sY);
 
-    Tile maze[HEIGHT][WIDTH]; //Make the final maze w/ info public to easily get contents
+
+    vector<eInfo> enemyInfo;
+
+    /*
+     * Loads in a maze/level to the game, where int l in the level to load
+     */
+    void loadMaze(int l);
+
+
+    /*
+     * Loads in a maze/level to the editor, where int l in the level to load
+     */
+    void loadMazeEditor(int l);
+
+    /*
+     * Clears instances of start squares, because there can only be one!
+     */
+    void clearStart();
+
+    /*
+     * Saves the level to 'l.txt', where l in an int input.
+     */
+    void saveLevel(int l);
+
+    //Make the final maze w/ info public to easily get contents
+    Tile maze[HEIGHT][WIDTH];
 
     //void solve_maze(int s_x, int s_y, int e_x, int e_y);
-
     void aStarSearch(int s_x, int s_y, int e_x, int e_y);
 
     int getNextX() const;
     int getNextY() const;
+
+    int getStartX() const;
+    int getStartY() const;
 
 
 private:
     vector<MazePoint> wallList;
     //int endX, endY;
     int nextX, nextY;
+    int playerStartX, playerStartY;
 
     // attempts to add a wall, if there isn't a wall in the position already
     void checkAndAdd(int x, int y);

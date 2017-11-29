@@ -7,41 +7,24 @@
 
 Tile::Tile() {
     wall = true;
-    wasHere = false;
-    correctPath = false;
-    end = false;
 }
 
 bool Tile::getWall() const {
     return wall;
 }
 
-bool Tile::getWasHere() const {
-    return wasHere;
+Statee Tile::getStati() const {
+    return stati;
 }
 
-bool Tile::getCorrectPath() const {
-    return correctPath;
-}
-
-bool Tile::getEnd() const {
-    return end;
-}
 
 void Tile::setWall(bool b) {
     wall = b;
 }
 
-void Tile::setWasHere(bool b) {
-    wasHere = b;
-}
-
-void Tile::setCorrectPath(bool b) {
-    correctPath = b;
-}
-
-void Tile::setEnd(bool b) {
-    end = b;
+void Tile::setStati(Statee s) {
+    stati = s;
+    wall = false;
 }
 
 
@@ -54,13 +37,7 @@ void Tile::draw(int x, int y, int xShift, int yShift, double angle) const {
 
     else {
 
-        if (end) {
-            glColor3f(1,.5,.5);
-
-        }
-        else {
             glColor3f(0, 0, 0);
-        }
     }
 
     x = (x * SCALE) + yShift;
@@ -70,7 +47,7 @@ void Tile::draw(int x, int y, int xShift, int yShift, double angle) const {
     //Convert to pixel coordinates
     glBegin(GL_QUADS);
 
-    if (angle == 0 && (wall || end)) {
+    if (angle == 0 && (wall)) {
         // top left corner
         glVertex2i(y, x);
         // top right corner
@@ -83,7 +60,8 @@ void Tile::draw(int x, int y, int xShift, int yShift, double angle) const {
     }
         //If using the rotate func,
     else {
-        if (wall || end) {
+        if (wall) {
+
             Point p1, p2, p3, p4;
             p1 = rotate(y, x, angle);
             p2 = rotate((y + SCALE), x, angle);
@@ -95,7 +73,72 @@ void Tile::draw(int x, int y, int xShift, int yShift, double angle) const {
             glVertex2i(p3.x, p3.y);
             glVertex2i(p4.x, p4.y);
         }
+
     }
+}
+
+//Flip wall status, used with editor
+void Tile::flipWall() {
+
+    if (wall == true) {
+        wall = false;
+
+    } else {
+        wall = true;
+        stati = None;
+    }
+}
+
+//Modified draw, used in the map editor
+void Tile::draw(int x, int y, int xShift, int yShift) const {
+
+    if (wall) {
+        glColor3f(0, 0, 0);
+    }
+
+    else {
+        switch (stati) {
+
+            case (None):
+                glColor3f(1, 1, 0);
+                break;
+
+            case (Start):
+                glColor3f(0, 1, 0);
+                break;
+
+            case (End):
+                glColor3f(1, 0, 0);
+                break;
+
+            case (FlipperSpawn):
+                glColor3f(.3, .7, .4);
+                break;
+
+            case (SizerSpawn):
+                glColor3f(.7, .4, .8);
+                break;
+        }
+    }
+
+    x = (x * EDITOR_SCALE) + yShift;
+    y = (y * EDITOR_SCALE) + xShift;
+
+
+    //Convert to pixel coordinates
+    glBegin(GL_QUADS);
+
+
+    // top left corner
+    glVertex2i(y, x);
+    // top right corner
+    glVertex2i((y + EDITOR_SCALE), x);
+    // bottom right corner
+    glVertex2i((y + EDITOR_SCALE), (x + EDITOR_SCALE));
+    // bottom left corner
+    glVertex2i(y, (x + EDITOR_SCALE));
+    glEnd();
+
 }
 
 MazePoint::MazePoint() {

@@ -8,9 +8,25 @@ using namespace std;
 
 Maze::Maze() {
 
+    //Set the start point, just the maze gen start point, to be not a wall, and add it to the list
+    maze[3][3].setWall(false);
+    addWall(3, 3);
+
+
+    int remove;
+
+    //Go through randomly and remove walls
+    while (wallList.size() != 0) {
+        remove = rand() % wallList.size();
+        removeOperation(remove);
+    }
+}
+
+Maze::Maze(int sX, int sY) {
+
     //Set the start point, to be not a wall, and add it to the list
-    maze[START_X][START_Y].setWall(false);
-    addWall(START_X, START_Y);
+    maze[sX][sY].setWall(false);
+    addWall(sX, sY);
 
     int remove;
 
@@ -20,14 +36,149 @@ Maze::Maze() {
         removeOperation(remove);
     }
 
-    //Set the end of the maze, to not a wall, and to be the end
-    maze[END_X][END_Y].setWall(false);
-    maze[END_X][END_Y].setEnd(true);
-
     addRoom({5, 4});
 
     addRoom((Point) {12,10}, (Point) {2,2});
 
+}
+
+Maze::Maze(int l, bool live) {
+    if (live) {
+        loadMaze(l);
+
+    } else {
+        loadMazeEditor(l);
+    }
+}
+
+//Load a maze/level into the real game
+void Maze::loadMaze(int l) {
+    //Open the file with error handling
+    ifstream inFile;
+
+    string level = std::to_string(l);
+
+    string fileName = level + ".txt";
+
+    inFile.open(fileName);
+
+    if (!inFile) {
+        cout << "Error: unable to open level file";
+        exit(1); // terminate with error
+    }
+
+    string line;
+    int intLine;
+
+    //For each line in the file
+    for (int i = 0; i < HEIGHT; i++) {
+        for (int j = 0; j < WIDTH; j++) {
+
+            std::getline(inFile, line);
+            intLine = std::atoi(line.c_str());
+
+            //1 == None, 2 == Start Loc, 3 = End Location
+            if ((intLine == 1) || (intLine == 2) || (intLine) == 3) {
+
+                //If not a wall, or enemy
+                maze[i][j].setStati(Statee(intLine));
+                maze[i][j].setWall(false);
+
+
+                if (intLine == 2) {
+
+                    playerStartX = i;
+                    playerStartY = j;
+                }
+            }
+
+            else if ((intLine == 4) || (intLine == 5)) {
+
+                enemyInfo.push_back(make_pair(make_pair(i,j),intLine));
+                maze[i][j].setWall(false);
+            }
+
+            //FlipperSpawn = 4, SizerSpawn = 5
+        }
+    }
+
+    inFile.close(); //Close the file
+}
+
+
+//Load a maze into the editor
+void Maze::loadMazeEditor(int l) {
+    //Open the file with error handling
+    ifstream inFile;
+
+    string level = std::to_string(l);
+
+    string fileName = level + ".txt";
+
+    inFile.open(fileName);
+
+    if (!inFile) {
+        cout << "Error: unable to open level file";
+        exit(1); // terminate with error
+    }
+
+    string line;
+    int intLine;
+
+    //For each line in the file
+    for (int i = 0; i < HEIGHT; i++) {
+        for (int j = 0; j < WIDTH; j++) {
+
+            std::getline(inFile, line);
+            intLine = std::atoi(line.c_str());
+
+            //If not a wall, set the tile to what it should be
+            if (intLine != 0) {
+                maze[i][j].setStati(Statee(intLine));
+            }
+        }
+    }
+
+    inFile.close(); //Close the file
+
+}
+
+void Maze::clearStart() {
+    for (int i = 0; i < HEIGHT; i++) {
+        for (int j = 0; j < WIDTH; j++) {
+            if (maze[i][j].getStati() == Start) {
+                maze[i][j].setStati(None);
+            }
+        }
+    }
+}
+
+void Maze::saveLevel(int l) {
+
+    string level = std::to_string(l);
+
+    ofstream fileOut;
+
+    string fileName = level + ".txt";
+
+    fileOut.open(fileName, ios::out);
+
+    if (fileOut) {
+
+        for (int i = 0; i < HEIGHT; i++) {
+            for (int j = 0; j < WIDTH; j++) {
+
+                if (maze[i][j].getWall()) {
+                    fileOut << 0 << "\n";
+
+                } else {
+                    fileOut << maze[i][j].getStati() << "\n";
+                }
+            }
+        }
+    }
+
+    fileOut.close();
 }
 
 void Maze::checkAndAdd(int x, int y) {
@@ -417,12 +568,21 @@ void Maze::aStarSearch(int s_x, int s_y, int e_x, int e_y) {
         }
 }
 
+
 int Maze::getNextX() const {
     return nextX;
 }
 
 int Maze::getNextY() const {
     return nextY;
+}
+
+int Maze::getStartX() const {
+    return playerStartX;
+}
+
+int Maze::getStartY() const {
+    return playerStartY;
 }
 
 void Maze::addRoom(Point loc){

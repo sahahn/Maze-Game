@@ -187,7 +187,11 @@ void Character::flipVelocity() {
 /*
  * Player Class
  */
+
 Player::Player() {
+
+}
+Player::Player(int sX, int sY) {
     size = 30;
     speed = 2;
     playerLight = Light();
@@ -202,8 +206,8 @@ Player::Player() {
     location.y = (SCREEN_HEIGHT / 2);
 
     //Set the starting location in the maze array, as defined in GameInfo
-    x = START_X;
-    y = START_Y;
+    x = sX;
+    y = sY;
 
     xShift = 0;
     yShift = 0;
@@ -282,12 +286,14 @@ void Player::setPlayerRotation(double angR) {
  */
 
 Enemy::Enemy() {
-    size = 20;
-    speed = 1;
 
+    /*
     //The default "spawning location" is set to 10,10 for now, as it is easier to test
-    x = 10;
-    y = 10;
+    spawnX = 10;
+    spawnY = 10;
+
+    x = spawnX;
+    y = spawnY;
 
     xShift = 0;
     yShift = 0;
@@ -297,14 +303,19 @@ Enemy::Enemy() {
 
     type = Flipper;
 
+    size = 20;
+    speed = 1;
+     */
+
 }
 
-Enemy::Enemy(int X, int Y, int s, int sp, eType e) {
-    size = s;
-    speed = sp;
+Enemy::Enemy(int X, int Y, eType e) {
 
-    x = X;
-    y = Y;
+    spawnX = X;
+    spawnY = Y;
+
+    x = spawnX;
+    y = spawnY;
 
     xShift = 0;
     yShift = 0;
@@ -313,14 +324,34 @@ Enemy::Enemy(int X, int Y, int s, int sp, eType e) {
     hBoundary = ((SCALE - size) / 2);
 
     type = e;
+
+    //Could have these dep. on type
+    size = 20; //Default size
+    speed = 1; //Default speed
 }
 
 eType Enemy::getType() const {
     return type;
 }
 
+int Enemy::getSpawnX() const {
+    return spawnX;
+}
+
+int Enemy::getSpawnY() const {
+    return spawnY;
+}
+
 void Enemy::setType(eType e) {
     type = e;
+}
+
+void Enemy::setSpawnX(int x) {
+    spawnX = x;
+}
+
+void Enemy::setSpawnY(int y) {
+    spawnY = y;
 }
 
 
@@ -397,6 +428,31 @@ void Enemy::resetLoc() {
     location.x = -2;
     location.y = -2;
 }
+
+
+void Enemy::nextCalc(int nX, int nY) {
+    //Move Right
+    if (nX > x) {
+        //First calculate move, then doMove, same for all movement.
+        calcMove(0, -speed, 0);
+    }
+
+        //Move Left
+    else if (nX < x) {
+        calcMove(0, speed, 0);
+    }
+
+        //Move Up
+    else if (nY > y) {
+        calcMove(-speed, 0, 0);
+    }
+
+        //Move Down
+    else if (nY < y) {
+        calcMove(speed, 0, 0);
+    }
+}
+
 
 
 

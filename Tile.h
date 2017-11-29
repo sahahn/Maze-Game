@@ -8,39 +8,42 @@
 #include "graphics.h"
 #include <math.h>
 
+
+//The fake plural of status, the fake singular being stati
+enum Statee {
+    None = 1, Start = 2, End = 3, FlipperSpawn = 4, SizerSpawn = 5
+};
+
 class Tile {
 public:
     // constructors
     Tile();
 
-    // getters
+   // getters
     bool getWall() const;
 
-    bool getWasHere() const;
-
-    bool getCorrectPath() const;
-
-    bool getEnd() const;
+    Statee getStati() const;
 
     // setters
     void setWall(bool b);
 
-    void setWasHere(bool b);
+    void setStati(Statee s);
 
-    void setCorrectPath(bool b);
-
-    void setEnd(bool b);
+    //Used in editor
+    void flipWall();
 
     // renders a single tile of the maze
     void draw(int x, int y, int xShift, int yShift, double angle) const;
 
+    //Slightly dif from maze render draw, no need for angle, USED IN EDITOR
+    void draw(int x, int y, int xShift, int yShift) const;
+
 private:
     bool wall;
-    bool wasHere;
-    bool correctPath;
-    bool end;
+    Statee stati;
 
 };
+
 
 
 /*

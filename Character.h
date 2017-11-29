@@ -10,7 +10,7 @@
 #include "Light.h"
 
 enum eType {
-    Flipper, Sizer
+    Flipper = 4, Sizer = 5
 };
 
 class Character {
@@ -95,6 +95,7 @@ public:
 
     // Constructor
     Player();
+    Player(int sX, int sY);
 
     //Draws the player, NOTE: although enemy also has a draw function, it requires different parameters
     //so I did not think there was a use in creating a virtual function to override.
@@ -122,13 +123,17 @@ public:
     // Constructors
     Enemy();
 
-    Enemy(int X, int Y, int s, int sp, eType e);
+    Enemy(int X, int Y, eType e);
 
     // getter
     eType getType() const;
+    int getSpawnX() const;
+    int getSpawnY() const;
 
     // setter
     void setType(eType e);
+    void setSpawnX(int x);
+    void setSpawnY(int y);
 
     //Note: The draw function for the Enemy, and Tile piece are quite close.
     //In order to draw the Enemy relative to the Player, the players xShift and yShift,
@@ -139,11 +144,15 @@ public:
     //simply sets the temp values.
     void calcMove(int xDelta, int yDelta, double angleR) override;
 
+
+    void nextCalc(int nX, int nY);
+
     // Sets location to a default
     void resetLoc();
 
 
 private:
+    int spawnX, spawnY;
 
     eType type;
 
