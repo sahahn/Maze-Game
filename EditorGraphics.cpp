@@ -30,6 +30,7 @@ int ticks;
 
 int level;
 
+
 void initE() {
 
     //Call with false to tell it to use map editor

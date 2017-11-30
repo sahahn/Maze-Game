@@ -6,16 +6,23 @@
 #include "Character.h"
 #include <ctime>
 #include <math.h>
+#include "MapEditor.h"
+#include "Box.h"
 
 using namespace std;
 
-enum GameState {StartMenu, Game, EndMenu};
+enum GameState {StartMenu, Game, EndMenu, Editor, EditorMenu};
 
 //Declare the main game object, maze, player, enemies, game
 Maze m;
 Player p;
 vector<Enemy> enemies(MAX_ENEMIES);
 GameInfo game;
+MapEditor e;
+
+
+Box startBox;
+Box endBox;
 
 int numEnemies;
 
@@ -38,9 +45,6 @@ bool rState;
 int miniTick;
 GameState state;
 
-int menuSX,menuSY,menuSize;
-bool hover;
-
 //Initialize
 void init() {
     for (int i = 0; i < 128; i++) {
@@ -48,10 +52,8 @@ void init() {
     }
 
     state = StartMenu;
-    menuSX = 300;
-    menuSY = 300;
-    menuSize = 50;
-    hover = false;
+    startBox = Box(300,300,50,0,1,0);
+    endBox = Box(350,350,50,1,0,0);
 
     currentLevel = 1;
 }
@@ -81,6 +83,18 @@ void gameInit() {
     //Lastly put the state into game
     state = Game;
 
+}
+
+void editorInit(int l) {
+    state = Editor;
+
+    e = MapEditor();
+    if (l != -1) {
+        m = Maze(l, false);
+
+    } else {
+        m = Maze(3,3);
+    }
 }
 
 // Initialize OpenGL Graphics
@@ -149,8 +163,33 @@ void kbu(unsigned char key, int x, int y) {
             keys[GLUT_KEY_UP] = false;
             break;
     }
-}
 
+    if (state == Editor) {
+        switch(key) {
+
+            case '1':
+                m.maze[e.mX][e.mY].setStati(None);
+            break;
+
+            case '2':
+                m.clearStart();
+                m.maze[e.mX][e.mY].setStati(Start);
+            break;
+
+            case '3':
+                m.maze[e.mX][e.mY].setStati(End);
+            break;
+
+            case '4':
+                m.maze[e.mX][e.mY].setStati(FlipperSpawn);
+            break;
+
+            case '5':
+                m.maze[e.mX][e.mY].setStati(SizerSpawn);
+            break;
+        }
+    }
+}
 
 void kbdS(int key, int x, int y) {
 
@@ -199,8 +238,6 @@ void keyUp(int key, int x, int y) {
     }
 }
 
-
-
 void cursor(int x, int y) {
 
     switch (state) {
@@ -215,49 +252,92 @@ void cursor(int x, int y) {
             //glutPostRedisplay();
             break;
         }
+
         case (StartMenu) : {
 
+            startBox.checkHover(x,y);
+            endBox.checkHover(x,y);
 
-            if ((x > menuSX) && (x < menuSX + menuSize) && (y > menuSY) && (y < menuSY + menuSize)) {
-                hover = true;
-            } else {
-                hover = false;
-            }
             glutPostRedisplay();
             break;
         }
 
         case (EndMenu) : {
 
-            if ((x > menuSX) && (x < menuSX + menuSize) && (y > menuSY) && (y < menuSY + menuSize)) {
-                hover = true;
-            } else {
-                hover = false;
-            }
+            startBox.checkHover(x,y);
+            endBox.checkHover(x,y);
+
             glutPostRedisplay();
             break;
+        }
+
+        case (Editor) : {
+
+            e.mX = (e.loc.x - EDITOR_SCOPE + 1) + ((y - e.yShift)/EDITOR_SCALE);
+            e.mY = (e.loc.y - EDITOR_SCOPE + 1) + ((x - e.xShift)/EDITOR_SCALE);
+            glutPostRedisplay();
         }
     }
 }
 
-//void mousemov(int x, int y) {
-//
-//}
+void mousemov(int x, int y) {
+
+    if (state == Editor) {
+
+        int tempX = (e.loc.x - EDITOR_SCOPE + 1) + ((y - e.yShift) / EDITOR_SCALE);
+        int tempY = (e.loc.y - EDITOR_SCOPE + 1) + ((x - e.xShift) / EDITOR_SCALE);
+
+        if (!((e.mX == tempX) && (e.mY == tempY))) {
+            keys[GLUT_LEFT_BUTTON] = true;
+            e.mX = tempX;
+            e.mY = tempY;
+        }
+
+        glutPostRedisplay();
+    }
+}
 
 // button will be GLUT_LEFT_BUTTON or GLUT_RIGHT_BUTTON
 // state will be GLUT_UP or GLUT_DOWN
-void mouse(int button, int state, int x, int y) {
+void mouse(int button, int stateB, int x, int y) {
 
-    if ((x > menuSX) && (x < menuSX + menuSize) && (y > menuSY)
-        && (y < menuSY + menuSize) && (state == GLUT_LEFT_BUTTON)) {
+        if ((state == StartMenu) || (state == EndMenu)) {
 
-        gameInit();
+            if (stateB == GLUT_LEFT_BUTTON) {
+                if (startBox.checkHover(x, y)) {
+                    gameInit();
+                } else if (endBox.checkHover(x, y)) {
+                    editorInit(2);
+                }
+
+            }
+        }
+
+        else if (state == Editor) {
+
+            if ((button == GLUT_LEFT_BUTTON) && (stateB == GLUT_DOWN)) {
+
+                //To avoid erroneous double clicks
+                if (!(e.clickTimer)) {
+
+                    e.clickTimer = true;
+                    keys[GLUT_LEFT_BUTTON] = true;
+
+                    //For filling, only fill with the start value,
+                    //You fill with dragging cursorE w/ mouseE held down
+                    if (m.maze[e.mX][e.mY].getWall()) {
+                        e.fillVal = true;
+                    } else {
+                        e.fillVal = false;
+                    }
+                }
+            }
+        }
+
+        glutPostRedisplay();
+
     }
 
-
-//glutPostRedisplay();
-
-}
 
 /**********************************************************************
  * Display - which contains the main screen rendering logic
@@ -362,23 +442,9 @@ void display() {
                 glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, menu2.at(p));
             }
 
-            glBegin(GL_QUADS);
-            if (hover) {
-                glColor3f(0, .5, 0);
-            } else {
-                glColor3f(0, 1, 0);
-            }
+            startBox.draw();
+            endBox.draw();
 
-            // top left corner
-            glVertex2i(menuSX, menuSY);
-            // top right corner
-            glVertex2i(menuSX+menuSize, menuSY);
-            // bottom right corner
-            glVertex2i(menuSX+menuSize, menuSY+menuSize);
-            // bottom left corner
-            glVertex2i(menuSX, menuSY+menuSize);
-
-            glEnd();
             break;
         }
 
@@ -399,27 +465,31 @@ void display() {
                 glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, menu2.at(p));
             }
 
-            glBegin(GL_QUADS);
-            if (hover) {
-                glColor3f(0, .5, 0);
-            } else {
-                glColor3f(0, 1, 0);
-            }
-
-            // top left corner
-            glVertex2i(menuSX, menuSY);
-            // top right corner
-            glVertex2i(menuSX+menuSize, menuSY);
-            // bottom right corner
-            glVertex2i(menuSX+menuSize, menuSY+menuSize);
-            // bottom left corner
-            glVertex2i(menuSX, menuSY+menuSize);
-
-            glEnd();
+            startBox.draw();
+            endBox.draw();
             break;
         }
-    }
 
+        case (Editor) : {
+
+                    int lb1 = e.loc.x - EDITOR_SCOPE;
+                    int upb1 = e.loc.x + EDITOR_SCOPE;
+                    int lb2 = e.loc.y - EDITOR_SCOPE;
+                    int upb2 = e.loc.y + EDITOR_SCOPE;
+
+                    int x = -1;
+
+                    for (int i = lb1; i <= upb1 + 1; i++, x++) {
+
+                        int y = -1;
+
+                        for (int j = lb2; j <= upb2 + 1; j++, y++) {
+
+                            m.maze[i][j].draw(x , y, e.xShift, e.yShift);
+                        }
+                    }
+                }
+            }
 
     //Render now
     glFlush();
@@ -429,26 +499,6 @@ void display() {
  * Main Player and Character movement logic
  *********************************************************************/
 
-void randomMenuMovement() {
-    Pair randMove = make_pair(rand() % 2, rand() % 2);
-
-    int randN = rand() % 2;
-
-    if (((menuSX + randMove.first) < SCREEN_WIDTH) && (randN == 1)) {
-        menuSX += randMove.first;
-    }
-    else if (((menuSX - randMove.first) > 0) && (randN == 0)) {
-        menuSX -= randMove.first;
-    }
-
-    if (((menuSY + randMove.second) < SCREEN_HEIGHT) && (randN == 1)) {
-        menuSY += randMove.second;
-    }
-
-    else if (((menuSY - randMove.second) > 0) && (randN == 0)) {
-        menuSY -= randMove.second;
-    }
-}
 
 
 //Implements the logic for an Enemy to follow the correct path to the player.
@@ -636,13 +686,86 @@ void timer(int extra) {
         }
 
         case (StartMenu)  : {
-            randomMenuMovement();
+            startBox.randomMenuMovement();
+            endBox.randomMenuMovement();
         }
 
         case (EndMenu)  : {
-           randomMenuMovement();
+           startBox.randomMenuMovement();
+            endBox.randomMenuMovement();
+        }
+
+        case (Editor) : {
+
+            //If click Timer, then increment
+            //until timerE is out, used to prevent accidental double clicks
+            if (e.clickTimer) {
+                e.ticks++;
+
+                if (e.ticks == 20) {
+
+                    e.ticks = 0;
+                    e.clickTimer = false;
+                }
+
+            } else {
+
+                if ((keys[GLUT_LEFT_BUTTON]) && (m.maze[e.mX][e.mY].getWall() == e.fillVal)) {
+                    m.maze[e.mX][e.mY].flipWall();
+                    keys[GLUT_LEFT_BUTTON] = false;
+                }
             }
 
+            if (keys[GLUT_KEY_DOWN]) {
+
+                if ((e.loc.x + EDITOR_SCOPE  < HEIGHT)) {
+                    e.yShift -= e.moveSpeed;
+                }
+            }
+
+            if (keys[GLUT_KEY_LEFT]) {
+
+                if ((e.loc.y - EDITOR_SCOPE) > 0) {
+                    e.xShift += e.moveSpeed;
+                }
+
+            }
+
+            if (keys[GLUT_KEY_UP]) {
+
+                if ((e.loc.x - EDITOR_SCOPE) > 0) {
+                    e.yShift += e.moveSpeed;
+                }
+
+            }
+
+            if (keys[GLUT_KEY_RIGHT]) {
+
+                if ((e.loc.y + EDITOR_SCOPE < WIDTH)) {
+                    e.xShift -= e.moveSpeed;
+                }
+            }
+
+            if (e.yShift < (-e.sBoundary)) {
+                e.loc.x +=1;
+                e.yShift += EDITOR_SCALE;
+            }
+
+            if (e.xShift > (e.sBoundary)) {
+                e.loc.y -= 1;
+                e.xShift -= EDITOR_SCALE;
+            }
+
+            if (e.xShift < (-e.sBoundary)) {
+                e.loc.y += 1;
+                e.xShift += EDITOR_SCALE;
+            }
+
+            if (e.yShift > (e.sBoundary)) {
+                e.loc.x -= 1;
+                e.yShift -= EDITOR_SCALE;
+            }
+        }
     }
 
     glutPostRedisplay();
@@ -655,6 +778,8 @@ int graphicsPlay(int argc, char **argv) {
 
     init();
     //gameInit(1);
+
+    //editorInit(1);
 
     // Initialize GLUT
     glutInit(&argc, argv);
