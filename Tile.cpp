@@ -7,6 +7,7 @@
 
 Tile::Tile() {
     wall = true;
+    stati = None;
 }
 
 bool Tile::getWall() const {
@@ -20,6 +21,11 @@ Statee Tile::getStati() const {
 
 void Tile::setWall(bool b) {
     wall = b;
+
+    //If wall, make sure no other status
+    if (wall) {
+        stati = None;
+    }
 }
 
 void Tile::setStati(Statee s) {

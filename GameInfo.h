@@ -15,8 +15,8 @@ using namespace std;
 // Global settings for use in Graphics,cpp, Tile.cpp, Player.cpp, and Maze.cpp
 // Include GameInfo.h to access fields.
 
-const int HEIGHT = 100;
-const int WIDTH = 100;
+const int HEIGHT = 30;
+const int WIDTH = 30;
 
 //For Live Game
 const int SCALE = 300;

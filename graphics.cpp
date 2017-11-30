@@ -445,9 +445,12 @@ void timer(int extra) {
 
         for (int z = 0; z < numEnemies; z++) {
 
+
             m.aStarSearch(enemies[z].x, enemies[z].y, p.x, p.y);
             follow_path(enemies[z]);
         }
+
+
 
 
         } else {

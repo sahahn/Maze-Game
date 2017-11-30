@@ -33,7 +33,7 @@ int level;
 void initE() {
 
     //Call with false to tell it to use map editor
-    lev = Maze(1, false);
+    lev = Maze(3,3);
 
     //Loads in center of the map
     loc.x = HEIGHT / 2;
