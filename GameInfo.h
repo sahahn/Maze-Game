@@ -32,7 +32,7 @@ const int EDITOR_SCOPE = 8;
 
 const double LUKE_M_PI = 3.14159265358;
 const bool TESTING = true;
-const int MAX_ENEMIES = 10;
+const int MAX_ENEMIES = 20;
 
 
 struct Point {   // Declare Point struct type

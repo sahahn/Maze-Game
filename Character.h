@@ -129,11 +129,13 @@ public:
     eType getType() const;
     int getSpawnX() const;
     int getSpawnY() const;
+    int getUpdateRate() const;
 
     // setter
     void setType(eType e);
     void setSpawnX(int x);
     void setSpawnY(int y);
+    void setUpdateRate(int u);
 
     //Note: The draw function for the Enemy, and Tile piece are quite close.
     //In order to draw the Enemy relative to the Player, the players xShift and yShift,
@@ -153,6 +155,7 @@ public:
 
 private:
     int spawnX, spawnY;
+    int updateRate;
 
     eType type;
 

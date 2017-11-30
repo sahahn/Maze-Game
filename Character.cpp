@@ -328,6 +328,7 @@ Enemy::Enemy(int X, int Y, eType e) {
     //Could have these dep. on type
     size = 20; //Default size
     speed = 1; //Default speed
+    updateRate = 3;
 }
 
 eType Enemy::getType() const {
@@ -342,6 +343,10 @@ int Enemy::getSpawnY() const {
     return spawnY;
 }
 
+int Enemy::getUpdateRate() const {
+    return updateRate;
+}
+
 void Enemy::setType(eType e) {
     type = e;
 }
@@ -352,6 +357,10 @@ void Enemy::setSpawnX(int x) {
 
 void Enemy::setSpawnY(int y) {
     spawnY = y;
+}
+
+void Enemy::setUpdateRate(int u) {
+    updateRate = u;
 }
 
 

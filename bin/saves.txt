@@ -30,3 +30,11 @@ luke
 Time: 37.1 s
 gotchas: 2 gots
 Completed: Yes!
+fabian
+Time: 40.4881 s
+gotchas: 19 gots
+Completed: Yes!
+dan
+Time: 22.7697 s
+gotchas: 3 gots
+Completed: Yes!

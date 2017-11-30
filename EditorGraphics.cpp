@@ -60,7 +60,7 @@ void initE() {
     clickTimer = false;
     ticks = 0;
 
-    level = 1;
+    level = 2;
 }
 
 /* Initialize OpenGL Graphics */

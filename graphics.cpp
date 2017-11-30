@@ -9,6 +9,8 @@
 
 using namespace std;
 
+enum GameState {StartMenu, Game, EndMenu};
+
 //Declare the main game object, maze, player, enemies, game
 Maze m;
 Player p;
@@ -27,29 +29,46 @@ int angle;
 //angle in radians
 double angleR;
 
+//Stores what level the player is in
+int currentLevel;
+
 //Global flag for rotation
 bool rState;
 
 int miniTick;
+GameState state;
+
+int menuSX,menuSY,menuSize;
+bool hover;
 
 //Initialize
 void init() {
+    for (int i = 0; i < 128; i++) {
+        keys[i] = false;
+    }
+
+    state = StartMenu;
+    menuSX = 300;
+    menuSY = 300;
+    menuSize = 50;
+    hover = false;
+
+    currentLevel = 1;
+}
+
+void gameInit() {
+
     game = GameInfo();
-    m = Maze(1, true); //True for load live game
+    m = Maze(currentLevel, true); //True for load live game
+    currentLevel++;
+
     p = Player(m.getStartX(),m.getStartY());
 
     numEnemies = m.enemyInfo.size();
 
     for (int i = 0; i < numEnemies; i++) {
         enemies[i] = Enemy(m.enemyInfo[i].first.first,
-                                    m.enemyInfo[i].first.second, eType(m.enemyInfo[i].second));
-    }
-
-    //enemies[0] = Enemy(4, 4,eType(5));
-    //enemies[1] = Enemy(4, 4, eType(5));
-
-    for (int i = 0; i < 128; i++) {
-        keys[i] = false;
+                           m.enemyInfo[i].first.second, eType(m.enemyInfo[i].second));
     }
 
     angle = 0;
@@ -58,6 +77,10 @@ void init() {
     rState = false;
 
     miniTick = 0;
+
+    //Lastly put the state into game
+    state = Game;
+
 }
 
 // Initialize OpenGL Graphics
@@ -80,9 +103,9 @@ void kbd(unsigned char key, int x, int y) {
     }
 
     //key 32 is space, I just have that rotate the maze here
-    if (key == 32) {
-        rState = true; //Animated transition
-    }
+    //if (key == 32) {
+    //    rState = true; //Animated transition
+    //}
 
     switch (key) {
 
@@ -176,21 +199,62 @@ void keyUp(int key, int x, int y) {
     }
 }
 
+
+
 void cursor(int x, int y) {
-    double ang;
-    ang = atan2(y - (SCREEN_HEIGHT / 2), x - (SCREEN_WIDTH / 2));
 
-    p.setPlayerRotation(ang);
-    //glutPostRedisplay();
+    switch (state) {
+
+        //Unused right now but for player rotation
+        case (Game) : {
+
+            //double ang;
+            //ang = atan2(y - (SCREEN_HEIGHT / 2), x - (SCREEN_WIDTH / 2));
+
+            //p.setPlayerRotation(ang);
+            //glutPostRedisplay();
+            break;
+        }
+        case (StartMenu) : {
+
+
+            if ((x > menuSX) && (x < menuSX + menuSize) && (y > menuSY) && (y < menuSY + menuSize)) {
+                hover = true;
+            } else {
+                hover = false;
+            }
+            glutPostRedisplay();
+            break;
+        }
+
+        case (EndMenu) : {
+
+            if ((x > menuSX) && (x < menuSX + menuSize) && (y > menuSY) && (y < menuSY + menuSize)) {
+                hover = true;
+            } else {
+                hover = false;
+            }
+            glutPostRedisplay();
+            break;
+        }
+    }
 }
 
-void mousemov(int x, int y) {
-    //glutPostRedisplay();
-}
+//void mousemov(int x, int y) {
+//
+//}
 
 // button will be GLUT_LEFT_BUTTON or GLUT_RIGHT_BUTTON
 // state will be GLUT_UP or GLUT_DOWN
 void mouse(int button, int state, int x, int y) {
+
+    if ((x > menuSX) && (x < menuSX + menuSize) && (y > menuSY)
+        && (y < menuSY + menuSize) && (state == GLUT_LEFT_BUTTON)) {
+
+        gameInit();
+    }
+
+
 //glutPostRedisplay();
 
 }
@@ -212,70 +276,150 @@ void display() {
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-    //lb and up refer to lower bound and upper bound, and are there as error checks to
-    //make sure the program doesn't attempt to render outside of the maze array.
-    int lb1 = p.x - SCOPE;
-    int upb1 = p.x + SCOPE;
-    int lb2 = p.y - SCOPE;
-    int upb2 = p.y + SCOPE;
+    switch (state) {
+        case (Game): {
 
-    if (lb1 < 0) {
-        lb1 = 0;
-    }
-    if (lb2 < 0) {
-        lb2 = 0;
-    }
+            //lb and up refer to lower bound and upper bound, and are there as error checks to
+            //make sure the program doesn't attempt to render outside of the maze array.
+            int lb1 = p.x - SCOPE;
+            int upb1 = p.x + SCOPE;
+            int lb2 = p.y - SCOPE;
+            int upb2 = p.y + SCOPE;
 
-    if (upb1 > HEIGHT) {
-        upb1 = HEIGHT;
-    }
+            if (lb1 < 0) {
+                lb1 = 0;
+            }
+            if (lb2 < 0) {
+                lb2 = 0;
+            }
 
-    if (upb2 > HEIGHT) {
-        upb2 = HEIGHT;
-    }
+            if (upb1 > HEIGHT) {
+                upb1 = HEIGHT;
+            }
 
-    // render the players light
-    //p.playerLight.renderLight((p.y)*SCALE+(-p.xShift), (p.x)*SCALE+(-p.yShift), m);
+            if (upb2 > HEIGHT) {
+                upb2 = HEIGHT;
+            }
 
-    p.playerLight.renderLight(p.x, p.y, p.xShift, p.yShift, m, angle);
+            // render the players light
+            //p.playerLight.renderLight((p.y)*SCALE+(-p.xShift), (p.x)*SCALE+(-p.yShift), m);
+
+            p.playerLight.renderLight(p.x, p.y, p.xShift, p.yShift, m, angle);
 
 
-    //x and y here are the relative locations to be rendered on the screen,
-    //so by starting with -1, the maze generates from 1 square off the screen
-    int x = -1;
+            //x and y here are the relative locations to be rendered on the screen,
+            //so by starting with -1, the maze generates from 1 square off the screen
+            int x = -1;
 
-    for (int i = lb1; i < upb1 + 1; i++, x++) {
+            for (int i = lb1; i < upb1 + 1; i++, x++) {
 
-        int y = -1;
+                int y = -1;
 
-        for (int j = lb2; j < upb2 + 1; j++, y++) {
+                for (int j = lb2; j < upb2 + 1; j++, y++) {
 
-            //For each position in the array being drawn, i and j, tell the
-            //tile piece to draw it at relative location x and y, according to
-            //also the players x and yShift and the current angle of the screen.
-            m.maze[i][j].draw(x, y, p.xShift, p.yShift, angleR);
+                    //For each position in the array being drawn, i and j, tell the
+                    //tile piece to draw it at relative location x and y, according to
+                    //also the players x and yShift and the current angle of the screen.
+                    m.maze[i][j].draw(x, y, p.xShift, p.yShift, angleR);
 
-            //If any enemies are in one of the squares,
-            //store the location of that square in there location field.
-            for (int z = 0; z < numEnemies; z++) {
+                    //If any enemies are in one of the squares,
+                    //store the location of that square in there location field.
+                    for (int z = 0; z < numEnemies; z++) {
 
-                if ((enemies[z].x == i) && (enemies[z].y == j)) {
-                    enemies[z].setLocation(x,y);
+                        if ((enemies[z].x == i) && (enemies[z].y == j)) {
+                            enemies[z].setLocation(x, y);
+                        }
+                    }
                 }
             }
+
+            //Render enemies, specifically after the maze tiles are displayed.
+            for (int z = 0; z < numEnemies; z++) {
+
+                enemies[z].draw(p, angleR);
+                enemies[z].resetLoc();  //Fixes bug
+            }
+
+
+            //Draw the player
+            p.draw();
+            break;
+        }
+
+        case (StartMenu): {
+            glColor3f(1, 1, 1);
+            string menu = "Hello, and welcome to our very low quality menu!";
+            glRasterPos2d(50, 50);
+
+            for (int p = 0; p < menu.size(); p++) {
+                glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, menu.at(p));
+            }
+
+            string menu2 = "Go ahead and click that square, the game might start also if you do.";
+            glRasterPos2d(50, 100);
+
+            for (int p = 0; p < menu2.size(); p++) {
+                glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, menu2.at(p));
+            }
+
+            glBegin(GL_QUADS);
+            if (hover) {
+                glColor3f(0, .5, 0);
+            } else {
+                glColor3f(0, 1, 0);
+            }
+
+            // top left corner
+            glVertex2i(menuSX, menuSY);
+            // top right corner
+            glVertex2i(menuSX+menuSize, menuSY);
+            // bottom right corner
+            glVertex2i(menuSX+menuSize, menuSY+menuSize);
+            // bottom left corner
+            glVertex2i(menuSX, menuSY+menuSize);
+
+            glEnd();
+            break;
+        }
+
+        case (EndMenu): {
+
+            glColor3f(1, 1, 1);
+            string menu = "Hey, that was okay.";
+            glRasterPos2d(50, 50);
+
+            for (int p = 0; p < menu.size(); p++) {
+                glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, menu.at(p));
+            }
+
+            string menu2 = "Ready for the next level?";
+            glRasterPos2d(50, 100);
+
+            for (int p = 0; p < menu2.size(); p++) {
+                glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, menu2.at(p));
+            }
+
+            glBegin(GL_QUADS);
+            if (hover) {
+                glColor3f(0, .5, 0);
+            } else {
+                glColor3f(0, 1, 0);
+            }
+
+            // top left corner
+            glVertex2i(menuSX, menuSY);
+            // top right corner
+            glVertex2i(menuSX+menuSize, menuSY);
+            // bottom right corner
+            glVertex2i(menuSX+menuSize, menuSY+menuSize);
+            // bottom left corner
+            glVertex2i(menuSX, menuSY+menuSize);
+
+            glEnd();
+            break;
         }
     }
 
-    //Render enemies, specifically after the maze tiles are displayed.
-    for (int z = 0; z < numEnemies; z++) {
-
-        enemies[z].draw(p, angleR);
-        enemies[z].resetLoc();  //Fixes bug
-    }
-
-
-    //Draw the player
-    p.draw();
 
     //Render now
     glFlush();
@@ -284,6 +428,28 @@ void display() {
 /**********************************************************************
  * Main Player and Character movement logic
  *********************************************************************/
+
+void randomMenuMovement() {
+    Pair randMove = make_pair(rand() % 2, rand() % 2);
+
+    int randN = rand() % 2;
+
+    if (((menuSX + randMove.first) < SCREEN_WIDTH) && (randN == 1)) {
+        menuSX += randMove.first;
+    }
+    else if (((menuSX - randMove.first) > 0) && (randN == 0)) {
+        menuSX -= randMove.first;
+    }
+
+    if (((menuSY + randMove.second) < SCREEN_HEIGHT) && (randN == 1)) {
+        menuSY += randMove.second;
+    }
+
+    else if (((menuSY - randMove.second) > 0) && (randN == 0)) {
+        menuSY -= randMove.second;
+    }
+}
+
 
 //Implements the logic for an Enemy to follow the correct path to the player.
 void follow_path(Enemy &E) {
@@ -360,107 +526,123 @@ void follow_path(Enemy &E) {
 
 void timer(int extra) {
 
-    if (!rState) {
 
-        miniTick++;
-        if (miniTick == 2) {
-            miniTick = 0;
-        }
+    switch (state) {
 
-        if (keys[GLUT_KEY_DOWN]) {
-            p.calcMove(0, -p.getSpeed(), angleR);
+        case(Game) : {
 
-            if (p.doMove(m)) {
-                p.updateVelocity(0, -p.getSpeed());
+            if (!rState) {
+
+                miniTick++;
+                if (miniTick == 2) {
+                    miniTick = 0;
+                }
+
+                if (keys[GLUT_KEY_DOWN]) {
+                    p.calcMove(0, -p.getSpeed(), angleR);
+
+                    if (p.doMove(m)) {
+                        p.updateVelocity(0, -p.getSpeed());
+                    } else {
+                        p.flipVelocity();
+                    }
+                }
+
+                if (keys[GLUT_KEY_LEFT]) {
+                    p.calcMove(p.getSpeed(), 0, angleR);
+
+                    if (p.doMove(m)) {
+                        p.updateVelocity(p.getSpeed(), 0);
+                    } else {
+                        p.flipVelocity();
+                    }
+                }
+
+                if (keys[GLUT_KEY_UP]) {
+                    p.calcMove(0, p.getSpeed(), angleR);
+
+                    if (p.doMove(m)) {
+                        p.updateVelocity(0, p.getSpeed());
+                    } else {
+                        p.flipVelocity();
+                    }
+                }
+
+                if (keys[GLUT_KEY_RIGHT]) {
+                    p.calcMove(-p.getSpeed(), 0, angleR);
+
+                    if (p.doMove(m)) {
+                        p.updateVelocity(-p.getSpeed(), 0);
+                    } else {
+                        p.flipVelocity();
+                    }
+                }
+
+                if (!keys[GLUT_KEY_DOWN] && !keys[GLUT_KEY_UP]) {
+                    p.calcMove((int) p.getMovementBuffer().x, 0, angleR);
+
+                    if (p.doMove(m)) {
+                        p.taperXVelocity();
+                    } else {
+                        p.flipVelocity();
+                    }
+                    //if (p.getMovementBuffer().x != 0) cout << p.getMovementBuffer().x << endl;
+                }
+                if (!keys[GLUT_KEY_LEFT] && !keys[GLUT_KEY_RIGHT]) {
+                    p.calcMove(0, (int) p.getMovementBuffer().y, angleR);
+
+                    if (p.doMove(m)) {
+                        p.taperYVelocity();
+                    } else {
+                        p.flipVelocity();
+                    }
+                    //if (p.getMovementBuffer().y != 0) cout << p.getMovementBuffer().y << endl;
+                }
+                p.update();
+
+
+
+                //If you reach the END_X and END_Y square you win!
+                if (m.maze[p.x][p.y].getStati() == End) {
+                    cout << "You win! " << endl;
+
+                    state = EndMenu;
+                    //Mark as completed and end game.
+                    //game.score.completed = true;
+
+                    //glutDestroyWindow(wd);
+                    //game.end();
+                }
+
+
+                for (int z = 0; z < numEnemies; z++) {
+
+                    if (miniTick < enemies[z].getUpdateRate()) {
+                        m.aStarSearch(enemies[z].x, enemies[z].y, p.x, p.y);
+                        follow_path(enemies[z]);
+                    }
+
+                }
+
             } else {
-                p.flipVelocity();
+
+                angle = (angle + 1) % 360;
+                angleR = angle * (LUKE_M_PI / 180);
+
+                if (angle % 90 == 0) {
+                    rState = 0;
+                }
             }
         }
 
-        if (keys[GLUT_KEY_LEFT]) {
-            p.calcMove(p.getSpeed(), 0, angleR);
+        case (StartMenu)  : {
+            randomMenuMovement();
+        }
 
-            if (p.doMove(m)) {
-                p.updateVelocity(p.getSpeed(), 0);
-            } else {
-                p.flipVelocity();
+        case (EndMenu)  : {
+           randomMenuMovement();
             }
-        }
 
-        if (keys[GLUT_KEY_UP]) {
-            p.calcMove(0, p.getSpeed(), angleR);
-
-            if (p.doMove(m)) {
-                p.updateVelocity(0, p.getSpeed());
-            } else {
-                p.flipVelocity();
-            }
-        }
-
-        if (keys[GLUT_KEY_RIGHT]) {
-            p.calcMove(-p.getSpeed(), 0, angleR);
-
-            if (p.doMove(m)) {
-                p.updateVelocity(-p.getSpeed(), 0);
-            } else {
-                p.flipVelocity();
-            }
-        }
-
-        if (!keys[GLUT_KEY_DOWN] && !keys[GLUT_KEY_UP]) {
-            p.calcMove((int) p.getMovementBuffer().x, 0, angleR);
-
-            if (p.doMove(m)) {
-                p.taperXVelocity();
-            } else {
-                p.flipVelocity();
-            }
-            //if (p.getMovementBuffer().x != 0) cout << p.getMovementBuffer().x << endl;
-        }
-        if (!keys[GLUT_KEY_LEFT] && !keys[GLUT_KEY_RIGHT]) {
-            p.calcMove(0, (int) p.getMovementBuffer().y, angleR);
-
-            if (p.doMove(m)) {
-                p.taperYVelocity();
-            } else {
-                p.flipVelocity();
-            }
-            //if (p.getMovementBuffer().y != 0) cout << p.getMovementBuffer().y << endl;
-        }
-        p.update();
-
-
-
-        //If you reach the END_X and END_Y square you win!
-        if (m.maze[p.x][p.y].getStati() == End) {
-                cout << "You win! " << endl;
-
-            //Mark as completed and end game.
-            game.score.completed = true;
-
-            glutDestroyWindow(wd);
-            game.end();
-        }
-
-
-        for (int z = 0; z < numEnemies; z++) {
-
-
-            m.aStarSearch(enemies[z].x, enemies[z].y, p.x, p.y);
-            follow_path(enemies[z]);
-        }
-
-
-
-
-        } else {
-
-        angle = (angle + 1) % 360;
-        angleR = angle * (LUKE_M_PI / 180);
-
-        if (angle % 90 == 0) {
-            rState = 0;
-        }
     }
 
     glutPostRedisplay();
@@ -472,6 +654,7 @@ void timer(int extra) {
 int graphicsPlay(int argc, char **argv) {
 
     init();
+    //gameInit(1);
 
     // Initialize GLUT
     glutInit(&argc, argv);
