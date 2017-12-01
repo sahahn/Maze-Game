@@ -23,6 +23,8 @@ public:
     bool clickTimer;
     int ticks;
 
+    int level;
+
 private:
 
 

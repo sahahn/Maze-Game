@@ -18,11 +18,14 @@ Maze m;
 Player p;
 vector<Enemy> enemies(MAX_ENEMIES);
 GameInfo game;
-MapEditor e;
 
+MapEditor e;
 
 Box startBox;
 Box endBox;
+Box editorBox;
+
+vector<Box> levelBoxes(NUM_LEVELS);
 
 int numEnemies;
 
@@ -44,6 +47,7 @@ bool rState;
 
 int miniTick;
 GameState state;
+int previewScale;
 
 //Initialize
 void init() {
@@ -54,6 +58,7 @@ void init() {
     state = StartMenu;
     startBox = Box(300,300,50,0,1,0);
     endBox = Box(350,350,50,1,0,0);
+    editorBox = Box(500,500,50,0,0,1);
 
     currentLevel = 1;
 }
@@ -85,6 +90,26 @@ void gameInit() {
 
 }
 
+void editorMenuInit() {
+
+    state = EditorMenu;
+
+    //To make a dif # per rows, change 3 w/ something
+    int W = (SCREEN_WIDTH / 3);
+    int H = (SCREEN_HEIGHT / 3);
+
+    int sz = (H - (H/3)) + (HEIGHT - ((H - (H/3)) % HEIGHT));
+
+    //Set the previewScale
+    previewScale = sz / HEIGHT;
+
+    cout << previewScale << endl;
+
+    for (int i = 0; i < NUM_LEVELS; i++){
+        levelBoxes[i] = Box(((W/6) + ((i % 3) * W)), ((H/6) + ((i/3) * H)), sz, .5, .5, .5);
+    }
+}
+
 void editorInit(int l) {
     state = Editor;
 
@@ -95,6 +120,8 @@ void editorInit(int l) {
     } else {
         m = Maze(3,3);
     }
+
+    e.level = l;
 }
 
 // Initialize OpenGL Graphics
@@ -257,6 +284,7 @@ void cursor(int x, int y) {
 
             startBox.checkHover(x,y);
             endBox.checkHover(x,y);
+            editorBox.checkHover(x,y);
 
             glutPostRedisplay();
             break;
@@ -276,6 +304,13 @@ void cursor(int x, int y) {
             e.mX = (e.loc.x - EDITOR_SCOPE + 1) + ((y - e.yShift)/EDITOR_SCALE);
             e.mY = (e.loc.y - EDITOR_SCOPE + 1) + ((x - e.xShift)/EDITOR_SCALE);
             glutPostRedisplay();
+        }
+        
+        case (EditorMenu) : {
+
+            for (int i = 0; i < NUM_LEVELS; i++) {
+                levelBoxes[i].checkHover(x,y);
+            }
         }
     }
 }
@@ -307,10 +342,25 @@ void mouse(int button, int stateB, int x, int y) {
                 if (startBox.checkHover(x, y)) {
                     gameInit();
                 } else if (endBox.checkHover(x, y)) {
-                    editorInit(2);
+                    //Mark as completed and end game.
+                    game.score.completed = true;
+
+                    glutDestroyWindow(wd);
+                    game.end();
+                } else if (editorBox.checkHover(x,y)) {
+                    editorMenuInit();
                 }
 
             }
+        }
+
+        else if ((state == EditorMenu) && (stateB == GLUT_LEFT_BUTTON)) {
+            for (int i = 0; i < NUM_LEVELS; i++){
+                if (levelBoxes[i].checkHover(x, y)) {
+                    editorInit(i+1);
+                }
+            }
+
         }
 
         else if (state == Editor) {
@@ -444,6 +494,7 @@ void display() {
 
             startBox.draw();
             endBox.draw();
+            editorBox.draw();
 
             break;
         }
@@ -469,6 +520,24 @@ void display() {
             endBox.draw();
             break;
         }
+
+        case (EditorMenu) : {
+
+            for (int i = 0; i < NUM_LEVELS; i++){
+
+
+                Maze lev = Maze(i+1,false);
+
+                for (int t = 0; t < WIDTH; t++) {
+                    for (int s = 0; s < HEIGHT; s++) {
+                        lev.maze[t][s].draw((levelBoxes[i].x + (s * previewScale)),
+                                            (levelBoxes[i].y + (t * previewScale)), previewScale, levelBoxes[i].hover);
+                    }
+                }
+            }
+        }
+
+            break;
 
         case (Editor) : {
 
@@ -657,11 +726,6 @@ void timer(int extra) {
                     cout << "You win! " << endl;
 
                     state = EndMenu;
-                    //Mark as completed and end game.
-                    //game.score.completed = true;
-
-                    //glutDestroyWindow(wd);
-                    //game.end();
                 }
 
 
@@ -688,11 +752,27 @@ void timer(int extra) {
         case (StartMenu)  : {
             startBox.randomMenuMovement();
             endBox.randomMenuMovement();
+            editorBox.randomMenuMovement();
         }
 
         case (EndMenu)  : {
-           startBox.randomMenuMovement();
+            startBox.randomMenuMovement();
             endBox.randomMenuMovement();
+        }
+
+        case (EditorMenu) : {
+            if (keys[GLUT_KEY_UP]) {
+                for (int i = 0; i < NUM_LEVELS; i++){
+                    levelBoxes[i].y += 5;
+                }
+            }
+
+            if (keys[GLUT_KEY_DOWN]) {
+                for (int i = 0; i < NUM_LEVELS; i++){
+                    levelBoxes[i].y -= 5;
+                }
+            }
+
         }
 
         case (Editor) : {
@@ -778,7 +858,6 @@ int graphicsPlay(int argc, char **argv) {
 
     init();
     //gameInit(1);
-
     //editorInit(1);
 
     // Initialize GLUT

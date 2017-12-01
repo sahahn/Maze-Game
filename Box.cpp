@@ -14,7 +14,7 @@ Box::Box() {
     r,g,b = 0;
 }
 
-Box::Box(int X, int Y, int s, int R, int G, int B) {
+Box::Box(int X, int Y, int s, double R, double G, double B) {
     x = X;
     y = Y;
     size = s;

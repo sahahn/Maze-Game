@@ -12,7 +12,7 @@
 class Box {
 public:
     Box();
-    Box(int X, int Y, int s, int R, int G, int B);
+    Box(int X, int Y, int s, double R, double G, double B);
     int x, y, size;
     double r,g,b;
 

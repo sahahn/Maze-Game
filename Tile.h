@@ -7,6 +7,7 @@
 
 #include "graphics.h"
 #include <math.h>
+#include "Box.h"
 
 
 //The fake plural of status, the fake singular being stati
@@ -37,6 +38,9 @@ public:
 
     //Slightly dif from maze render draw, no need for angle, USED IN EDITOR
     void draw(int x, int y, int xShift, int yShift) const;
+
+    //Draw used to generate map previews
+    void draw(int x, int y, int scale, bool hover) const;
 
 private:
     bool wall;

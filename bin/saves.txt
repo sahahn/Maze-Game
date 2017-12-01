@@ -38,3 +38,11 @@ dan
 Time: 22.7697 s
 gotchas: 3 gots
 Completed: Yes!
+no
+Time: 0.568709 s
+gotchas: 0 gots
+Completed: Yes!
+zsfsf
+Time: 0.249991 s
+gotchas: 0 gots
+Completed: Yes!

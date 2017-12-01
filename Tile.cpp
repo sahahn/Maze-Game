@@ -4,7 +4,7 @@
 
 #include "Tile.h"
 #include "GameInfo.h"
-
+#include <iostream>
 Tile::Tile() {
     wall = true;
     stati = None;
@@ -148,7 +148,79 @@ void Tile::draw(int x, int y, int xShift, int yShift) const {
     // bottom left corner
     glVertex2i(y, (x + EDITOR_SCALE));
     glEnd();
+}
 
+//Modified draw, used in the map editor preview
+void Tile::draw(int x, int y, int scale, bool hover) const {
+
+    if (wall) {
+        glColor3f(.2, .2, .2);
+    }
+
+    else {
+        switch (stati) {
+
+            case (None):
+                if (hover) {
+                    glColor3f(1/2, 1/2, 0);
+                } else {
+                    glColor3f(1, 1, 0);
+                }
+
+                break;
+
+            case (Start):
+                if (hover) {
+                    glColor3f(0, 1/2, 0);
+                } else {
+                    glColor3f(0, 1, 0);
+                }
+
+                break;
+
+            case (End):
+                if (hover) {
+                    glColor3f(1/2, 0, 0);
+                } else {
+
+                    glColor3f(1, 0, 0);
+                }
+
+                break;
+
+            case (FlipperSpawn):
+                if (hover) {
+                    glColor3f(.3/2, .7/2, .4/2);
+                } else {
+                    glColor3f(.3, .7, .4);
+                }
+
+                break;
+
+            case (SizerSpawn):
+                if (hover) {
+                    glColor3f(.7/2, .4/2, .8/2);
+                } else {
+                    glColor3f(.7, .4, .8);
+                }
+
+                break;
+        }
+    }
+
+
+    //Convert to pixel coordinates
+    glBegin(GL_QUADS);
+
+    // top left corner
+    glVertex2i(x, y);
+    // top right corner
+    glVertex2i((x + scale), y);
+    // bottom right corner
+    glVertex2i((x + scale), (y + scale));
+    // bottom left corner
+    glVertex2i(x, (y + scale));
+    glEnd();
 }
 
 MazePoint::MazePoint() {

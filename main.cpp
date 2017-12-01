@@ -2,7 +2,7 @@
 #include "graphics.h"
 #include "GameInfo.h"
 #include "Character.h"
-#include "EditorGraphics.h"
+
 
 using namespace std;
 // test variable
