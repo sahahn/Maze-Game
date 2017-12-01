@@ -46,16 +46,6 @@ public:
 
     vector<eInfo> enemyInfo;
 
-    /*
-     * Loads in a maze/level to the game, where int l in the level to load
-     */
-    void loadMaze(int l);
-
-
-    /*
-     * Loads in a maze/level to the editor, where int l in the level to load
-     */
-    void loadMazeEditor(int l);
 
     /*
      * Clears instances of start squares, because there can only be one!
@@ -75,9 +65,12 @@ public:
 
     int getNextX() const;
     int getNextY() const;
+    bool getEmpty() const;
 
     int getStartX() const;
     int getStartY() const;
+
+    void setEmpty(bool b );
 
 
 private:
@@ -85,6 +78,19 @@ private:
     //int endX, endY;
     int nextX, nextY;
     int playerStartX, playerStartY;
+
+    bool empty;
+
+    /*
+     * Loads in a maze/level to the game, where int l in the level to load
+     */
+    void loadMaze(int l);
+
+    /*
+     * Loads in a maze/level to the editor, where int l in the level to load
+     */
+    void loadMazeEditor(int l);
+
 
     // attempts to add a wall, if there isn't a wall in the position already
     void checkAndAdd(int x, int y);

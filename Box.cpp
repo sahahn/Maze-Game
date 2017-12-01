@@ -3,6 +3,7 @@
 //
 
 #include "Box.h"
+#include <iostream>
 
 Box::Box() {
     x = 300;
@@ -12,6 +13,8 @@ Box::Box() {
     hover = false;
     
     r,g,b = 0;
+
+    empty = false;
 }
 
 Box::Box(int X, int Y, int s, double R, double G, double B) {
@@ -24,6 +27,15 @@ Box::Box(int X, int Y, int s, double R, double G, double B) {
     r = R;
     g = G;
     b = B;
+
+    empty = false;
+}
+
+bool Box::getE() const {
+    return empty;
+}
+void Box::setE(bool b) {
+    empty = b;
 }
 
 bool Box::checkHover(int X, int Y) {

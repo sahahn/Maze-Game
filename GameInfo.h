@@ -26,14 +26,12 @@ const int SCOPE = 2;
 
 //For Editor
 const int EDITOR_SCALE = 70;
-const int EDITOR_SCREEN_HEIGHT = 1000;
-const int EDITOR_SCREEN_WIDTH = 1000;
 const int EDITOR_SCOPE = 8;
 
 const double LUKE_M_PI = 3.14159265358;
 const bool TESTING = true;
 const int MAX_ENEMIES = 20;
-const int NUM_LEVELS = 2;
+const int NUM_LEVELS = 12;
 
 
 struct Point {   // Declare Point struct type

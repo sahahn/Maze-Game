@@ -43,6 +43,8 @@ Maze::Maze(int sX, int sY) {
 }
 
 Maze::Maze(int l, bool live) {
+    empty = false;
+
     if (live) {
         loadMaze(l);
 
@@ -118,8 +120,8 @@ void Maze::loadMazeEditor(int l) {
     inFile.open(fileName);
 
     if (!inFile) {
-        cout << "Error: unable to open level file";
-        exit(1); // terminate with error
+        empty = true;
+        return;
     }
 
     string line;
@@ -140,6 +142,7 @@ void Maze::loadMazeEditor(int l) {
     }
 
     inFile.close(); //Close the file
+    empty = false; //flag empty as false
 
 }
 
@@ -583,6 +586,14 @@ int Maze::getStartX() const {
 
 int Maze::getStartY() const {
     return playerStartY;
+}
+
+bool Maze::getEmpty() const {
+    return empty;
+}
+
+void Maze::setEmpty(bool b) {
+    empty = b;
 }
 
 void Maze::addRoom(Point loc){

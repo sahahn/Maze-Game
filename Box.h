@@ -16,6 +16,10 @@ public:
     int x, y, size;
     double r,g,b;
 
+    //Getters+Setters for empty
+    bool getE() const;
+    void setE(bool b);
+
     bool hover;
 
     bool checkHover(int X, int Y);
@@ -24,6 +28,10 @@ public:
 
     void randomMenuMovement();
 
+
+private:
+
+    bool empty;
 
 
 };
