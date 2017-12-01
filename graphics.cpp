@@ -9,6 +9,7 @@
 #include "MapEditor.h"
 #include "Box.h"
 #include "Text.h"
+#include <stdio.h>
 
 using namespace std;
 
@@ -53,6 +54,9 @@ int miniTick;
 GameState state;
 int previewScale;
 
+//Used in editorMenu
+int mark;
+
 //Initialize
 void init() {
     for (int i = 0; i < 128; i++) {
@@ -61,7 +65,7 @@ void init() {
 
     state = StartMenu;
     startBox = Box(300,300,50,0,1,0);
-    endBox = Box(350,350,50,1,0,0);
+    endBox = Box(400,400,50,1,0,0);
     editorBox = Box(500,500,50,0,0,1);
 
     menu1 = Text();
@@ -80,19 +84,27 @@ void gameInit() {
 
     numEnemies = m.enemyInfo.size();
 
+    //If over the max enemies, just use up to the max
+    if (numEnemies > MAX_ENEMIES) {
+        numEnemies = MAX_ENEMIES;
+    }
+
+    //Load the enemies into the enemies vector, w/ info from loading
     for (int i = 0; i < numEnemies; i++) {
         enemies[i] = Enemy(m.enemyInfo[i].first.first,
                            m.enemyInfo[i].first.second, eType(m.enemyInfo[i].second));
     }
 
+    //Init the angles of the map
     angle = 0;
     angleR = 0;
 
+    //rState is used when the player is hit by the Flipper
     rState = false;
 
     miniTick = 0;
 
-    //Lastly put the state into game
+    //Lastly set the state to game
     state = Game;
 
 }
@@ -110,25 +122,28 @@ void editorMenuInit() {
     //Set the previewScale
     previewScale = sz / HEIGHT;
 
-    cout << previewScale << endl;
-
+    //Init the levelBoxes, position pre-determined to fill in 3 per row, w/ 3 visible columns
     for (int i = 0; i < NUM_LEVELS; i++){
-        levelBoxes[i] = Box(((W/6) + ((i % 3) * W)), ((H/6) + ((i/3) * H)), sz, .5, .5, .5);
+        levelBoxes[i] = Box(((W/6) + ((i % 3) * W)), ((H/6) + ((i/3) * H)), sz, .2, .2, .2);
     }
+
+    //Used to flag a box
+    mark = 0;
 }
 
-void editorInit(int l) {
+void editorInit(int l, bool emp) {
     state = Editor;
 
     e = MapEditor();
-    if (l != -1) {
-        m = Maze(l, false);
-
-    } else {
-        m = Maze(3,3);
-    }
+    m = !emp ? Maze(l, false) : Maze();
 
     e.level = l;
+
+    startBox.x = (SCREEN_WIDTH / 2) - startBox.size;
+    startBox.y = SCREEN_HEIGHT - startBox.size;
+
+    endBox.x = (SCREEN_WIDTH / 2) + endBox.size;
+    endBox.y = SCREEN_HEIGHT - endBox.size;
 }
 
 // Initialize OpenGL Graphics
@@ -145,6 +160,7 @@ void kbd(unsigned char key, int x, int y) {
     //Escape key
     if (key == 27) {
         glutDestroyWindow(wd);
+
         game.end();
     }
 
@@ -308,6 +324,10 @@ void cursor(int x, int y) {
 
             e.mX = (e.loc.x - EDITOR_SCOPE + 1) + ((y - e.yShift)/EDITOR_SCALE);
             e.mY = (e.loc.y - EDITOR_SCOPE + 1) + ((x - e.xShift)/EDITOR_SCALE);
+
+            startBox.checkHover(x,y);
+            endBox.checkHover(x,y);
+
             glutPostRedisplay();
         }
         
@@ -322,19 +342,32 @@ void cursor(int x, int y) {
 
 void mousemov(int x, int y) {
 
-    if (state == Editor) {
+    switch (state) {
 
-        int tempX = (e.loc.x - EDITOR_SCOPE + 1) + ((y - e.yShift) / EDITOR_SCALE);
-        int tempY = (e.loc.y - EDITOR_SCOPE + 1) + ((x - e.xShift) / EDITOR_SCALE);
-
-        if (!((e.mX == tempX) && (e.mY == tempY))) {
-            keys[GLUT_LEFT_BUTTON] = true;
-            e.mX = tempX;
-            e.mY = tempY;
+        //Check for hover even if mouse held down
+        case (EditorMenu) : {
+            for (int i = 0; i < NUM_LEVELS; i++) {
+                levelBoxes[i].checkHover(x, y);
+            }
         }
 
-        glutPostRedisplay();
+        case (Editor) : {
+
+            int tempX = (e.loc.x - EDITOR_SCOPE + 1) + ((y - e.yShift) / EDITOR_SCALE);
+            int tempY = (e.loc.y - EDITOR_SCOPE + 1) + ((x - e.xShift) / EDITOR_SCALE);
+
+            if (!((e.mX == tempX) && (e.mY == tempY))) {
+                keys[GLUT_LEFT_BUTTON] = true;
+                e.mX = tempX;
+                e.mY = tempY;
+            }
+
+        }
+
     }
+
+    glutPostRedisplay();
+
 }
 
 // button will be GLUT_LEFT_BUTTON or GLUT_RIGHT_BUTTON
@@ -347,11 +380,26 @@ void mouse(int button, int stateB, int x, int y) {
                 if (startBox.checkHover(x, y)) {
                     gameInit();
                 } else if (endBox.checkHover(x, y)) {
+
+
+                    //End and saving player info is buggy, so just quit
+                    glutDestroyWindow(wd);
+                    exit(0);
+                    /*
+
                     //Mark as completed and end game.
                     game.score.completed = true;
 
+                    //No need to save score from start menu
+                    if (state == StartMenu) {
+                        glutDestroyWindow(wd);
+                        exit(0);
+                    }
+                     */
+
                     glutDestroyWindow(wd);
                     game.end();
+
                 } else if (editorBox.checkHover(x,y)) {
                     editorMenuInit();
                 }
@@ -359,11 +407,44 @@ void mouse(int button, int stateB, int x, int y) {
             }
         }
 
-        else if ((state == EditorMenu) && (stateB == GLUT_LEFT_BUTTON)) {
-            for (int i = 0; i < NUM_LEVELS; i++){
-                if (levelBoxes[i].checkHover(x, y)) {
-                    editorInit(i+1);
+        //Mark whatever box the mouse is over when left clicked
+        else if ((state == EditorMenu) && (stateB == GLUT_DOWN)) {
+            for (int i = 0; i < NUM_LEVELS; i++) {
+                if (levelBoxes[i].checkHover(x,y)) {
+                    mark = i;
                 }
+            }
+        }
+
+        else if ((state == EditorMenu) && (stateB == GLUT_UP)) {
+            for (int i = 0; i < NUM_LEVELS; i++){
+
+
+                //If same box as left click, load editor
+                if ((levelBoxes[i].hover) && (i == mark)) {
+                    editorInit(i+1, levelBoxes[i].getE());
+                }
+
+                //If a different box then left click, attempt to switch them
+                else if ((levelBoxes[i].hover) && (i != mark)) {
+
+                    string L = std::to_string((mark+1));
+                    string oldName = L + ".txt";
+                    string tempName = "temp.txt";
+
+                    //Try renaming marked box to temp;
+                    rename(oldName.c_str(), tempName.c_str());
+
+                    L = std::to_string((i+1));
+                    string newName = L + ".txt";
+
+                    //Try renaming the end square w/ the first square
+                    rename(newName.c_str(), oldName.c_str());
+
+                    //Lastly rename temp name to new name's spot
+                    rename(tempName.c_str(), newName.c_str());
+                }
+
             }
 
         }
@@ -371,6 +452,13 @@ void mouse(int button, int stateB, int x, int y) {
         else if (state == Editor) {
 
             if ((button == GLUT_LEFT_BUTTON) && (stateB == GLUT_DOWN)) {
+
+                if (startBox.checkHover(x, y)) {
+                    m.saveLevel(e.level);
+                    init();
+                } else if (endBox.checkHover(x, y)) {
+                    init();
+                }
 
                 //To avoid erroneous double clicks
                 if (!(e.clickTimer)) {
@@ -508,20 +596,28 @@ void display() {
         }
 
         case (EditorMenu) : {
-            menu1.setTextAndLoc("Keys: 1 to carve wall, 2 to place start, ", {50,300});
-            menu1.draw();
 
-            menu2.setTextAndLoc("3 to place end, 4 and 5 to spawn enemies", {50, 350});
-            menu2.draw();
+            //For each level loads either a preview, or blank space.
             for (int i = 0; i < NUM_LEVELS; i++){
-
 
                 Maze lev = Maze(i+1,false);
 
-                for (int t = 0; t < WIDTH; t++) {
-                    for (int s = 0; s < HEIGHT; s++) {
-                        lev.maze[t][s].draw((levelBoxes[i].x + (s * previewScale)),
-                                            (levelBoxes[i].y + (t * previewScale)), previewScale, levelBoxes[i].hover);
+                //If there isn't a file for the level, set it as empty
+                //and instead draw a blank square
+                if (lev.getEmpty()) {
+                    levelBoxes[i].setE(true);
+                    levelBoxes[i].draw();
+
+
+                } else {
+
+                    //Otherwise, if the level exists, display a preview
+                    for (int t = 0; t < WIDTH; t++) {
+                        for (int s = 0; s < HEIGHT; s++) {
+                            lev.maze[t][s].draw((levelBoxes[i].x + (s * previewScale)),
+                                                (levelBoxes[i].y + (t * previewScale)), previewScale,
+                                                levelBoxes[i].hover);
+                        }
                     }
                 }
             }
@@ -531,6 +627,8 @@ void display() {
 
         case (Editor) : {
 
+                    //The editor screen is a modified verison of the game function,
+                    //Just responsible for keeping the editor within the bounds
                     int lb1 = e.loc.x - EDITOR_SCOPE;
                     int upb1 = e.loc.x + EDITOR_SCOPE;
                     int lb2 = e.loc.y - EDITOR_SCOPE;
@@ -547,6 +645,9 @@ void display() {
                             m.maze[i][j].draw(x , y, e.xShift, e.yShift);
                         }
                     }
+
+            startBox.draw();
+            endBox.draw();
                 }
             }
 
@@ -788,7 +889,7 @@ void timer(int extra) {
 
             if (keys[GLUT_KEY_DOWN]) {
 
-                if ((e.loc.x + EDITOR_SCOPE  < HEIGHT)) {
+                if ((e.loc.x + EDITOR_SCOPE <= HEIGHT)) {
                     e.yShift -= e.moveSpeed;
                 }
             }
@@ -811,7 +912,7 @@ void timer(int extra) {
 
             if (keys[GLUT_KEY_RIGHT]) {
 
-                if ((e.loc.y + EDITOR_SCOPE < WIDTH)) {
+                if ((e.loc.y + EDITOR_SCOPE <= WIDTH)) {
                     e.xShift -= e.moveSpeed;
                 }
             }
@@ -880,7 +981,7 @@ int graphicsPlay(int argc, char **argv) {
 
     //Register mouse
     glutPassiveMotionFunc(cursor);
-    //glutMotionFunc(mousemov);
+    glutMotionFunc(mousemov);
     glutMouseFunc(mouse);
 
     //Timer

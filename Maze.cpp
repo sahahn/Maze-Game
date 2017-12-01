@@ -142,7 +142,6 @@ void Maze::loadMazeEditor(int l) {
     }
 
     inFile.close(); //Close the file
-    empty = false; //flag empty as false
 
 }
 
