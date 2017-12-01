@@ -8,6 +8,7 @@
 #include <math.h>
 #include "MapEditor.h"
 #include "Box.h"
+#include "Text.h"
 
 using namespace std;
 
@@ -24,6 +25,9 @@ MapEditor e;
 Box startBox;
 Box endBox;
 Box editorBox;
+
+Text menu1;
+Text menu2;
 
 vector<Box> levelBoxes(NUM_LEVELS);
 
@@ -59,6 +63,9 @@ void init() {
     startBox = Box(300,300,50,0,1,0);
     endBox = Box(350,350,50,1,0,0);
     editorBox = Box(500,500,50,0,0,1);
+
+    menu1 = Text();
+    menu2 = Text();
 
     currentLevel = 1;
 }
@@ -137,9 +144,7 @@ void kbd(unsigned char key, int x, int y) {
 
     //Escape key
     if (key == 27) {
-        cout << "its ova actually tho" << endl;
         glutDestroyWindow(wd);
-
         game.end();
     }
 
@@ -477,20 +482,11 @@ void display() {
         }
 
         case (StartMenu): {
-            glColor3f(1, 1, 1);
-            string menu = "Hello, and welcome to our very low quality menu!";
-            glRasterPos2d(50, 50);
+            menu1.setTextAndLoc("Hello, and welcome to our very low quality menu!", {50,50});
+            menu1.draw();
 
-            for (int p = 0; p < menu.size(); p++) {
-                glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, menu.at(p));
-            }
-
-            string menu2 = "Go ahead and click that square, the game might start also if you do.";
-            glRasterPos2d(50, 100);
-
-            for (int p = 0; p < menu2.size(); p++) {
-                glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, menu2.at(p));
-            }
+            menu2.setTextAndLoc("Go ahead and click that square, the game might start also if you do.", {50,100});
+            menu2.draw();
 
             startBox.draw();
             endBox.draw();
@@ -500,21 +496,11 @@ void display() {
         }
 
         case (EndMenu): {
+            menu1.setTextAndLoc("Hey, that was okay.", {50,50});
+            menu1.draw();
 
-            glColor3f(1, 1, 1);
-            string menu = "Hey, that was okay.";
-            glRasterPos2d(50, 50);
-
-            for (int p = 0; p < menu.size(); p++) {
-                glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, menu.at(p));
-            }
-
-            string menu2 = "Ready for the next level?";
-            glRasterPos2d(50, 100);
-
-            for (int p = 0; p < menu2.size(); p++) {
-                glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, menu2.at(p));
-            }
+            menu2.setTextAndLoc("Ready for the next level?", {50,100});
+            menu2.draw();
 
             startBox.draw();
             endBox.draw();
@@ -522,7 +508,11 @@ void display() {
         }
 
         case (EditorMenu) : {
+            menu1.setTextAndLoc("Keys: 1 to carve wall, 2 to place start, ", {50,300});
+            menu1.draw();
 
+            menu2.setTextAndLoc("3 to place end, 4 and 5 to spawn enemies", {50, 350});
+            menu2.draw();
             for (int i = 0; i < NUM_LEVELS; i++){
 
 
