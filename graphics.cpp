@@ -611,6 +611,9 @@ void display() {
 
                 } else {
 
+                    //Set to not empty
+                    levelBoxes[i].setE(false);
+
                     //Otherwise, if the level exists, display a preview
                     for (int t = 0; t < WIDTH; t++) {
                         for (int s = 0; s < HEIGHT; s++) {
