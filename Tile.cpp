@@ -128,6 +128,9 @@ void Tile::draw(int x, int y, int xShift, int yShift) const {
             case (SizerSpawn):
                 glColor3f(.7, .4, .8);
                 break;
+
+            case (ScaryThingSpawn):
+                glColor3f(.2, .2, .2);
         }
     }
 

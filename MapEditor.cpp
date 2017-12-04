@@ -27,3 +27,34 @@ MapEditor::MapEditor() {
     ticks = 0;
 
 }
+
+int MapEditor::getLevel() const {
+    return level;
+}
+
+void MapEditor::setLevel(int l) {
+    level = l;
+}
+
+void MapEditor::update() {
+
+    if (yShift < (-sBoundary)) {
+        loc.x +=1;
+        yShift += EDITOR_SCALE;
+    }
+
+    if (xShift > (sBoundary)) {
+        loc.y -= 1;
+        xShift -= EDITOR_SCALE;
+    }
+
+    if (xShift < (-sBoundary)) {
+        loc.y += 1;
+        xShift += EDITOR_SCALE;
+    }
+
+    if (yShift > (sBoundary)) {
+        loc.x -= 1;
+        yShift -= EDITOR_SCALE;
+    }
+}

@@ -12,9 +12,6 @@
 using namespace std;
 
 class Text {
-private:
-    string text;
-    Point loc;
 
 public:
     Text();
@@ -24,6 +21,11 @@ public:
     void draw();
 
     void setTextAndLoc(string text, Point loc);
+
+private:
+    string text;
+    Point loc;
+
 };
 
 

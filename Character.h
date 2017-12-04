@@ -10,7 +10,7 @@
 #include "Light.h"
 
 enum eType {
-    Flipper = 4, Sizer = 5
+    Flipper = 4, Sizer = 5, ScaryThing = 6
 };
 
 class Character {
@@ -110,12 +110,23 @@ public:
 
     // getter and setter for rotation
     double getPlayerRotation() const;
+    int getLightRadius() const;
 
     void setPlayerRotation(double angR);
+    void setLightRadius(int l);
+
+    void calcDist(int d);
 
 
 private:
     double playerRotation;
+
+    //Holds closest distance to scary thing
+    mutable int dist;
+
+    //The default lightRadius for the player
+    int lightRadius;
+
 };
 
 class Enemy : public Character {
@@ -130,12 +141,17 @@ public:
     int getSpawnX() const;
     int getSpawnY() const;
     int getUpdateRate() const;
+    int getSpawnBuffer() const;
 
     // setter
     void setType(eType e);
     void setSpawnX(int x);
     void setSpawnY(int y);
     void setUpdateRate(int u);
+    void setSpawnBuffer(int s);
+
+    //Decrements buffer and resets location if done
+    bool doBuffer();
 
     //Note: The draw function for the Enemy, and Tile piece are quite close.
     //In order to draw the Enemy relative to the Player, the players xShift and yShift,
@@ -153,9 +169,13 @@ public:
     void resetLoc();
 
 
+
+
 private:
     int spawnX, spawnY;
     int updateRate;
+
+    int spawnBuffer;
 
     eType type;
 

@@ -12,7 +12,7 @@
 
 //The fake plural of status, the fake singular being stati
 enum Statee {
-    None = 1, Start = 2, End = 3, FlipperSpawn = 4, SizerSpawn = 5
+    None = 1, Start = 2, End = 3, FlipperSpawn = 4, SizerSpawn = 5, ScaryThingSpawn = 6
 };
 
 class Tile {

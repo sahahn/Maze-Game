@@ -29,6 +29,7 @@ Box editorBox;
 
 Text menu1;
 Text menu2;
+Text gameMenu;
 
 vector<Box> levelBoxes(NUM_LEVELS);
 
@@ -65,11 +66,15 @@ void init() {
 
     state = StartMenu;
     startBox = Box(300,300,50,0,1,0);
-    endBox = Box(400,400,50,1,0,0);
+    endBox = Box(5,5,25,1,0,0);
     editorBox = Box(500,500,50,0,0,1);
 
     menu1 = Text();
     menu2 = Text();
+
+    //Start menu text
+    menu1.setTextAndLoc("Hello, and welcome to the game or something, go ahead an click the green square.", {50,50});
+    menu2.setTextAndLoc("The game might start if you do, oh and red to quit, blue for editor menu...", {50,100});
 
     currentLevel = 1;
 }
@@ -78,6 +83,32 @@ void gameInit() {
 
     game = GameInfo();
     m = Maze(currentLevel, true); //True for load live game
+
+    gameMenu = Text();
+    gameMenu.setTextAndLoc("Level: " + to_string(currentLevel), {(SCREEN_WIDTH/2) - 35, 20});
+
+    //Display a different tip/message for some levels
+    switch(currentLevel) {
+        case (1) : {
+            menu1.setTextAndLoc("So you know, use the arrow keys or wasd to move, and try and find the red block", {50,50});
+            break;
+        }
+        case (2) : {
+            menu1.setTextAndLoc("Oh uh... did I mention enemies? Yeah... try not to get him by them...", {50,50});
+            break;
+        }
+
+        case (3) : {
+            menu1.setTextAndLoc("Turns out there are different kinds of enemies... who knew!", {50,50});
+            break;
+        }
+
+        default:
+            menu1.setTextAndLoc("",{50,50});
+    }
+
+
+
     currentLevel++;
 
     p = Player(m.getStartX(),m.getStartY());
@@ -102,11 +133,15 @@ void gameInit() {
     //rState is used when the player is hit by the Flipper
     rState = false;
 
+    //miniTicks are used for more percise enemy movement
     miniTick = 0;
+
+    //End box is static in game
+    endBox.x = 5;
+    endBox.y = 5;
 
     //Lastly set the state to game
     state = Game;
-
 }
 
 void editorMenuInit() {
@@ -125,7 +160,12 @@ void editorMenuInit() {
     //Init the levelBoxes, position pre-determined to fill in 3 per row, w/ 3 visible columns
     for (int i = 0; i < NUM_LEVELS; i++){
         levelBoxes[i] = Box(((W/6) + ((i % 3) * W)), ((H/6) + ((i/3) * H)), sz, .2, .2, .2);
+        levelBoxes[i].y += 150;
     }
+
+    menu1.setTextAndLoc("Select a map to edit, or drag and drop to change the level order.", {50,50});
+    menu2.setTextAndLoc("Use the up and down arrow to navigate additional levels!", {50,100});
+
 
     //Used to flag a box
     mark = 0;
@@ -137,13 +177,17 @@ void editorInit(int l, bool emp) {
     e = MapEditor();
     m = !emp ? Maze(l, false) : Maze();
 
-    e.level = l;
+    e.setLevel(l);
 
+    //Start and end box in bottom for save/not save in Editor
     startBox.x = (SCREEN_WIDTH / 2) - startBox.size;
     startBox.y = SCREEN_HEIGHT - startBox.size;
 
+    //Change size back
+    endBox.size = 50;
     endBox.x = (SCREEN_WIDTH / 2) + endBox.size;
     endBox.y = SCREEN_HEIGHT - endBox.size;
+
 }
 
 // Initialize OpenGL Graphics
@@ -235,6 +279,9 @@ void kbu(unsigned char key, int x, int y) {
             case '5':
                 m.maze[e.mX][e.mY].setStati(SizerSpawn);
             break;
+
+            case '6':
+                m.maze[e.mX][e.mY].setStati(ScaryThingSpawn);
         }
     }
 }
@@ -298,6 +345,8 @@ void cursor(int x, int y) {
 
             //p.setPlayerRotation(ang);
             //glutPostRedisplay();
+
+            endBox.checkHover(x,y);
             break;
         }
 
@@ -361,9 +410,7 @@ void mousemov(int x, int y) {
                 e.mX = tempX;
                 e.mY = tempY;
             }
-
         }
-
     }
 
     glutPostRedisplay();
@@ -379,12 +426,19 @@ void mouse(int button, int stateB, int x, int y) {
             if (stateB == GLUT_LEFT_BUTTON) {
                 if (startBox.checkHover(x, y)) {
                     gameInit();
+
                 } else if (endBox.checkHover(x, y)) {
+
+                    if (state == EndMenu) {
+                        //PROMPT FOR NAME OR SCORE STUFF HERE, THEN BRING BACK TO MAIN MENU
+                        init();
+                    } else {
+                        glutDestroyWindow(wd);
+                        exit(0);
+                    }
 
 
                     //End and saving player info is buggy, so just quit
-                    glutDestroyWindow(wd);
-                    exit(0);
                     /*
 
                     //Mark as completed and end game.
@@ -394,11 +448,11 @@ void mouse(int button, int stateB, int x, int y) {
                     if (state == StartMenu) {
                         glutDestroyWindow(wd);
                         exit(0);
+                       glutDestroyWindow(wd);
+                        game.end();
                     }
                      */
 
-                    glutDestroyWindow(wd);
-                    game.end();
 
                 } else if (editorBox.checkHover(x,y)) {
                     editorMenuInit();
@@ -444,17 +498,17 @@ void mouse(int button, int stateB, int x, int y) {
                     //Lastly rename temp name to new name's spot
                     rename(tempName.c_str(), newName.c_str());
                 }
-
             }
-
         }
 
         else if (state == Editor) {
 
             if ((button == GLUT_LEFT_BUTTON) && (stateB == GLUT_DOWN)) {
 
+                //Check the start and end box, start box to save level
+                //Red to return to main menu
                 if (startBox.checkHover(x, y)) {
-                    m.saveLevel(e.level);
+                    m.saveLevel(e.getLevel());
                     init();
                 } else if (endBox.checkHover(x, y)) {
                     init();
@@ -477,8 +531,21 @@ void mouse(int button, int stateB, int x, int y) {
             }
         }
 
-        glutPostRedisplay();
+        else if ((state == Game && (stateB == GLUT_DOWN))) {
+            if (endBox.checkHover(x, y)) {
 
+                //If end Box is pressed within the game decrement level
+                currentLevel--;
+
+                //and go to EndMenu
+                state = EndMenu;
+
+                //Change the text also,
+                menu2.setTextAndLoc("You can try again... if you want", {50,100});
+            }
+        }
+
+        glutPostRedisplay();
     }
 
 
@@ -566,14 +633,22 @@ void display() {
 
             //Draw the player
             p.draw();
+
+            //Draw the endBox
+            endBox.draw();
+
+            //Draw the thing that says what level you're on.. you know
+            gameMenu.draw();
+
+            menu1.draw();
+
+
             break;
         }
 
         case (StartMenu): {
-            menu1.setTextAndLoc("Hello, and welcome to our very low quality menu!", {50,50});
-            menu1.draw();
 
-            menu2.setTextAndLoc("Go ahead and click that square, the game might start also if you do.", {50,100});
+            menu1.draw();
             menu2.draw();
 
             startBox.draw();
@@ -585,9 +660,8 @@ void display() {
 
         case (EndMenu): {
             menu1.setTextAndLoc("Hey, that was okay.", {50,50});
-            menu1.draw();
 
-            menu2.setTextAndLoc("Ready for the next level?", {50,100});
+            menu1.draw();
             menu2.draw();
 
             startBox.draw();
@@ -596,6 +670,10 @@ void display() {
         }
 
         case (EditorMenu) : {
+
+            menu1.draw();
+
+            menu2.draw();
 
             //For each level loads either a preview, or blank space.
             for (int i = 0; i < NUM_LEVELS; i++){
@@ -623,6 +701,10 @@ void display() {
                         }
                     }
                 }
+
+                //Display the level number above each map preview
+                Text levNum(to_string(i+1), {levelBoxes[i].x,levelBoxes[i].y - 5});
+                levNum.draw();
             }
         }
 
@@ -630,29 +712,32 @@ void display() {
 
         case (Editor) : {
 
-                    //The editor screen is a modified verison of the game function,
-                    //Just responsible for keeping the editor within the bounds
-                    int lb1 = e.loc.x - EDITOR_SCOPE;
-                    int upb1 = e.loc.x + EDITOR_SCOPE;
-                    int lb2 = e.loc.y - EDITOR_SCOPE;
-                    int upb2 = e.loc.y + EDITOR_SCOPE;
+            //The editor screen is a modified verison of the game function,
+            //Just responsible for keeping the editor within the bounds
+            int lb1 = e.loc.x - EDITOR_SCOPE;
+            int upb1 = e.loc.x + EDITOR_SCOPE;
+            int lb2 = e.loc.y - EDITOR_SCOPE;
+            int upb2 = e.loc.y + EDITOR_SCOPE;
 
-                    int x = -1;
+            int x = -1;
 
-                    for (int i = lb1; i <= upb1 + 1; i++, x++) {
+            for (int i = lb1; i <= upb1 + 1; i++, x++) {
 
-                        int y = -1;
+                int y = -1;
 
-                        for (int j = lb2; j <= upb2 + 1; j++, y++) {
+                for (int j = lb2; j <= upb2 + 1; j++, y++) {
 
-                            m.maze[i][j].draw(x , y, e.xShift, e.yShift);
-                        }
-                    }
-
-            startBox.draw();
-            endBox.draw();
+                    //Draw the tile
+                    m.maze[i][j].draw(x, y, e.xShift, e.yShift);
                 }
             }
+
+            //Draw the start and end Boxes which act as save or don't save here
+            startBox.draw();
+            endBox.draw();
+
+        }
+    }
 
     //Render now
     glFlush();
@@ -661,8 +746,6 @@ void display() {
 /**********************************************************************
  * Main Player and Character movement logic
  *********************************************************************/
-
-
 
 //Implements the logic for an Enemy to follow the correct path to the player.
 void follow_path(Enemy &E) {
@@ -708,27 +791,46 @@ void follow_path(Enemy &E) {
             //If a collision then,
         else {
 
-            if (E.getType() == Flipper) {
+            //Check buffer
+            if (E.doBuffer()) {
 
-                //Flip the screen 90 degrees
-                rState = true;
-            } else if (E.getType() == Sizer) {
+                switch (E.getType()) {
 
-                //Increase the Players size
-                p.setSize(p.getSize() + 1);
+                    case (Flipper) : {
+                        //Flip the screen 90 degrees
+                        rState = true;
+                        break;
+                    }
+
+                    case (Sizer) : {
+                        //Increase the Players size
+                        p.setSize(p.getSize() + 1);
+                        break;
+                    }
+
+                    case (ScaryThing) : {
+
+                        //If hit by scary thing, light radius smaller for rest of level
+                        if (p.getLightRadius() > 50) {
+                            p.setLightRadius(p.getLightRadius() - 50);
+                        }
+                        break;
+                    }
+                }
+
+                E.setSpawnBuffer(500);
+
+                //Reset the location of the Enemy
+                E.x = E.getSpawnX();
+                E.y = E.getSpawnY();
+
+                E.xShift = 0;
+                E.yShift = 0;
+
+                //Update score
+                game.score.got++;
+                //cout << "You got Got!" << endl;
             }
-
-            //Reset the location of the Enemy
-            E.x = E.getSpawnX();
-            E.y = E.getSpawnY();
-
-            E.xShift = 0;
-            E.yShift = 0;
-
-            //Update score
-            game.score.got++;
-            cout << "You got Got!" << endl;
-
         }
     }
 
@@ -739,18 +841,20 @@ void follow_path(Enemy &E) {
 
 void timer(int extra) {
 
-
     switch (state) {
 
         case(Game) : {
 
+            //If in rState/rotate state, don't allow other movement/updates
             if (!rState) {
 
                 miniTick++;
-                if (miniTick == 2) {
+                if (miniTick == 3) {
                     miniTick = 0;
                 }
 
+                //The movement logic for the player is defined here,
+                //Where the move is calculated, and then done.
                 if (keys[GLUT_KEY_DOWN]) {
                     p.calcMove(0, -p.getSpeed(), angleR);
 
@@ -791,6 +895,7 @@ void timer(int extra) {
                     }
                 }
 
+                //Additional movement logic for velocity
                 if (!keys[GLUT_KEY_DOWN] && !keys[GLUT_KEY_UP]) {
                     p.calcMove((int) p.getMovementBuffer().x, 0, angleR);
 
@@ -799,8 +904,8 @@ void timer(int extra) {
                     } else {
                         p.flipVelocity();
                     }
-                    //if (p.getMovementBuffer().x != 0) cout << p.getMovementBuffer().x << endl;
                 }
+
                 if (!keys[GLUT_KEY_LEFT] && !keys[GLUT_KEY_RIGHT]) {
                     p.calcMove(0, (int) p.getMovementBuffer().y, angleR);
 
@@ -809,52 +914,63 @@ void timer(int extra) {
                     } else {
                         p.flipVelocity();
                     }
-                    //if (p.getMovementBuffer().y != 0) cout << p.getMovementBuffer().y << endl;
                 }
+
+                //Update the player loc after move info
                 p.update();
 
-
-
-                //If you reach the END_X and END_Y square you win!
+                //If the tile the player is in is an end tile
                 if (m.maze[p.x][p.y].getStati() == End) {
-                    cout << "You win! " << endl;
-
+                    menu2.setTextAndLoc("Ready for the next level?", {50,100});
                     state = EndMenu;
                 }
 
-
+                //Call the enemies search + movement function
                 for (int z = 0; z < numEnemies; z++) {
 
-                    if (miniTick < enemies[z].getUpdateRate()) {
+                    //Only call if miniTick is >= to enemies update rate, e.g.
+                    //sizer gets called every time, but Flipper gets called every 2/3
+                    //Also check the enemies respawn buffer
+                    if ((miniTick >= enemies[z].getUpdateRate()) && (enemies[z].doBuffer())) {
                         m.aStarSearch(enemies[z].x, enemies[z].y, p.x, p.y);
                         follow_path(enemies[z]);
                     }
-
                 }
 
             } else {
 
+                //If rState, then rotate the map 90 degrees
                 angle = (angle + 1) % 360;
                 angleR = angle * (LUKE_M_PI / 180);
 
+                //Stop at intervals of 90 degrees
                 if (angle % 90 == 0) {
                     rState = 0;
                 }
             }
+            break;
         }
 
         case (StartMenu)  : {
+
+            //Have the menu boxes move around randomly idk why
             startBox.randomMenuMovement();
             endBox.randomMenuMovement();
             editorBox.randomMenuMovement();
+            break;
         }
 
         case (EndMenu)  : {
+
+            //Menu boxes move around randomly
             startBox.randomMenuMovement();
             endBox.randomMenuMovement();
+            break;
         }
 
         case (EditorMenu) : {
+
+            //Logic to move up and down in the editorMenu
             if (keys[GLUT_KEY_UP]) {
                 for (int i = 0; i < NUM_LEVELS; i++){
                     levelBoxes[i].y += 5;
@@ -866,8 +982,9 @@ void timer(int extra) {
                     levelBoxes[i].y -= 5;
                 }
             }
-
+            break;
         }
+
 
         case (Editor) : {
 
@@ -884,12 +1001,16 @@ void timer(int extra) {
 
             } else {
 
+                //When a tile is clicked in editor, flip from wall to not, or vice-versa
                 if ((keys[GLUT_LEFT_BUTTON]) && (m.maze[e.mX][e.mY].getWall() == e.fillVal)) {
                     m.maze[e.mX][e.mY].flipWall();
+
+                    //Flip flag off
                     keys[GLUT_LEFT_BUTTON] = false;
                 }
             }
 
+            //The logic for moving around the camera
             if (keys[GLUT_KEY_DOWN]) {
 
                 if ((e.loc.x + EDITOR_SCOPE <= HEIGHT)) {
@@ -902,7 +1023,6 @@ void timer(int extra) {
                 if ((e.loc.y - EDITOR_SCOPE) > 0) {
                     e.xShift += e.moveSpeed;
                 }
-
             }
 
             if (keys[GLUT_KEY_UP]) {
@@ -910,7 +1030,6 @@ void timer(int extra) {
                 if ((e.loc.x - EDITOR_SCOPE) > 0) {
                     e.yShift += e.moveSpeed;
                 }
-
             }
 
             if (keys[GLUT_KEY_RIGHT]) {
@@ -920,25 +1039,9 @@ void timer(int extra) {
                 }
             }
 
-            if (e.yShift < (-e.sBoundary)) {
-                e.loc.x +=1;
-                e.yShift += EDITOR_SCALE;
-            }
-
-            if (e.xShift > (e.sBoundary)) {
-                e.loc.y -= 1;
-                e.xShift -= EDITOR_SCALE;
-            }
-
-            if (e.xShift < (-e.sBoundary)) {
-                e.loc.y += 1;
-                e.xShift += EDITOR_SCALE;
-            }
-
-            if (e.yShift > (e.sBoundary)) {
-                e.loc.x -= 1;
-                e.yShift -= EDITOR_SCALE;
-            }
+            //Update the map locations
+            e.update();
+            break;
         }
     }
 
@@ -950,9 +1053,8 @@ void timer(int extra) {
 /* Main function: GLUT runs as a console application starting at main()  */
 int graphicsPlay(int argc, char **argv) {
 
+    //Call init for start menu
     init();
-    //gameInit(1);
-    //editorInit(1);
 
     // Initialize GLUT
     glutInit(&argc, argv);

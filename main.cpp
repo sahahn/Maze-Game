@@ -16,10 +16,6 @@ void testWithBool(string testName, bool pass) {
 
 int main(int argc, char **argv) {
 
-        graphicsPlay(argc, argv);
-
-
-    /*
 
     // TESTING
     if (TESTING) {
@@ -60,9 +56,8 @@ int main(int argc, char **argv) {
         testPlayer.taperYVelocity();
         testWithBool("Player > taperX&YVelocity", testPlayer.getVelocity().x > -10 && testPlayer.getVelocity().y > -10);
 
-        Enemy testEnemy = Enemy(20, 20, 10, 1, Flipper);
-        testWithBool("Enemy > Non-Default Constructor", testEnemy.x == 20 && testEnemy.y == 20
-                                                        && testEnemy.getSize() == 10 && testEnemy.getSpeed() == 1);
+        Enemy testEnemy = Enemy(20, 20, Flipper);
+        testWithBool("Enemy > Non-Default Constructor", testEnemy.x == 20 && testEnemy.y == 20);
 
         testEnemy.calcMove(10, 10, 0);
         //testWithBool("Enemy > calcMove", testEnemy.temp1 == 10 && testEnemy.temp2 == 10);
@@ -73,19 +68,14 @@ int main(int argc, char **argv) {
 
 
         Point testRotate = rotate(600, 600, (90 * (LUKE_M_PI / 180)));
-        //testWithBool("GameInfo > rotate", ((testRotate.x == 400) && (testRotate.y)));
+        
+        testWithBool("GameInfo > rotate", ((testRotate.x == 300) && (testRotate.y == 600)));
 
         // testing maze and tile class
         Tile testTile = Tile();
 
         testTile.setWall(true);
         testWithBool("Tile > setWall", testTile.getWall() == true);
-        testTile.setEnd(true);
-        testWithBool("Tile > setEnd", testTile.getEnd() == true);
-        testTile.setWasHere(true);
-        testWithBool("Tile > setWashere", testTile.getWasHere() == true);
-        testTile.setCorrectPath(true);
-        testWithBool("Tile > setCorrectPath", testTile.getCorrectPath() == true);
 
         MazePoint testMazePoint1 = MazePoint();
         MazePoint testMazePoint2 = MazePoint(5, 5);
@@ -96,9 +86,6 @@ int main(int argc, char **argv) {
         testWithBool("MazePoint > setY", testMazePoint1.getY() == 5);
         testWithBool("MazePoint > == overload", testMazePoint1 == testMazePoint2);
 
-        // NOTE: the game information class is not tested because the methods all have side
-        // effects that effect the console, requiring a user input in some of them, and would require
-        // user input every time the tests are run.
     }
 
     // TESTING END
@@ -110,6 +97,6 @@ int main(int argc, char **argv) {
         cout << "ERROR: A TEST FAILED!" << endl;
     }
 
-     */
+
     return 0;
 }

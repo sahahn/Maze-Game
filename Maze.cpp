@@ -94,13 +94,13 @@ void Maze::loadMaze(int l) {
                 }
             }
 
-            else if ((intLine == 4) || (intLine == 5)) {
+            else if (intLine >= 4) {
 
                 enemyInfo.push_back(make_pair(make_pair(i,j),intLine));
                 maze[i][j].setWall(false);
             }
 
-            //FlipperSpawn = 4, SizerSpawn = 5
+            //FlipperSpawn = 4, SizerSpawn = 5, ScaryThing = 6
         }
     }
 

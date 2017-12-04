@@ -170,7 +170,7 @@ void Character::taperXVelocity() {
 }
 
 void Character::taperYVelocity() {
-    currentVelocity.y /= 1.05;
+    currentVelocity.y /= 1.02;
     if (velocityMovementBuffer.y > 1 || velocityMovementBuffer.y < -1) {
         velocityMovementBuffer.y = 0;
     }
@@ -195,7 +195,10 @@ Player::Player(int sX, int sY) {
     size = 30;
     speed = 2;
     playerLight = Light();
-    playerLight.setRadius(300);
+
+    lightRadius = 300;
+
+    playerLight.setRadius(lightRadius);
 
     // constantly updated speed of player.
     currentVelocity = DoublePoint{0, 0};
@@ -276,37 +279,33 @@ double Player::getPlayerRotation() const {
     return playerRotation;
 }
 
+int Player::getLightRadius() const {
+    return lightRadius;
+}
+
 void Player::setPlayerRotation(double angR) {
     playerRotation = angR;
 }
 
+void Player::setLightRadius(int l) {
+    lightRadius = l;
+    playerLight.setRadius(lightRadius);
+}
+
+void Player::calcDist(int d) {
+
+    //Calculate light radius
+    if (d < lightRadius) {
+        playerLight.setRadius(d);
+    }
+}
 
 /*
  * Enemy Class
  */
 
 Enemy::Enemy() {
-
-    /*
-    //The default "spawning location" is set to 10,10 for now, as it is easier to test
-    spawnX = 10;
-    spawnY = 10;
-
-    x = spawnX;
-    y = spawnY;
-
-    xShift = 0;
-    yShift = 0;
-
-    //hBoundary, same as with Player, must be calculated depending on size.
-    hBoundary = ((SCALE - size) / 2);
-
-    type = Flipper;
-
-    size = 20;
-    speed = 1;
-     */
-
+    //Default constructor isn't used
 }
 
 Enemy::Enemy(int X, int Y, eType e) {
@@ -328,7 +327,26 @@ Enemy::Enemy(int X, int Y, eType e) {
     //Could have these dep. on type
     size = 20; //Default size
     speed = 1; //Default speed
-    updateRate = 3;
+
+    //Update rate is determined by type
+    switch (type) {
+
+        case (Sizer) : {
+            updateRate = 0;
+            break;
+        }
+
+        case (Flipper) : {
+            updateRate = 1;
+            break;
+        }
+
+        case (ScaryThing) : {
+            updateRate = 2;
+            size = 50;
+            break;
+        }
+    }
 }
 
 eType Enemy::getType() const {
@@ -347,6 +365,10 @@ int Enemy::getUpdateRate() const {
     return updateRate;
 }
 
+int Enemy::getSpawnBuffer() const {
+    return spawnBuffer;
+}
+
 void Enemy::setType(eType e) {
     type = e;
 }
@@ -363,67 +385,93 @@ void Enemy::setUpdateRate(int u) {
     updateRate = u;
 }
 
+void Enemy::setSpawnBuffer(int s) {
+    spawnBuffer = s;
+}
+
+bool Enemy::doBuffer() {
+    if (spawnBuffer > 0) {
+        spawnBuffer--;
+        return false;
+    } else {
+        return true;
+    }
+}
+
 
 //Note: The draw function for the Enemy, and Tile piece are quite close.
 //In order to draw the Enemy relative to the Player, the players xShift and yShift,
 //along with the current angle in radians is needed.
 void Enemy::draw(Player &p, double angleR) const {
-    int pXShift = p.xShift;
-    int pYShift = p.yShift;
-    //Temp values used in calculation
-    int X, Y;
 
-    //Note here, the location.x and location.y must be set prior to draw being called,
-    //within the main graphics function. Where location.x and location.y refer to
-    //which grid on the screen the enemy will be drawn.
-    //Further the location must be brought to scale, and set to reflect
-    //both the Enemy being drawns x and y shifts and the players.
-    X = (location.x * SCALE) - yShift + pYShift;
-    Y = (location.y * SCALE) - xShift + pXShift;
+    //Only draw if not buffering
+    if (!spawnBuffer > 0) {
 
-    //Next set X and Y to reflect the top left corner of the Enemy.
-    X += (SCALE / 2) - (size / 2);
-    Y += (SCALE / 2) - (size / 2);
+        int pXShift = p.xShift;
+        int pYShift = p.yShift;
+        //Temp values used in calculation
+        int X, Y;
 
-    glBegin(GL_QUADS);
+        //Note here, the location.x and location.y must be set prior to draw being called,
+        //within the main graphics function. Where location.x and location.y refer to
+        //which grid on the screen the enemy will be drawn.
+        //Further the location must be brought to scale, and set to reflect
+        //both the Enemy being drawns x and y shifts and the players.
+        X = (location.x * SCALE) - yShift + pYShift;
+        Y = (location.y * SCALE) - xShift + pXShift;
 
-    Point p1, p2, p3, p4, center;
+        //Next set X and Y to reflect the top left corner of the Enemy.
+        X += (SCALE / 2) - (size / 2);
+        Y += (SCALE / 2) - (size / 2);
 
-    p1 = rotate(Y, X, angleR);
-    p2 = rotate((Y + size), X, angleR);
-    p3 = rotate((Y + size), (X + size), angleR);
-    p4 = rotate(Y, (X + size), angleR);
+        glBegin(GL_QUADS);
 
-    center.x = (p1.x + p2.x) / 2;
-    center.y = (p1.y + p4.y) / 2;
+        Point p1, p2, p3, p4, center;
 
-    double distance = sqrt(pow((center.x - (SCREEN_WIDTH / 2)),2) + pow((center.y - (SCREEN_HEIGHT/2)),2));
-    int playerLightRadius = p.playerLight.getRadius() + 10;
+        p1 = rotate(Y, X, angleR);
+        p2 = rotate((Y + size), X, angleR);
+        p3 = rotate((Y + size), (X + size), angleR);
+        p4 = rotate(Y, (X + size), angleR);
 
-    //Color is based on enemy type
-    switch (type) {
+        center.x = (p1.x + p2.x) / 2;
+        center.y = (p1.y + p4.y) / 2;
+
+        double distance = sqrt(pow((center.x - (SCREEN_WIDTH / 2)), 2) + pow((center.y - (SCREEN_HEIGHT / 2)), 2));
+        int playerLightRadius = p.playerLight.getRadius() + 10; // +10 so that you can see it a little better
+
+        //Color is based on enemy type
+        switch (type) {
+
+            case (Flipper):
+                glColor3f(.3 - (distance / playerLightRadius), .7 - (distance / playerLightRadius),
+                          .4 - (distance / playerLightRadius));
+                break;
+
+            case (Sizer):
+                glColor3f(.7 - (distance / playerLightRadius), .4 - (distance / playerLightRadius),
+                          .8 - (distance / playerLightRadius));
+                break;
+
+            case (ScaryThing) :
+                //If scary thing then do the players calcDistance
+                p.calcDist((int) rint(distance / 2));
+
+                glColor3f(.1, .1, .1);
+                break;
+
+            default:
+                glColor3f(1, 1, 1);
+                break;
+        }
+
+        glVertex2i(p1.x, p1.y); //TL
+        glVertex2i(p2.x, p2.y); //TR
+        glVertex2i(p3.x, p3.y); //BR
+        glVertex2i(p4.x, p4.y); //BL
 
 
-        case (Flipper):
-            glColor3f(.6 - (distance / playerLightRadius) , 1 - (distance / playerLightRadius), .8 - (distance / playerLightRadius));
-            break;
-
-        case (Sizer):
-            glColor3f(.6 - (distance / playerLightRadius), .6 - (distance / playerLightRadius), 1 - (distance / playerLightRadius));
-            break;
-
-        default:
-            glColor3f(1, 1, 1);
-            break;
+        glEnd();
     }
-
-    glVertex2i(p1.x, p1.y); //TL
-    glVertex2i(p2.x, p2.y); //TR
-    glVertex2i(p3.x, p3.y); //BR
-    glVertex2i(p4.x, p4.y); //BL
-
-
-    glEnd();
 }
 
 //Like the player calcMove, but no need to adjust for rotation,
@@ -461,6 +509,7 @@ void Enemy::nextCalc(int nX, int nY) {
         calcMove(speed, 0, 0);
     }
 }
+
 
 
 

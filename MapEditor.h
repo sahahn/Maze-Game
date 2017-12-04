@@ -15,21 +15,21 @@ public:
 
     int moveSpeed;
 
-    int sBoundary;
-
     int mX, mY;
 
     bool fillVal;
     bool clickTimer;
     int ticks;
 
-    int level;
+    int getLevel() const;
+
+    void setLevel(int l);
+
+    void update();
 
 private:
-
-
-
-
+    int sBoundary;
+    int level;
 };
 
 
