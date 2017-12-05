@@ -115,7 +115,11 @@ public:
     void setPlayerRotation(double angR);
     void setLightRadius(int l);
 
-    void calcDist(int d);
+    //Call to update the players light
+    void updateLight();
+
+    //Calculate the new light position based on enemy position
+    void calcNewLight(int d);
 
 
 private:
@@ -126,6 +130,9 @@ private:
 
     //The default lightRadius for the player
     int lightRadius;
+
+
+
 
 };
 
@@ -162,6 +169,8 @@ public:
     //simply sets the temp values.
     void calcMove(int xDelta, int yDelta, double angleR) override;
 
+
+    double getDistance(Point center) const;
 
     void nextCalc(int nX, int nY);
 

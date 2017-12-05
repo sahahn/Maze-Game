@@ -594,6 +594,7 @@ void display() {
             // render the players light
             //p.playerLight.renderLight((p.y)*SCALE+(-p.xShift), (p.x)*SCALE+(-p.yShift), m);
 
+            p.updateLight();
             p.playerLight.renderLight(p.x, p.y, p.xShift, p.yShift, m, angle);
 
 

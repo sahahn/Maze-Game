@@ -290,13 +290,22 @@ void Player::setPlayerRotation(double angR) {
 void Player::setLightRadius(int l) {
     lightRadius = l;
     playerLight.setRadius(lightRadius);
+    dist = lightRadius;
 }
 
-void Player::calcDist(int d) {
+//Change player light radius accordingly
+void Player::updateLight() {
 
-    //Calculate light radius
+    if (dist < (lightRadius * 2)) {
+        playerLight.setRadius(dist);
+    }
+}
+
+//Called before light radius, e.g. if there are multiple scary things
+void Player::calcNewLight(int d) {
+
     if (d < lightRadius) {
-        playerLight.setRadius(d);
+        dist = d;
     }
 }
 
@@ -398,6 +407,10 @@ bool Enemy::doBuffer() {
     }
 }
 
+double Enemy::getDistance(Point center) const {
+    return sqrt(pow((center.x - (SCREEN_WIDTH / 2)), 2) + pow((center.y - (SCREEN_HEIGHT / 2)), 2));
+}
+
 
 //Note: The draw function for the Enemy, and Tile piece are quite close.
 //In order to draw the Enemy relative to the Player, the players xShift and yShift,
@@ -436,7 +449,8 @@ void Enemy::draw(Player &p, double angleR) const {
         center.x = (p1.x + p2.x) / 2;
         center.y = (p1.y + p4.y) / 2;
 
-        double distance = sqrt(pow((center.x - (SCREEN_WIDTH / 2)), 2) + pow((center.y - (SCREEN_HEIGHT / 2)), 2));
+        double distance = getDistance(center);
+
         int playerLightRadius = p.playerLight.getRadius() + 10; // +10 so that you can see it a little better
 
         //Color is based on enemy type
@@ -454,7 +468,7 @@ void Enemy::draw(Player &p, double angleR) const {
 
             case (ScaryThing) :
                 //If scary thing then do the players calcDistance
-                p.calcDist((int) rint(distance / 2));
+                p.calcNewLight((int) rint(distance / 2));
 
                 glColor3f(.1, .1, .1);
                 break;
