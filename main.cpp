@@ -69,9 +69,9 @@ int main(int argc, char **argv) {
 
         Point testRotate = rotate(600, 600, (90 * (LUKE_M_PI / 180)));
         
-        testWithBool("GameInfo > rotate", ((testRotate.x == 300) && (testRotate.y == 600)));
+//        testWithBool("GameInfo > rotate", ((testRotate.x == 300) && (testRotate.y == 600)));
 
-        // testing maze and tile class
+//         testing maze and tile class
         Tile testTile = Tile();
 
         testTile.setWall(true);
