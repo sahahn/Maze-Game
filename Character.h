@@ -9,6 +9,9 @@
 #include "GameInfo.h"
 #include "Light.h"
 
+/*
+ * The different types of enemies, 4,5,6 correspond with the different types of spawns in the editor
+ */
 enum eType {
     Flipper = 4, Sizer = 5, ScaryThing = 6
 };
@@ -29,11 +32,17 @@ public:
 
     int getSpeed() const;
 
-    // Getters
+    /**
+     * Setter for size
+     * @param sizeIn - int of size value, must be > 0
+     */
     void setSize(int sizeIn);
 
+    /**
+     * Setter for speed
+     * @param speedIn - int of speed value, must be > 0
+     */
     void setSpeed(int speedIn);
-
 
     //Sets the characters location on the screen, used mostly for enemy,
     //but could be used for the Player for some sort of end game animation.
@@ -110,10 +119,10 @@ public:
 
     // getter and setter for rotation
     double getPlayerRotation() const;
-    int getLightRadius() const;
+    int getDLightRadius() const;
 
     void setPlayerRotation(double angR);
-    void setLightRadius(int l);
+    void setDLightRadius(int l);
 
     //Call to update the players light
     void updateLight();
@@ -125,11 +134,9 @@ public:
 private:
     double playerRotation;
 
-    //Holds closest distance to scary thing
-    mutable int dist;
-
     //The default lightRadius for the player
-    int lightRadius;
+    mutable int lightRadius;
+    int defaultLightRadius;
 
 
 

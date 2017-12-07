@@ -16,6 +16,7 @@ Box::Box() {
     empty = false;
 }
 
+
 Box::Box(int X, int Y, int s, double R, double G, double B) {
     x = X;
     y = Y;
@@ -33,6 +34,7 @@ Box::Box(int X, int Y, int s, double R, double G, double B) {
 bool Box::getE() const {
     return empty;
 }
+
 void Box::setE(bool b) {
     empty = b;
 }
