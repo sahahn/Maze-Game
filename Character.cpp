@@ -193,7 +193,7 @@ Player::Player() {
 }
 Player::Player(int sX, int sY) {
     size = 30;
-    speed = 2;
+    speed = 5;  // Adjust if you wanna go fast
     playerLight = Light();
 
     lightRadius = 300;
