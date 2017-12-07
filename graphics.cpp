@@ -7,10 +7,12 @@
 #include "MapEditor.h"
 #include "Text.h"
 
-
 using namespace std;
 
 enum GameState {StartMenu, Game, Editor, EditorMenu, Login, LevelMenu};
+
+int songState = 0;
+bool audio = true;
 
 //Declare the main game object, maze, player, enemies, game
 Maze m;
@@ -61,6 +63,18 @@ int previewScale;
 //Used in editorMenu
 int mark;
 
+/**
+ * @param name - string name of song with file extension
+ * @param val - which song is playing - so you don't restart song when it is already playing
+ */
+void playAudio(string name, int val) {
+    if (val != songState && audio) {
+        string path = "start ..\\";
+        system((path + name).c_str());
+        songState = val;
+    }
+}
+
 void init() {
     state = Login;
 
@@ -75,12 +89,15 @@ void init() {
     //First params are x and y, then width and height, and finally color
     inputBox = InputBox((SCREEN_WIDTH / 2) - 100, (SCREEN_HEIGHT/2) - 100, 200, 24, 1,1,1);
     textInBox = Text();
+    playAudio("soundtrackStart.mp3", 5);
+
 
 }
 
 
 //Initialize
 void menuInit() {
+    playAudio("soundtrackStart.mp3", 5);
 
     state = StartMenu;
     startBox = Box(300,300,50,0,1,0);
@@ -109,20 +126,34 @@ void gameInit() {
     switch(currentLevel) {
         case (1) : {
             menu1.setTextAndLoc("So you know, use the arrow keys or wasd to move, and try and find the red block", {50,50});
+            playAudio("soundtrack0.mp3", 0);
             break;
         }
         case (2) : {
             menu1.setTextAndLoc("Oh uh... did I mention enemies? Yeah... try not to get him by them...", {50,50});
+            playAudio("soundtrack1.mp3", 1);
             break;
         }
 
         case (3) : {
             menu1.setTextAndLoc("Turns out there are different kinds of enemies... who knew!", {50,50});
+            playAudio("soundtrack2.mp3", 2);
+            break;
+        }
+        case (4) : {
+            menu1.setTextAndLoc("",{50,50});
+            playAudio("soundtrack3.mp3", 3);
+            break;
+        }
+        case (5) : {
+            menu1.setTextAndLoc("",{50,50});
+            playAudio("soundtrack4.mp3", 4);
             break;
         }
 
         default:
             menu1.setTextAndLoc("",{50,50});
+            playAudio("soundtrack4.mp3", 4);
     }
 
     p = Player(m.getStartX(),m.getStartY());
@@ -194,6 +225,7 @@ void levelMenuInit() {
 }
 
 void editorMenuInit() {
+    playAudio("ElevatorMusic.mp3", 10);
     state = EditorMenu;
 
     endBox = Box(5,5,25,1,0,0);
