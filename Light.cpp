@@ -52,7 +52,7 @@ void Light::renderLight(int pX, int pY, int pXShift, int pYShift, Maze &m, int a
     for (double i = 0; i <= 2.0 * 3.14159264; i += 2.0 * 3.14159265 / 360.0) {
         int distance = 0;
         while (wallCheck(x + distance * cos(i), y + distance * sin(i), m, pX, pY) && distance < rad) {
-            distance += 8;
+            distance += 5;
         }
         tempRadArray.push_back(distance);
     }
