@@ -12,7 +12,7 @@ using namespace std;
 enum GameState {StartMenu, Game, Editor, EditorMenu, Login, LevelMenu};
 
 int songState = 0;
-bool audio = true;
+bool audio = false;
 
 //Declare the main game object, maze, player, enemies, game
 Maze m;
@@ -49,6 +49,8 @@ double angleR;
 
 //Stores what level the player is in
 int currentLevel;
+
+int MAX_LEVEL = 9;
 
 //Stores the highest level reached for that user
 int levelReached;
@@ -90,8 +92,6 @@ void init() {
     inputBox = InputBox((SCREEN_WIDTH / 2) - 100, (SCREEN_HEIGHT/2) - 100, 200, 24, 1,1,1);
     textInBox = Text();
     playAudio("soundtrackStart.mp3", 5);
-
-
 }
 
 
@@ -130,7 +130,7 @@ void gameInit() {
             break;
         }
         case (2) : {
-            menu1.setTextAndLoc("Oh uh... did I mention enemies? Yeah... try not to get him by them...", {50,50});
+            menu1.setTextAndLoc("Oh uh... did I mention enemies? Yeah... try not to get got by them...", {50,50});
             playAudio("soundtrack1.mp3", 1);
             break;
         }
@@ -141,12 +141,22 @@ void gameInit() {
             break;
         }
         case (4) : {
-            menu1.setTextAndLoc("",{50,50});
+            menu1.setTextAndLoc("Congrats, now you know about aas much as I do", {50,50});
             playAudio("soundtrack3.mp3", 3);
             break;
         }
         case (5) : {
             menu1.setTextAndLoc("",{50,50});
+            playAudio("soundtrack4.mp3", 4);
+            break;
+        }
+        case (8) : {
+            menu1.setTextAndLoc("It's a trap!", {50,50});
+            playAudio("soundtrack2.mp3", 2);
+            break;
+        }
+        case (9) : {
+            menu1.setTextAndLoc("Hope you're not afraid of the dark...", {50,50});
             playAudio("soundtrack4.mp3", 4);
             break;
         }
@@ -304,7 +314,7 @@ void kbd(unsigned char key, int x, int y) {
     //Escape key
     if (key == 27) {
         glutDestroyWindow(wd);
-        game.end();
+        exit(0);
     }
 
     //key 32 is space, I just have that rotate the maze here
@@ -561,6 +571,7 @@ void mouse(int button, int stateB, int x, int y) {
                 } else if (endBox.checkHover(x, y)) {
 
                     glutDestroyWindow(wd);
+                    currentLevel--;
                     exit(0);
 
                 } else if (editorBox.checkHover(x, y)) {
@@ -1116,7 +1127,7 @@ void timer(int extra) {
 
                 //If the tile the player is in is an end tile
                 if (m.maze[p.x][p.y].getStati() == End) {
-                    if (currentLevel == levelReached) {
+                    if (currentLevel == levelReached && currentLevel != MAX_LEVEL) {
                         levelReached++;
                         game.updatePlayer(inputBox.content, levelReached);
                     }
