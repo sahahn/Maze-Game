@@ -18,7 +18,9 @@ public:
 
     Text(string text, Point loc);
 
-    void draw();
+    void draw() const;
+
+    void draw(int r, int g, int b, bool blink) const;
 
     void setTextAndLoc(string text, Point loc);
 

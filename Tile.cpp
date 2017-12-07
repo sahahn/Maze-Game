@@ -3,8 +3,6 @@
 //
 
 #include "Tile.h"
-#include "GameInfo.h"
-#include <iostream>
 Tile::Tile() {
     wall = true;
     stati = None;
@@ -72,7 +70,7 @@ void Tile::draw(int x, int y, int xShift, int yShift, double angle) const {
     else {
         if ((wall || (stati == End))) {
 
-            Point p1, p2, p3, p4;
+            Point p1{}, p2{}, p3{}, p4{};
             p1 = rotate(y, x, angle);
             p2 = rotate((y + SCALE), x, angle);
             p3 = rotate((y + SCALE), (x + SCALE), angle);
@@ -90,7 +88,7 @@ void Tile::draw(int x, int y, int xShift, int yShift, double angle) const {
 //Flip wall status, used with editor
 void Tile::flipWall() {
 
-    if (wall == true) {
+    if (wall) {
         wall = false;
 
     } else {
@@ -165,7 +163,7 @@ void Tile::draw(int x, int y, int scale, bool hover) const {
 
             case (None):
                 if (hover) {
-                    glColor3f(1/2, 1/2, 0);
+                    glColor3f(0, 0, 0);
                 } else {
                     glColor3f(1, 1, 0);
                 }
@@ -174,7 +172,7 @@ void Tile::draw(int x, int y, int scale, bool hover) const {
 
             case (Start):
                 if (hover) {
-                    glColor3f(0, 1/2, 0);
+                    glColor3f(0, .5, 0);
                 } else {
                     glColor3f(0, 1, 0);
                 }
@@ -183,7 +181,8 @@ void Tile::draw(int x, int y, int scale, bool hover) const {
 
             case (End):
                 if (hover) {
-                    glColor3f(1/2, 0, 0);
+                    glColor3f(.5, 0, 0);
+
                 } else {
 
                     glColor3f(1, 0, 0);
@@ -193,7 +192,7 @@ void Tile::draw(int x, int y, int scale, bool hover) const {
 
             case (FlipperSpawn):
                 if (hover) {
-                    glColor3f(.3/2, .7/2, .4/2);
+                    glColor3f(static_cast<GLfloat>(.3 / 2), static_cast<GLfloat>(.7 / 2), static_cast<GLfloat>(.4 / 2));
                 } else {
                     glColor3f(.3, .7, .4);
                 }
@@ -202,14 +201,21 @@ void Tile::draw(int x, int y, int scale, bool hover) const {
 
             case (SizerSpawn):
                 if (hover) {
-                    glColor3f(.7/2, .4/2, .8/2);
+                    glColor3f(static_cast<GLfloat>(.7 / 2), static_cast<GLfloat>(.4 / 2), static_cast<GLfloat>(.8 / 2));
                 } else {
                     glColor3f(.7, .4, .8);
                 }
 
                 break;
+
+            case (ScaryThingSpawn):
+                if (hover) {
+                    glColor3f(.1, .1, .1);
+                } else {
+                    glColor3f(.2, .2, .2);
+                }
+            }
         }
-    }
 
 
     //Convert to pixel coordinates
@@ -250,10 +256,5 @@ void MazePoint::setY(int Y) {
 }
 
 bool MazePoint::operator ==(const MazePoint &b) const {
-    if ((x == b.getX()) && (y == b.getY())) {
-        return true;
-    }
-    else {
-        return false;
-    }
+    return (x == b.getX()) && (y == b.getY());
 }

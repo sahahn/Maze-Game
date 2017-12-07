@@ -26,9 +26,9 @@
 void init(void);
 
 // Initialize OpenGL Graphics
-void InitGL(void);
+void InitGL();
 
-void kbd(unsigned char key, int x, int y);
+void kbd(unsigned char key, int x, int);
 
 void kbu(unsigned char key, int x, int y);
 

@@ -22,18 +22,47 @@ public:
 
     bool hover;
 
-    bool checkHover(int X, int Y);
+    virtual bool checkHover(int X, int Y);
 
-    void draw() const;
+    virtual void draw() const;
 
     void randomMenuMovement();
 
 
-private:
+protected:
 
     bool empty;
 
+};
 
+class InputBox : public Box {
+public:
+    InputBox();
+    InputBox(int X, int Y, int w, int h, double R, double G, double B);
+    bool checkHover(int X, int Y) override;
+    void draw() const override;
+
+    bool getActive() const;
+    bool getThere() const;
+
+
+
+    void setActive(bool b);
+
+    void addChar(char c);
+    void delChar();
+
+    int width,height;
+    int index;
+    string content;
+
+    void blinkCursor();
+
+
+private:
+    bool active;
+    int ticks;
+    bool there;
 };
 
 

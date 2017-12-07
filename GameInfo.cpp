@@ -6,6 +6,7 @@
 #include "GameInfo.h"
 #include <fstream>
 #include <iostream>
+#include <vector>
 
 /*
  * Takes in an x and y, and an angle in radians and returns the location of the point rotated around the center
@@ -21,9 +22,9 @@ Point rotate(int x, int y, double Angle) {
     xP += (SCREEN_WIDTH / 2);
     yP += (SCREEN_HEIGHT / 2);
 
-    Point newPoint;
-    newPoint.x = rint (xP);
-    newPoint.y = rint (yP);
+    Point newPoint{};
+    newPoint.x = static_cast<int>(rint(xP));
+    newPoint.y = static_cast<int>(rint(yP));
 
     return newPoint;
 }
@@ -42,6 +43,93 @@ void GameInfo::end() {
     endTimer();
     saveScore();
     exit(0);
+}
+
+int GameInfo::loadPlayer(string name) {
+    ifstream fileIn;
+
+    fileIn.open("players.txt");
+
+    if (!fileIn) {
+        cerr << "Unable to open players.txt";
+        exit(1);
+    }
+
+    string line;
+    int x;
+
+    while (fileIn >> line >> x) {
+        if (line == name) {
+
+            fileIn.close();
+            return x;
+        }
+    }
+
+    fileIn.close();
+    //Return -1 for not found
+    return -1;
+}
+
+void GameInfo::updatePlayer(string name, int level) {
+
+    vector<string> names(MAX_PLAYERS);
+    vector<int> levels(MAX_PLAYERS);
+
+    ifstream fileIn;
+    fileIn.open("players.txt");
+
+    if (!fileIn) {
+        cerr << "Unable to open players.txt";
+        exit(1);
+    }
+
+    string line;
+    int x;
+
+    int size = 0;
+
+    //Read the file into memory and change the players level that needs to be changed
+    while (fileIn >> line >> x) {
+
+        names[size] = line;
+
+        if (line == name) {
+            levels[size] = level;
+        } else {
+            levels[size] = x;
+        }
+
+        size++;
+    }
+
+    fileIn.close();
+
+    //Write a new version with the change
+    ofstream fileOut;
+
+    fileOut.open("players.txt", ios::out);
+
+    if (fileOut) {
+
+        for (int i = 0; i < size; i++){
+            fileOut << names[i] << " " << levels[i] << '\n';
+        }
+    }
+
+    fileOut.close();
+}
+
+void GameInfo::makePlayer(string name) {
+    ofstream fileOut;
+
+    fileOut.open("players.txt", ios::app);
+
+    if (fileOut) {
+        fileOut << name << " " << 1 << '\n';
+    }
+
+    fileOut.close();
 }
 
 void GameInfo::saveScore() {

@@ -2,18 +2,15 @@
 
 #include <iostream>
 #include "Maze.h"
-#include "GameInfo.h"
 #include "Character.h"
-#include <ctime>
 #include <math.h>
 #include "MapEditor.h"
-#include "Box.h"
 #include "Text.h"
-#include <stdio.h>
+
 
 using namespace std;
 
-enum GameState {StartMenu, Game, EndMenu, Editor, EditorMenu};
+enum GameState {StartMenu, Game, Editor, EditorMenu, Login, LevelMenu};
 
 //Declare the main game object, maze, player, enemies, game
 Maze m;
@@ -26,6 +23,9 @@ MapEditor e;
 Box startBox;
 Box endBox;
 Box editorBox;
+
+InputBox inputBox;
+Text textInBox;
 
 Text menu1;
 Text menu2;
@@ -48,6 +48,9 @@ double angleR;
 //Stores what level the player is in
 int currentLevel;
 
+//Stores the highest level reached for that user
+int levelReached;
+
 //Global flag for rotation
 bool rState;
 
@@ -58,11 +61,26 @@ int previewScale;
 //Used in editorMenu
 int mark;
 
-//Initialize
 void init() {
-    for (int i = 0; i < 128; i++) {
-        keys[i] = false;
+    state = Login;
+
+    for (bool &key : keys) {
+        key = false;
     }
+
+    menu1 = Text();
+    menu1.setTextAndLoc("Enter your name and press enter to continue ",
+                        {(SCREEN_WIDTH / 2) - 220, (SCREEN_HEIGHT/2) - 125});
+
+    //First params are x and y, then width and height, and finally color
+    inputBox = InputBox((SCREEN_WIDTH / 2) - 100, (SCREEN_HEIGHT/2) - 100, 200, 24, 1,1,1);
+    textInBox = Text();
+
+}
+
+
+//Initialize
+void menuInit() {
 
     state = StartMenu;
     startBox = Box(300,300,50,0,1,0);
@@ -107,13 +125,9 @@ void gameInit() {
             menu1.setTextAndLoc("",{50,50});
     }
 
-
-
-    currentLevel++;
-
     p = Player(m.getStartX(),m.getStartY());
 
-    numEnemies = m.enemyInfo.size();
+    numEnemies = static_cast<int>(m.enemyInfo.size());
 
     //If over the max enemies, just use up to the max
     if (numEnemies > MAX_ENEMIES) {
@@ -144,9 +158,8 @@ void gameInit() {
     state = Game;
 }
 
-void editorMenuInit() {
-
-    state = EditorMenu;
+//Helper function for levelMenu and editorMenu init
+void initPreviewBoxes(int yShift) {
 
     //To make a dif # per rows, change 3 w/ something
     int W = (SCREEN_WIDTH / 3);
@@ -160,12 +173,35 @@ void editorMenuInit() {
     //Init the levelBoxes, position pre-determined to fill in 3 per row, w/ 3 visible columns
     for (int i = 0; i < NUM_LEVELS; i++){
         levelBoxes[i] = Box(((W/6) + ((i % 3) * W)), ((H/6) + ((i/3) * H)), sz, .2, .2, .2);
-        levelBoxes[i].y += 150;
+        levelBoxes[i].y += yShift;
     }
+
+}
+
+void levelMenuInit() {
+    state = LevelMenu;
+
+    endBox = Box(5,5,25,1,0,0);
+
+    initPreviewBoxes(100);
+
+    menu1.setTextAndLoc("Select a level to play!", {50,50});
+    menu2.setTextAndLoc("Use the up and down arrow to navigate additional levels!", {50,100});
+
+    //Used to flag a box
+    mark = 0;
+
+}
+
+void editorMenuInit() {
+    state = EditorMenu;
+
+    endBox = Box(5,5,25,1,0,0);
+
+    initPreviewBoxes(150);
 
     menu1.setTextAndLoc("Select a map to edit, or drag and drop to change the level order.", {50,50});
     menu2.setTextAndLoc("Use the up and down arrow to navigate additional levels!", {50,100});
-
 
     //Used to flag a box
     mark = 0;
@@ -201,10 +237,41 @@ void initGL() {
  *********************************************************************/
 void kbd(unsigned char key, int x, int y) {
 
+
+    //Check for backspace key if on Login screen
+    if (state == Login) {
+
+       if (key == 13) {
+            if (inputBox.index > 0) {
+
+                //Erase the |
+                inputBox.content.erase(static_cast<unsigned long>(inputBox.index), 1);
+
+
+                //Load the players level
+                levelReached = game.loadPlayer(inputBox.content);
+
+                //If player doesn't exist yet
+                if (levelReached == -1) {
+                    game.makePlayer(inputBox.content);
+                    levelReached = 1;
+                }
+
+                menuInit();
+
+            } else {
+                inputBox.g = .6;
+                inputBox.b = .6;
+            }
+
+       }  else if ((inputBox.getActive()) && (key == 8)) {
+            inputBox.delChar();
+        }
+    }
+
     //Escape key
     if (key == 27) {
         glutDestroyWindow(wd);
-
         game.end();
     }
 
@@ -261,27 +328,39 @@ void kbu(unsigned char key, int x, int y) {
 
             case '1':
                 m.maze[e.mX][e.mY].setStati(None);
-            break;
+                break;
 
             case '2':
                 m.clearStart();
                 m.maze[e.mX][e.mY].setStati(Start);
-            break;
+                break;
 
             case '3':
                 m.maze[e.mX][e.mY].setStati(End);
-            break;
+                break;
 
             case '4':
                 m.maze[e.mX][e.mY].setStati(FlipperSpawn);
-            break;
+                break;
 
             case '5':
                 m.maze[e.mX][e.mY].setStati(SizerSpawn);
-            break;
+                break;
 
             case '6':
                 m.maze[e.mX][e.mY].setStati(ScaryThingSpawn);
+                break;
+
+            case 'f':
+                m.fillFromSpot(e.mX,e.mY);
+                break;
+        }
+
+    } else if (state == Login) {
+
+        //Add char if in login and inputBox selected, and key not backspace or enter
+        if (inputBox.getActive() && (key != 8) && (key != 13)) {
+            inputBox.addChar(key);
         }
     }
 }
@@ -330,6 +409,8 @@ void keyUp(int key, int x, int y) {
         case GLUT_KEY_UP:
             keys[GLUT_KEY_UP] = false;
             break;
+        default :
+            break;
     }
 }
 
@@ -337,9 +418,10 @@ void cursor(int x, int y) {
 
     switch (state) {
 
-        //Unused right now but for player rotation
+
         case (Game) : {
 
+            //Unused right now but code for player rotation
             //double ang;
             //ang = atan2(y - (SCREEN_HEIGHT / 2), x - (SCREEN_WIDTH / 2));
 
@@ -360,9 +442,11 @@ void cursor(int x, int y) {
             break;
         }
 
-        case (EndMenu) : {
+        case (LevelMenu) : {
+            for (int i = 0; i < NUM_LEVELS; i++) {
+                levelBoxes[i].checkHover(x,y);
+            }
 
-            startBox.checkHover(x,y);
             endBox.checkHover(x,y);
 
             glutPostRedisplay();
@@ -378,6 +462,7 @@ void cursor(int x, int y) {
             endBox.checkHover(x,y);
 
             glutPostRedisplay();
+            break;
         }
         
         case (EditorMenu) : {
@@ -385,6 +470,15 @@ void cursor(int x, int y) {
             for (int i = 0; i < NUM_LEVELS; i++) {
                 levelBoxes[i].checkHover(x,y);
             }
+
+            endBox.checkHover(x,y);
+
+            glutPostRedisplay();
+            break;
+        }
+
+        default: {
+            break;
         }
     }
 }
@@ -411,6 +505,9 @@ void mousemov(int x, int y) {
                 e.mY = tempY;
             }
         }
+
+        default :
+            break;
     }
 
     glutPostRedisplay();
@@ -421,87 +518,99 @@ void mousemov(int x, int y) {
 // state will be GLUT_UP or GLUT_DOWN
 void mouse(int button, int stateB, int x, int y) {
 
-        if ((state == StartMenu) || (state == EndMenu)) {
+    switch (state) {
+        case (StartMenu) : {
 
-            if (stateB == GLUT_LEFT_BUTTON) {
+            if ((button == GLUT_LEFT_BUTTON) && (stateB == GLUT_DOWN)) {
+
                 if (startBox.checkHover(x, y)) {
-                    gameInit();
+                    levelMenuInit();
 
                 } else if (endBox.checkHover(x, y)) {
 
-                    if (state == EndMenu) {
-                        //PROMPT FOR NAME OR SCORE STUFF HERE, THEN BRING BACK TO MAIN MENU
-                        init();
-                    } else {
-                        glutDestroyWindow(wd);
-                        exit(0);
-                    }
+                    glutDestroyWindow(wd);
+                    exit(0);
 
-
-                    //End and saving player info is buggy, so just quit
-                    /*
-
-                    //Mark as completed and end game.
-                    game.score.completed = true;
-
-                    //No need to save score from start menu
-                    if (state == StartMenu) {
-                        glutDestroyWindow(wd);
-                        exit(0);
-                       glutDestroyWindow(wd);
-                        game.end();
-                    }
-                     */
-
-
-                } else if (editorBox.checkHover(x,y)) {
+                } else if (editorBox.checkHover(x, y)) {
                     editorMenuInit();
                 }
-
             }
+            break;
         }
 
-        //Mark whatever box the mouse is over when left clicked
-        else if ((state == EditorMenu) && (stateB == GLUT_DOWN)) {
-            for (int i = 0; i < NUM_LEVELS; i++) {
-                if (levelBoxes[i].checkHover(x,y)) {
-                    mark = i;
+        case (Login) : {
+
+            if (inputBox.checkHover(x, y)) {
+                inputBox.setActive(true);
+            } else if (inputBox.getActive()) {
+                inputBox.setActive(false);
+            }
+            break;
+        }
+
+        case (LevelMenu) : {
+
+            if (stateB == GLUT_DOWN) {
+                for (int i = 0; i < levelReached; i++) {
+                    if (levelBoxes[i].checkHover(x, y)) {
+                        currentLevel = i + 1;
+                        gameInit();
+                    }
+                }
+
+                if (endBox.checkHover(x, y)) {
+                    menuInit();
                 }
             }
         }
 
-        else if ((state == EditorMenu) && (stateB == GLUT_UP)) {
-            for (int i = 0; i < NUM_LEVELS; i++){
-
-
-                //If same box as left click, load editor
-                if ((levelBoxes[i].hover) && (i == mark)) {
-                    editorInit(i+1, levelBoxes[i].getE());
+        case (EditorMenu) : {
+            if (stateB == GLUT_DOWN) {
+                for (int i = 0; i < NUM_LEVELS; i++) {
+                    if (levelBoxes[i].checkHover(x, y)) {
+                        mark = i;
+                    }
                 }
 
-                //If a different box then left click, attempt to switch them
-                else if ((levelBoxes[i].hover) && (i != mark)) {
+                if (endBox.checkHover(x, y)) {
+                    menuInit();
+                }
 
-                    string L = std::to_string((mark+1));
-                    string oldName = L + ".txt";
-                    string tempName = "temp.txt";
+            } else if (stateB == GLUT_UP) {
 
-                    //Try renaming marked box to temp;
-                    rename(oldName.c_str(), tempName.c_str());
+                for (int i = 0; i < NUM_LEVELS; i++) {
 
-                    L = std::to_string((i+1));
-                    string newName = L + ".txt";
+                    //If same box as left click, load editor
+                    if ((levelBoxes[i].hover) && (i == mark)) {
+                        editorInit(i + 1, levelBoxes[i].getE());
+                    }
 
-                    //Try renaming the end square w/ the first square
-                    rename(newName.c_str(), oldName.c_str());
+                        //If a different box then left click, attempt to switch them
+                    else if ((levelBoxes[i].hover) && (i != mark)) {
 
-                    //Lastly rename temp name to new name's spot
-                    rename(tempName.c_str(), newName.c_str());
+                        string L = std::to_string((mark + 1));
+                        string oldName = L + ".txt";
+                        string tempName = "temp.txt";
+
+                        //Try renaming marked box to temp;
+                        rename(oldName.c_str(), tempName.c_str());
+
+                        L = std::to_string((i + 1));
+                        string newName = L + ".txt";
+
+                        //Try renaming the end square w/ the first square
+                        rename(newName.c_str(), oldName.c_str());
+
+                        //Lastly rename temp name to new name's spot
+                        rename(tempName.c_str(), newName.c_str());
+                    }
                 }
             }
+
+            break;
         }
 
-        else if (state == Editor) {
+        case (Editor) : {
 
             if ((button == GLUT_LEFT_BUTTON) && (stateB == GLUT_DOWN)) {
 
@@ -509,9 +618,9 @@ void mouse(int button, int stateB, int x, int y) {
                 //Red to return to main menu
                 if (startBox.checkHover(x, y)) {
                     m.saveLevel(e.getLevel());
-                    init();
+                    menuInit();
                 } else if (endBox.checkHover(x, y)) {
-                    init();
+                    editorMenuInit();
                 }
 
                 //To avoid erroneous double clicks
@@ -522,31 +631,36 @@ void mouse(int button, int stateB, int x, int y) {
 
                     //For filling, only fill with the start value,
                     //You fill with dragging cursorE w/ mouseE held down
-                    if (m.maze[e.mX][e.mY].getWall()) {
-                        e.fillVal = true;
-                    } else {
-                        e.fillVal = false;
-                    }
+
+                    e.fillVal = m.maze[e.mX][e.mY].getWall();
+
                 }
             }
+            break;
         }
 
-        else if ((state == Game && (stateB == GLUT_DOWN))) {
-            if (endBox.checkHover(x, y)) {
+        case (Game) : {
+
+            if ((button == GLUT_LEFT_BUTTON) && (stateB == GLUT_DOWN) && (endBox.checkHover(x, y))) {
 
                 //If end Box is pressed within the game decrement level
                 currentLevel--;
 
                 //and go to EndMenu
-                state = EndMenu;
+                levelMenuInit();
 
                 //Change the text also,
-                menu2.setTextAndLoc("You can try again... if you want", {50,100});
+                menu2.setTextAndLoc("You can try again... if you want", {50, 100});
+
             }
+
+            break;
         }
 
-        glutPostRedisplay();
     }
+
+    glutPostRedisplay();
+}
 
 
 /**********************************************************************
@@ -659,21 +773,68 @@ void display() {
             break;
         }
 
-        case (EndMenu): {
-            menu1.setTextAndLoc("Hey, that was okay.", {50,50});
+        case (Login) : {
 
+            //Draw the prompt
+            menu1.draw();
+
+            //Draw the input box
+            inputBox.draw();
+
+            //Set the text to whats saved in the inputBox
+            textInBox.setTextAndLoc(inputBox.content, {inputBox.x+2, inputBox.y+20});
+
+            //calc the blink for the cursor thing, the '|'
+            if (inputBox.getActive()) {
+                inputBox.blinkCursor();
+            }
+
+            //Sets the color of text to black, and getThere tells it to display the | marker or not
+            textInBox.draw(0, 0, 0, inputBox.getThere());
+        }
+
+        case (LevelMenu) : {
             menu1.draw();
             menu2.draw();
 
-            startBox.draw();
-            endBox.draw();
+            //For each level loads either a preview, or blank space.
+            for (int i = 0; i < levelReached; i++){
+
+                Maze lev = Maze(i+1,false);
+
+                //If there isn't a file for the level, set it as empty
+                //or if it is the next level to complete
+                if ((lev.getEmpty()) || (i == levelReached - 1)) {
+                    levelBoxes[i].setE(true);
+                    levelBoxes[i].draw();
+
+                } else {
+
+                    //Otherwise, if the level exists and is completed
+                    for (int t = 0; t < WIDTH; t++) {
+                        for (int s = 0; s < HEIGHT; s++) {
+                            lev.maze[t][s].draw((levelBoxes[i].x + (s * previewScale)),
+                                                (levelBoxes[i].y + (t * previewScale)), previewScale,
+                                                levelBoxes[i].hover);
+                        }
+                    }
+                }
+
+                //Display the level number above each map preview
+                Text levNum(to_string(i+1), {levelBoxes[i].x,levelBoxes[i].y - 5});
+                levNum.draw();
+
+                endBox.draw();
+            }
+
             break;
         }
 
+
         case (EditorMenu) : {
 
+            //Draw the menus
             menu1.draw();
-
             menu2.draw();
 
             //For each level loads either a preview, or blank space.
@@ -707,9 +868,10 @@ void display() {
                 Text levNum(to_string(i+1), {levelBoxes[i].x,levelBoxes[i].y - 5});
                 levNum.draw();
             }
-        }
 
+            endBox.draw();
             break;
+        }
 
         case (Editor) : {
 
@@ -752,7 +914,7 @@ void display() {
 void follow_path(Enemy &E) {
 
     //Check if in players square
-    if (!(m.getNextX() == -2)) {
+    if (m.getNextX() != -2) {
 
         E.nextCalc(m.getNextX(),m.getNextY());
         E.doMove(m);
@@ -922,8 +1084,12 @@ void timer(int extra) {
 
                 //If the tile the player is in is an end tile
                 if (m.maze[p.x][p.y].getStati() == End) {
-                    menu2.setTextAndLoc("Ready for the next level?", {50,100});
-                    state = EndMenu;
+                    if (currentLevel == levelReached) {
+                        levelReached++;
+                        game.updatePlayer(inputBox.content, levelReached);
+                    }
+
+                    levelMenuInit();
                 }
 
                 //Call the enemies search + movement function
@@ -946,7 +1112,7 @@ void timer(int extra) {
 
                 //Stop at intervals of 90 degrees
                 if (angle % 90 == 0) {
-                    rState = 0;
+                    rState = false;
                 }
             }
             break;
@@ -961,11 +1127,23 @@ void timer(int extra) {
             break;
         }
 
-        case (EndMenu)  : {
+        case (LevelMenu) : {
 
-            //Menu boxes move around randomly
-            startBox.randomMenuMovement();
+            //Logic to move up and down in the editorMenu
+            if (keys[GLUT_KEY_UP]) {
+                for (int i = 0; i < levelReached; i++){
+                    levelBoxes[i].y += 5;
+                }
+            }
+
+            if (keys[GLUT_KEY_DOWN]) {
+                for (int i = 0; i < levelReached; i++){
+                    levelBoxes[i].y -= 5;
+                }
+            }
+
             endBox.randomMenuMovement();
+
             break;
         }
 
@@ -983,7 +1161,10 @@ void timer(int extra) {
                     levelBoxes[i].y -= 5;
                 }
             }
+
+            endBox.randomMenuMovement();
             break;
+
         }
 
 
@@ -1044,6 +1225,11 @@ void timer(int extra) {
             e.update();
             break;
         }
+
+        default : {
+            break;
+        }
+
     }
 
     glutPostRedisplay();

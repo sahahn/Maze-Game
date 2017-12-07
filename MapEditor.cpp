@@ -6,8 +6,8 @@
 
 MapEditor::MapEditor() {
     //Loads in center of the map
-    loc.x = HEIGHT / 2;
-    loc.y = WIDTH / 2;
+    loc.x = 10;
+    loc.y = 10;
 
     //Xshift and yShift are just to control the camera in map editor
     xShift = 0;

@@ -33,6 +33,9 @@ const bool TESTING = true;
 const int MAX_ENEMIES = 20;
 const int NUM_LEVELS = 12;
 
+//Only store up to 100 players in players.txt
+const int MAX_PLAYERS = 100;
+
 
 struct Point {   // Declare Point struct type
     int x;   // Declare member types
@@ -69,6 +72,10 @@ public:
 
     //Calls saveScore and endTimer in one function
     void end();
+
+    int loadPlayer(string name);
+    void updatePlayer(string name, int level);
+    void makePlayer(string name);
 
 
 private:

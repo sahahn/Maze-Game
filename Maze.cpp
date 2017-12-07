@@ -16,8 +16,8 @@ Maze::Maze() {
     int remove;
 
     //Go through randomly and remove walls
-    while (wallList.size() != 0) {
-        remove = rand() % wallList.size();
+    while (!wallList.empty()) {
+        remove = static_cast<int>(rand() % wallList.size());
         removeOperation(remove);
     }
 }
@@ -31,8 +31,8 @@ Maze::Maze(int sX, int sY) {
     int remove;
 
     //Go through randomly and remove walls
-    while (wallList.size() != 0) {
-        remove = rand() % wallList.size();
+    while (!wallList.empty()) {
+        remove = static_cast<int>(rand() % wallList.size());
         removeOperation(remove);
     }
 
@@ -128,7 +128,7 @@ void Maze::loadMazeEditor(int l) {
     int intLine;
 
     //For each line in the file
-    for (int i = 0; i < HEIGHT; i++) {
+    for (auto &i : maze) {
         for (int j = 0; j < WIDTH; j++) {
 
             std::getline(inFile, line);
@@ -136,7 +136,7 @@ void Maze::loadMazeEditor(int l) {
 
             //If not a wall, set the tile to what it should be
             if (intLine != 0) {
-                maze[i][j].setStati(Statee(intLine));
+                i[j].setStati(Statee(intLine));
             }
         }
     }
@@ -146,10 +146,10 @@ void Maze::loadMazeEditor(int l) {
 }
 
 void Maze::clearStart() {
-    for (int i = 0; i < HEIGHT; i++) {
+    for (auto &i : maze) {
         for (int j = 0; j < WIDTH; j++) {
-            if (maze[i][j].getStati() == Start) {
-                maze[i][j].setStati(None);
+            if (i[j].getStati() == Start) {
+                i[j].setStati(None);
             }
         }
     }
@@ -167,14 +167,14 @@ void Maze::saveLevel(int l) {
 
     if (fileOut) {
 
-        for (int i = 0; i < HEIGHT; i++) {
+        for (auto &i : maze) {
             for (int j = 0; j < WIDTH; j++) {
 
-                if (maze[i][j].getWall()) {
+                if (i[j].getWall()) {
                     fileOut << 0 << "\n";
 
                 } else {
-                    fileOut << maze[i][j].getStati() << "\n";
+                    fileOut << i[j].getStati() << "\n";
                 }
             }
         }
@@ -225,25 +225,25 @@ void Maze::removeOperation(int r) {
     int y = wallList[r].getY();
 
     if ((x+1) < (HEIGHT-SCOPE)) {
-        if (maze[x+1][y].getWall() == false) {
+        if (!maze[x + 1][y].getWall()) {
             count += 1;
         }
     }
 
     if ((x-1) > SCOPE-1) {
-        if (maze[x-1][y].getWall() == false) {
+        if (!maze[x - 1][y].getWall()) {
             count += 1;
         }
     }
 
     if ((y+1) < (WIDTH-SCOPE)) {
-        if (maze[x][y+1].getWall() == false) {
+        if (!maze[x][y + 1].getWall()) {
             count += 1;
         }
     }
 
     if ((y-1) > SCOPE-1) {
-        if (maze[x][y-1].getWall() == false) {
+        if (!maze[x][y - 1].getWall()) {
             count += 1;
         }
     }
@@ -269,21 +269,12 @@ bool Maze::checkBound(int row, int col) {
 
 bool Maze::checkWall(int row, int col) {
     // Returns true if the cell is not blocked else false
-    if (maze[row][col].getWall()) {
-        return true;
-    } else {
-        return false;
-    }
+    return (maze[row][col].getWall());
 }
 
 
 bool Maze::isDest(int row, int col, Pair dest) {
-    if (row == dest.first && col == dest.second) {
-        return true;
-    }
-    else {
-        return false;
-    }
+    return (row == dest.first && col == dest.second);
 }
 
 double Maze::calcH(int row, int col, Pair dest) {
@@ -311,8 +302,6 @@ void Maze::setNextMove(MazeCell cellInfo[][WIDTH], Pair dest) {
 
     nextX = Path.top().first;
     nextY = Path.top().second;
-
-    return;
 }
 
 void Maze::aStarSearch(int s_x, int s_y, int e_x, int e_y) {
@@ -321,20 +310,20 @@ void Maze::aStarSearch(int s_x, int s_y, int e_x, int e_y) {
     Pair dest = make_pair(e_x, e_y);
 
     //Perform checks to make sure
-    if (checkBound (src.first, src.second) == false) {
+    if (!checkBound (src.first, src.second)) {
         return;
     }
 
-    if (checkBound (dest.first, dest.second) == false) {
+    if (!checkBound (dest.first, dest.second)) {
         return;
     }
 
-    if (checkWall(src.first, src.second) == true || checkWall(dest.first, dest.second) == true) {
+    if (checkWall(src.first, src.second) || checkWall(dest.first, dest.second)) {
         return;
     }
 
     //If in square, set nextX to be -2 as a flag
-    if (isDest(src.first, src.second, dest) == true) {
+    if (isDest(src.first, src.second, dest)) {
         nextX = -2;
         nextY = -2;
         return;
@@ -347,16 +336,16 @@ void Maze::aStarSearch(int s_x, int s_y, int e_x, int e_y) {
     //Cell info holds the parents and different scores for each cell
     MazeCell cellInfo[HEIGHT][WIDTH];
 
-    for (int i = 0; i < HEIGHT; i++) {
+    for (auto &i : cellInfo) {
         for (int j = 0; j < WIDTH; j++) {
 
             //Set f,g,h to FLT_MAX at start
-            cellInfo[i][j].f = FLT_MAX;
-            cellInfo[i][j].g = FLT_MAX;
-            cellInfo[i][j].h = FLT_MAX;
+            i[j].f = FLT_MAX;
+            i[j].g = FLT_MAX;
+            i[j].h = FLT_MAX;
 
             //Set no parent, i.e. -1
-            cellInfo[i][j].parent = make_pair(-1,-1);
+            i[j].parent = make_pair(-1,-1);
         }
     }
 
@@ -403,10 +392,10 @@ void Maze::aStarSearch(int s_x, int s_y, int e_x, int e_y) {
         double gNew, hNew, fNew;
 
         //Check above
-        if (checkBound(i - 1, j) == true) {
+        if (checkBound(i - 1, j)) {
 
             //Check if destination
-            if (isDest(i - 1, j, dest) == true) {
+            if (isDest(i - 1, j, dest)) {
 
                 //Set Parent
                 cellInfo[i - 1][j].parent = make_pair(i,j);
@@ -420,7 +409,7 @@ void Maze::aStarSearch(int s_x, int s_y, int e_x, int e_y) {
             }
 
                 //Check if on closed list, or if blocked
-            else if (closedList[i - 1][j] == false && checkWall(i - 1, j) == false) {
+            else if (!closedList[i - 1][j] && !checkWall(i - 1, j)) {
 
                 //Calculate new g,h and f
                 gNew = cellInfo[i][j].g + 1.0;
@@ -443,10 +432,10 @@ void Maze::aStarSearch(int s_x, int s_y, int e_x, int e_y) {
         }
 
         //Check below
-        if (checkBound(i + 1, j) == true) {
+        if (checkBound(i + 1, j)) {
 
             //Check if destination
-            if (isDest(i + 1, j, dest) == true) {
+            if (isDest(i + 1, j, dest)) {
 
                 //Set Parent
                 cellInfo[i + 1][j].parent = make_pair(i,j);
@@ -460,7 +449,7 @@ void Maze::aStarSearch(int s_x, int s_y, int e_x, int e_y) {
             }
 
                 //Check if on closed list, or if blocked
-            else if (closedList[i + 1][j] == false && checkWall(i + 1, j) == false) {
+            else if (!closedList[i + 1][j] && !checkWall(i + 1, j)) {
 
                 //Calculate new g,h and f
                 gNew = cellInfo[i][j].g + 1.0;
@@ -483,10 +472,10 @@ void Maze::aStarSearch(int s_x, int s_y, int e_x, int e_y) {
         }
 
         //Check right
-        if (checkBound(i, j+1) == true) {
+        if (checkBound(i, j+1)) {
 
             //Check if destination
-            if (isDest(i, j+1, dest) == true) {
+            if (isDest(i, j+1, dest)) {
 
                 //Set Parent
                 cellInfo[i][j+1].parent = make_pair(i,j);
@@ -500,7 +489,7 @@ void Maze::aStarSearch(int s_x, int s_y, int e_x, int e_y) {
             }
 
                 //Check if on closed list, or if blocked
-            else if (closedList[i][j+1] == false && checkWall(i, j+1) == false) {
+            else if (!closedList[i][j + 1] && !checkWall(i, j + 1)) {
 
                 //Calculate new g,h and f
                 gNew = cellInfo[i][j].g + 1.0;
@@ -523,10 +512,10 @@ void Maze::aStarSearch(int s_x, int s_y, int e_x, int e_y) {
         }
 
         //Check left
-        if (checkBound(i, j-1) == true) {
+        if (checkBound(i, j-1)) {
 
             //Check if destination
-            if (isDest(i, j-1, dest) == true) {
+            if (isDest(i, j-1, dest)) {
 
                 //Set Parent
                 cellInfo[i][j-1].parent = make_pair(i,j);
@@ -540,7 +529,7 @@ void Maze::aStarSearch(int s_x, int s_y, int e_x, int e_y) {
             }
 
                 //Check if on closed list, or if blocked
-            else if (closedList[i][j-1] == false && checkWall(i, j-1) == false) {
+            else if (!closedList[i][j - 1] && !checkWall(i, j - 1)) {
 
                 //Calculate new g,h and f
                 gNew = cellInfo[i][j].g + 1.0;
@@ -565,7 +554,7 @@ void Maze::aStarSearch(int s_x, int s_y, int e_x, int e_y) {
         //If we want to include maze solving w/ diagonals, just add four more cases here
     }
         //Maze cant be solved for some reason
-        if (foundDest == false) {
+        if (!foundDest == false) {
             return;
         }
 }
@@ -596,7 +585,7 @@ void Maze::setEmpty(bool b) {
 }
 
 void Maze::addRoom(Point loc){
-    for(int i = loc.x; i < loc.x + 4; i++){
+    for (int i = loc.x; i < loc.x + 4; i++){
         for(int j = loc.y; j < loc.y + 3; j++){
             maze[j][i].setWall(false);
         }
@@ -612,6 +601,8 @@ void Maze::addRoom(Point loc, Point size) {
         }
     }
 }
+
+
 
 /*    IMPLIMENTATION TO SOLVE PERFECT MAZE
 bool Maze::recursiveSolve(int x, int y) {
@@ -680,6 +671,71 @@ void Maze::solve_maze(int s_x, int s_y, int e_x, int e_y) {
  
  */
 
+void Maze::fillFromSpot(int x, int y) {
+    //Reuse wallList to store non wall tiles
+    //Make sure wallList is empty
+
+    wallList.clear();
+
+    wallList.push_back(MazePoint(x,y));
+
+    int amt = -1;
+    while (wallList.size() != amt) {
+
+        amt = static_cast<int>(wallList.size());
+
+        //Check from every open square
+        for (auto &i : wallList) {
+            add(i.getX(), i.getY());
+
+            //If this would override a status box, don't do the fill
+            if (maze[i.getX()][i.getY()].getStati() != None) {
+                return;
+            }
+        }
+    }
+
+    //Go through and make everything that wall
+    for (auto &i : wallList) {
+        maze[i.getX()][i.getY()].setWall(true);
+    }
+}
+
+
+void Maze::fillAround(int x, int y) {
+
+    if (!maze[x][y].getWall()) {
+
+        //Check if the point is already in the list
+        if (std::find(wallList.begin(), wallList.end(), MazePoint(x,y)) != wallList.end()) {
+            return;
+        }
+            //Only add if not already present
+        else {
+            wallList.push_back(MazePoint(x,y));
+        }
+    }
+}
+
+//Adds all available walls
+void Maze::add(int x, int y) {
+
+    if ((x + 1) < (HEIGHT - SCOPE)) {
+        fillAround((x + 1), y);
+    }
+
+    if ((x - 1) > SCOPE - 1) {
+        fillAround((x - 1), y);
+    }
+
+    if ((y + 1) < (WIDTH - SCOPE)) {
+        fillAround(x,(y + 1));
+    }
+
+    if ((y - 1) > SCOPE - 1) {
+        fillAround(x ,(y - 1));
+    }
+}
 
 
 

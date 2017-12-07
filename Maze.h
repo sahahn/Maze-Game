@@ -43,9 +43,7 @@ public:
     Maze(int l, bool edit);
     Maze(int sX, int sY);
 
-
     vector<eInfo> enemyInfo;
-
 
     /*
      * Clears instances of start squares, because there can only be one!
@@ -71,6 +69,7 @@ public:
     int getStartY() const;
 
     void setEmpty(bool b );
+    void fillFromSpot(int x, int y);
 
 
 private:
@@ -118,6 +117,10 @@ private:
     double calcH(int row, int col, Pair dest);
 
     void setNextMove(MazeCell cellInfo[][WIDTH], Pair dest);
+
+    void fillAround(int x, int y);
+
+    void add(int x, int y);
 
 };
 
