@@ -587,6 +587,10 @@ void mouse(int button, int stateB, int x, int y) {
                     editorMenuInit();
                 }
             }
+            int width,height;
+            int index;
+            string content;
+
             break;
         }
 
@@ -1026,9 +1030,10 @@ void follow_path(Enemy &E) {
                     case (ScaryThing) : {
 
                         //If hit by scary thing, light radius smaller for rest of level
-                        if (p.getLightRadius() > 50) {
-                            p.setLightRadius(p.getLightRadius() - 50);
+                        if (p.getDLightRadius() > 50) {
+                            p.setDLightRadius(p.getDLightRadius() - 50);
                         }
+
                         break;
                     }
                 }

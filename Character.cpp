@@ -193,11 +193,11 @@ Player::Player() {
 }
 Player::Player(int sX, int sY) {
     size = 30;
-    speed = 5;  // Adjust if you wanna go fast
+    speed = 2;
     playerLight = Light();
 
-    lightRadius = 300;
-    dist = 100000;
+    defaultLightRadius = 300;
+    lightRadius = defaultLightRadius;
     playerLight.setRadius(lightRadius);
 
     // constantly updated speed of player.
@@ -279,33 +279,37 @@ double Player::getPlayerRotation() const {
     return playerRotation;
 }
 
-int Player::getLightRadius() const {
-    return lightRadius;
+int Player::getDLightRadius() const {
+    return defaultLightRadius;
 }
 
 void Player::setPlayerRotation(double angR) {
     playerRotation = angR;
 }
 
-void Player::setLightRadius(int l) {
-    lightRadius = l;
-    playerLight.setRadius(lightRadius);
-    dist = lightRadius;
+void Player::setDLightRadius(int l) {
+    defaultLightRadius = l;
+
+    calcNewLight(defaultLightRadius);
 }
 
 //Change player light radius accordingly
 void Player::updateLight() {
 
-    if (dist < (lightRadius * 2)) {
-        playerLight.setRadius(dist);
+    if (lightRadius < (defaultLightRadius * 2)) {
+        playerLight.setRadius(lightRadius);
     }
+
+    //Reset lightRadius back to default
+    lightRadius = defaultLightRadius;
 }
 
 //Called before light radius, e.g. if there are multiple scary things
 void Player::calcNewLight(int d) {
 
+    //If d is less then the current lightRadius, set the lightRadius to d
     if (d < lightRadius) {
-        dist = d;
+        lightRadius = d;
     }
 }
 

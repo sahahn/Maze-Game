@@ -119,10 +119,10 @@ public:
 
     // getter and setter for rotation
     double getPlayerRotation() const;
-    int getLightRadius() const;
+    int getDLightRadius() const;
 
     void setPlayerRotation(double angR);
-    void setLightRadius(int l);
+    void setDLightRadius(int l);
 
     //Call to update the players light
     void updateLight();
@@ -134,11 +134,9 @@ public:
 private:
     double playerRotation;
 
-    //Holds closest distance to scary thing
-    mutable int dist;
-
     //The default lightRadius for the player
-    int lightRadius;
+    mutable int lightRadius;
+    int defaultLightRadius;
 
 
 
