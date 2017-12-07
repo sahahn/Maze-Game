@@ -17,3 +17,6 @@ j 1
 k 1
 yo 1
 t 1
+dan 8
+n 1
+test 1

@@ -197,7 +197,7 @@ Player::Player(int sX, int sY) {
     playerLight = Light();
 
     lightRadius = 300;
-
+    dist = 100000;
     playerLight.setRadius(lightRadius);
 
     // constantly updated speed of player.
@@ -318,6 +318,7 @@ Enemy::Enemy() {
 }
 
 Enemy::Enemy(int X, int Y, eType e) {
+    spawnBuffer = 1;
 
     spawnX = X;
     spawnY = Y;

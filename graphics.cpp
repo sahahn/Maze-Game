@@ -12,7 +12,7 @@ using namespace std;
 enum GameState {StartMenu, Game, Editor, EditorMenu, Login, LevelMenu};
 
 int songState = 0;
-bool audio = true;
+bool audio = false;
 
 //Declare the main game object, maze, player, enemies, game
 Maze m;
@@ -189,7 +189,10 @@ void gameInit() {
     state = Game;
 }
 
-//Helper function for levelMenu and editorMenu init
+/**
+ * Helper function for levelMenu and editorMenu to generate preview/level boxes
+ * @param yShift - int change in yShift for all boxes
+ */
 void initPreviewBoxes(int yShift) {
 
     //To make a dif # per rows, change 3 w/ something
@@ -239,6 +242,11 @@ void editorMenuInit() {
     mark = 0;
 }
 
+/**
+ * Initialize the variables for the editor, and load in/create a maze
+ * @param l - int level that should be loaded into editor
+ * @param emp - bool for if that level is empty
+ */
 void editorInit(int l, bool emp) {
     state = Editor;
 
@@ -526,6 +534,7 @@ void mousemov(int x, int y) {
             }
         }
 
+        //In the editor, mouse movement is used for dragging blocks over an area
         case (Editor) : {
 
             int tempX = (e.loc.x - EDITOR_SCOPE + 1) + ((y - e.yShift) / EDITOR_SCALE);
@@ -1272,7 +1281,7 @@ void timer(int extra) {
 /* Main function: GLUT runs as a console application starting at main()  */
 int graphicsPlay(int argc, char **argv) {
 
-    //Call init for start menu
+    //Call the first init when the game starts
     init();
 
     // Initialize GLUT
